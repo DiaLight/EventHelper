@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'org.spongepowered.plugin' version '0.8.1'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.21'
+}
+
+group = pluginGroup
+version = pluginVersion
+sponge.plugin.id = pluginId
+
+project.libsDirName  = 'D:\\temp\\EventHelper_sponge\\mods'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+configurations {
+    compile.extendsFrom shadow
+}
+
+dependencies {
+//    compile 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT'
+    compile 'org.spongepowered:spongeapi:8.0.0-SNAPSHOT'
+    compile 'com.github.JekaRUS:sponge-colorizer:v1.0.0'
+    shadow "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+jar {
+    from {
+        sourceSets.main.output
+        configurations.shadow.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+import java.lang.reflect.Field
+import java.lang.reflect.Method
+import java.util.stream.Collectors
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}
