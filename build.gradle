@@ -13,6 +13,47 @@ project.libsDirName  = 'D:\\temp\\EventHelper_sponge\\mods'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'jitpack-repo'
+        url = "https://jitpack.io/"
+    }
+    maven {
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
+    }
+    //    maven {
+    //        name = 'spigotmc-snapshots-repo'
+    //        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    //    }
+    maven {
+        name 'spacehq-repo'
+        url 'https://repo.spacehq.org/content/repositories/releases/'
+    }
+//        maven {
+//            name 'spacehq-snapshots-repo'
+//            url 'https://repo.spacehq.org/content/repositories/snapshots/'
+//        }
+    maven {
+        name = 'sonatype-repo'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+//    maven {
+//        name = 'sonatype-snapshots-repo'
+//        url = 'https://oss.sonatype.org/content/repositories/snapshots'
+//    }
+//    maven {
+//        name = 'angal-repo'
+//        url = "https://maven2.ontando.ru/repository/"
+//    }
+//    maven {
+//        name = 'dmulloy2-repo'
+//        url = 'http://repo.dmulloy2.net/content/groups/public/'
+//    }
+}
+
 configurations {
     compile.extendsFrom shadow
 }
@@ -20,7 +61,6 @@ configurations {
 dependencies {
 //    compile 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT'
     compile 'org.spongepowered:spongeapi:8.0.0-SNAPSHOT'
-    compile 'com.github.JekaRUS:sponge-colorizer:v1.0.0'
     shadow "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

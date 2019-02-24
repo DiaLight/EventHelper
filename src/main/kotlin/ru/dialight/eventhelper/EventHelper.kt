@@ -18,7 +18,7 @@ import ru.dialight.eventhelper.tool.ToolRegistry
     id = "eventhelper",
     name = "Eventhelper",
     version = "2.0",
-    authors = ["DiaLight"],
+    authors = ["DiaLight", "JekaRUS"],
     description = "Useful tool to help event masters with theirs job"
 )
 class EventHelper @Inject constructor(

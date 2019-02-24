@@ -41,7 +41,7 @@ fun EventHelper.registerCommands() {
 }
 
 fun Text_colorized(msg: String) = Text.of(Colorizer.apply(msg))
-fun Text_colorized(vararg msgs: String) = Text.of(Colorizer.apply(*msgs))
+fun Text_colorized(vararg msgs: String) = Text.of(Colorizer.apply(mutableListOf(*msgs)))
 fun Text_colorizedList(vararg msgs: String) = msgs.map { Text_colorized(it) }
 
 class EventHelperCommand(val plugin: EventHelper) : CommandExecutor {
