@@ -54,6 +54,15 @@ repositories {
 //    }
 }
 
+sourceSets {
+    main {
+        kotlin.srcDirs = [
+                'src/main/eventhelper',
+                'src/main/guilib',
+        ]
+    }
+}
+
 configurations {
     compile.extendsFrom shadow
 }

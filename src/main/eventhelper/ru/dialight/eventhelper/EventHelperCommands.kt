@@ -48,7 +48,7 @@ class EventHelperCommand(val plugin: EventHelper) : CommandExecutor {
 
     override fun execute(src: CommandSource, args: CommandContext): CommandResult {
         if (src is Player) {
-            plugin.gui.openFor(src)
+            plugin.guistory.openGui(src, plugin.gui)
         }
         return CommandResult.success()
     }

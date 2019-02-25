@@ -6,14 +6,17 @@ import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.SlotIndex
+import org.spongepowered.api.text.Text
 import ru.dialight.eventhelper.EventHelper
 import ru.dialight.eventhelper.Text_colorized
 import ru.dialight.eventhelper.Text_colorizedList
+import ru.dielight.guilib.Gui
+import ru.dielight.guilib.simple.SimpleGui
 
-class MainGui(plugin: EventHelper) : Gui(plugin) {
-
-    override val width = 9
-    override val height = 6
+class MainGui(plugin: EventHelper) : SimpleGui (
+    plugin.guiregistry,
+    Text_colorized("Ультра мега инвентарь!"),
+    9, 6) {
 
     init {
         /* Информация */
@@ -36,6 +39,12 @@ class MainGui(plugin: EventHelper) : Gui(plugin) {
         }
     }
 
-    fun openFor(p: Player) = p.openInventory(inventory)
+    override fun openFor(player: Player) {
+        player.openInventory(inventory)
+    }
+
+    override fun onClose(player: Player) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
 }
