@@ -16,7 +16,7 @@ import dialight.toollib.Tool
 
 class EventHelperGui(val plugin: EventHelperPlugin) : SimpleGui(
     plugin.guilib,
-    Text_colorized("Ультра мега инвентарь!"),
+    Text_colorized("Инвентарь EventHelper"),
     9, 6) {
 
     companion object {
@@ -33,9 +33,9 @@ class EventHelperGui(val plugin: EventHelperPlugin) : SimpleGui(
             .also {
                 offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
             }
-            .name(Text_colorized("Краткое описание"))
+            .name(Text_colorized("|r|Краткое описание"))
             .lore(Text_colorizedList(
-                "|a|Тут лежат инструменты",
+                "|a|Тут находятся инструменты",
                 "",
                 "|g|Версия: |y|v" + plugin.container.version.orElse("null")
             ))
