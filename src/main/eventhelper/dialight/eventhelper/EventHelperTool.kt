@@ -11,12 +11,12 @@ class EventHelperTool(val plugin: EventHelperPlugin) : Tool(ID) {
         val ID = "eventhelper"
     }
 
-    override val title = Colorizer.apply("|a|Вещь всея майнкрафта")
+    override val title = Colorizer.apply("|a|Вещь всея Майнкрафта")
     override val lore = Colorizer.apply(
         mutableListOf(
-//            "|a|ЛКМ|y|: Открыть \"Ультра мега модули\"",
-            "|a|ПКМ|y|: Открыть \"Ультра мега инвентарь\"",
-            "|a|Шифт|y|+|a|ПКМ|y|: Открыть последнюю открытую гуи.",
+//            "|a|ЛКМ|y|: Открыть «Модули всея Майнкрафта»",
+            "|a|ПКМ|y|: Открыть «Инвентарь всея Майнкрафта»",
+            "|a|Shift|y|+|a|ПКМ|y|: Открыть последний открытый интерфейс",
             "|y|Аналог: |g|/eh"
         )
     )
