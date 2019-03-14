@@ -33,9 +33,10 @@ class EventHelperGui(val plugin: EventHelperPlugin) : SimpleGui(
             .also {
                 offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
             }
-            .name(Text_colorized("Краткое описание"))
+            .name(Text_colorized("|r|Краткое описание"))
             .lore(Text_colorizedList(
-                "|a|Здесь находятся различные инструменты",
+                "|a|Здесь находятся",
+                "|a|различные инструменты",
                 "",
                 "|g|Версия: |y|v" + plugin.container.version.orElse("null")
             ))
