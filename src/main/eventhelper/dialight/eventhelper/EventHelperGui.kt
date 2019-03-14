@@ -16,7 +16,7 @@ import dialight.toollib.Tool
 
 class EventHelperGui(val plugin: EventHelperPlugin) : SimpleGui(
     plugin.guilib,
-    Text_colorized("Мегаинвентарь"),
+    Text_colorized("Инвентарь EventHelper"),
     9, 6) {
 
     companion object {
