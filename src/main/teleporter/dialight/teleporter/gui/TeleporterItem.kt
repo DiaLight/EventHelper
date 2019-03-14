@@ -17,7 +17,7 @@ class TeleporterItem(val plugin: TeleporterPlugin) : View.Item {
         .also {
             offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
         }
-        .name(Text_colorized("|a|Телепортация игроков"))
+        .name(Text_colorized("|a|Телепорт игроков"))
         .lore(
             Text_colorizedList(
                 "|g|ЛКМ|y|: Получить инструмент",
