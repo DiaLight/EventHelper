@@ -28,9 +28,7 @@ class TeleporterTool(val plugin: TeleporterPlugin) : Tool(TeleporterTool.ID) {
     override val title = Colorizer.apply("|a|Телепортация игроков")
     override val lore = Text_colorizedList(
         "|w|Телепортация",
-        "|g|ЛКМ|y|: телепортировать всех выбранных",
-        "|g|Shift|y|+|g|ЛКМ|y|: телепортировать всех,",
-        "|y| кроме себя",
+        "|g|ЛКМ|y|: телепортировать выбранных игроков",
         "|w|Выбор игроков",
         "|g|ПКМ|y|: открыть редактор выбранных игроков",
         "|g|ПКМ по игроку*|y|: выбрать игрока",
