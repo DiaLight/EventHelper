@@ -15,7 +15,7 @@ class EventHelperTool(val plugin: EventHelperPlugin) : Tool(ID) {
     override val lore = Colorizer.apply(
         mutableListOf(
 //            "|a|ЛКМ|y|: Открыть «Мегамодули»",
-            "|a|ПКМ|y|: Открыть «Мегаинвентарь»",
+            "|a|ПКМ|y|: Открыть «Инвентарь EventHelper»",
             "|a|Shift|y|+|a|ПКМ|y|: Открыть ранее открытый интерфейс",
             "|y|Аналог: |g|/eh"
         )
