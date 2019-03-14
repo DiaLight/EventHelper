@@ -25,7 +25,7 @@ class TeleporterTool(val plugin: TeleporterPlugin) : Tool(TeleporterTool.ID) {
     }
 
     override val type = ItemTypes.STICK
-    override val title = Colorizer.apply("|a|Телепортация игроков")
+    override val title = Colorizer.apply("|a|Телепорт игроков")
     override val lore = Text_colorizedList(
         "|w|Телепортация",
         "|g|ЛКМ|y|: телепортировать выбранных игроков",
