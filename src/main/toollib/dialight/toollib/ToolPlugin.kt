@@ -40,7 +40,7 @@ class ToolPlugin @Inject constructor(
     fun giveTool(player: Player, id: String): Boolean {
         val tool = getTool(id)
         if(tool == null) {
-            player.sendMessage(Text_colorized("|r|Инструмент с ид $id не зарегистрирован"))
+            player.sendMessage(Text_colorized("|r|Инструмент с ID «$id» не зарегистрирован"))
             return false
         }
 

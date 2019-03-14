@@ -8,17 +8,17 @@ import java.util.*
 
 object TeleporterMessages {
 
-    var pluginPrefix = Text_colorized("|go|Teleporter|gr|: ")
+    var pluginPrefix = Text_colorized("|go|Телепорт|gr|: ")
 
     fun YouHBTp(name: String): Text {
-        return Text.of(pluginPrefix, Text_colorized("|g|Вас телепортировал |w|$name"))
+        return Text.of(pluginPrefix, Text_colorized("|w|$name |g|телепортировал вас"))
     }
     fun YouTp(online: Collection<Player>, offline: Collection<User>): Text {
-        return Text.of(pluginPrefix, Text_colorized("|g|Телепортировано |w|${online.size}|g| онлайн и |w|${offline.size}|g| оффлайн игроков"))
+        return Text.of(pluginPrefix, Text_colorized("|g|Телепортировано |w|${online.size}|g| онлайн-игроков и |w|${offline.size}|g| офлайн-игроков"))
     }
 
 
-    var PlayersBaseIsEmpty = Text.of(pluginPrefix, Text_colorized("|r|Никто не помечен!"))
+    var PlayersBaseIsEmpty = Text.of(pluginPrefix, Text_colorized("|r|Никто не выбран!"))
     var noPlayersTagged = Text.of(pluginPrefix, Text_colorized("|r|Некого телепортировать!"))
     val AllPlayersRemoved = Text.of(pluginPrefix, Text_colorized("|g|Список игроков очищен!"))
 
@@ -35,14 +35,14 @@ object TeleporterMessages {
     }
 
     fun targets(names: Collection<String>): Text {
-        return Text.of(pluginPrefix, Text_colorized("|g|Помечены: |w|$names"))
+        return Text.of(pluginPrefix, Text_colorized("|g|Выбраны: |w|$names"))
     }
 
     fun notFound(trgName: String): Text {
         return Text_colorized("Игрок с ником $trgName не найден")
     }
     fun notFound(uuid: UUID): Text {
-        return Text_colorized("Игрок с uuid $uuid не найден")
+        return Text_colorized("Игрок с UUID $uuid не найден")
     }
 
 }

@@ -20,7 +20,7 @@ abstract class Tool(val id: String) {
 
     companion object {
 
-        private val prefix = Colorizer.apply("|dgr|tool id: |gr|")
+        private val prefix = Colorizer.apply("|dgr|Tool ID: |gr|")
         private val pattern = Pattern.compile("^${prefix.toPlain()}(.*)$")
 
         fun parseId(itemStack: ValueContainer<*>): String? {

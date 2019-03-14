@@ -17,14 +17,14 @@ class TeleporterItem(val plugin: TeleporterPlugin) : View.Item {
         .also {
             offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
         }
-        .name(Text_colorized("|a|Телепортатор игроков"))
+        .name(Text_colorized("|a|Телепорт игроков"))
         .lore(
             Text_colorizedList(
                 "|g|ЛКМ|y|: Получить инструмент",
                 "|g|ПКМ|y|: Открыть редактор",
-                "|y| выделенных игроков(таггер)",
+                "|y| выбранных игроков",
                 "",
-                "|g|Плагин: |y|Телепортер",
+                "|g|Плагин: |y|Телепорт",
                 "|g|Версия: |y|v" + plugin.container.version.orElse("null")
             )
         )
