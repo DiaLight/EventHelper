@@ -9,7 +9,7 @@ import java.util.*
 
 object FreezerMessages {
 
-    var pluginPrefix = Text_colorized("|go|Заморозка|gr|: ")
+    var pluginPrefix = Text_colorized("|go|Замораживатель|gr|: ")
 
     fun untagged(names: List<String>): Text {
         return if (names.size == 1) {
