@@ -1,6 +1,7 @@
 package dialight.teleporter.gui
 
 import dialight.extensions.ItemStackBuilderEx
+import dialight.extensions.closeInventoryLater
 import dialight.guilib.View
 import dialight.guilib.events.ItemClickEvent
 import dialight.teleporter.TeleporterPlugin
@@ -10,6 +11,7 @@ import jekarus.colorizer.Text_colorizedList
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.DyeColors
 import org.spongepowered.api.item.ItemTypes
+import org.spongepowered.api.scheduler.Task
 
 class TeleporterItem(val plugin: TeleporterPlugin) : View.Item {
 
@@ -34,7 +36,7 @@ class TeleporterItem(val plugin: TeleporterPlugin) : View.Item {
         val player = event.player
         when (event.type) {
             ItemClickEvent.Type.LEFT, ItemClickEvent.Type.SHIFT_LEFT -> {
-                player.closeInventory()
+                player.closeInventoryLater(plugin)
                 plugin.toollib.giveTool(player, TeleporterTool.ID)
             }
             ItemClickEvent.Type.RIGHT -> {

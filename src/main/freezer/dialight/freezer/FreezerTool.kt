@@ -35,7 +35,21 @@ class FreezerTool(val plugin: FreezerPlugin) : Tool(FreezerTool.ID) {
     override fun onClick(e: ToolInteractEvent) {
         when (e.action) {
             ToolInteractEvent.Type.LEFT_CLICK -> if (!e.sneaking) {
-                plugin.freezer.invoke(e.player, Freezer.Action.FREEZE, Freezer.Group.ONLINE)
+                if (e.type == ToolInteractEvent.Target.ENTITY) {
+                    e as ToolInteractEvent.Entity
+                    if (e.entity.type == EntityTypes.PLAYER) {
+                        plugin.freezer.invoke(e.player, Freezer.Action.TOGGLE, e.entity as Player)
+                    }
+                } else {
+                    val p2 = Utils.getEnByDirection(e.player, 20.0, 1.5, EntityTypes.PLAYER) as? Player
+                    if (p2 == null) {
+                        plugin.guilib?.also { guilib ->
+                            guilib.openGui(e.player, plugin.freezergui)
+                        }
+                    } else {
+                        plugin.freezer.invoke(e.player, Freezer.Action.TOGGLE, p2)
+                    }
+                }
             } else {
                 plugin.freezer.invoke(e.player, Freezer.Action.UNFREEZE, Freezer.Group.ONLINE)
             }

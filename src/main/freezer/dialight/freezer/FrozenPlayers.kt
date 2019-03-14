@@ -7,24 +7,31 @@ import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
 import java.util.*
-import java.util.function.BiConsumer
 
 class FrozenPlayers {
 
-    class Frozen(val uniqueId: UUID, loc: Location<World>, private val byPlugin: Boolean = false) {
+    companion object {
+        fun alignLocation(loc: Location<World>) = Location(
+            loc.extent,
+            loc.blockX.toDouble() + 0.5,
+            loc.blockY.toDouble(),
+            loc.blockZ.toDouble() + 0.5
+        )
+    }
 
-        private var location: Location<World>? = null
+    class Frozen(
+        val uniqueId: UUID,
+        location: Location<World>,
+        private val byPlugin: Boolean = false) {
 
+        var location: Location<World> = alignLocation(location)
+            set(value) { field = alignLocation(value) }
 
         private var lastKnownName: String? = null
         private var velocity: Vector3d? = null
 
         val name: String
             get() = if (this.lastKnownName == null) this.uniqueId.toString() else this.lastKnownName!!
-
-        init {
-            this.setLocation(loc)
-        }
 
         constructor(uniqueId: UUID, location: Location<World>, name: String) : this(uniqueId, location) {
             this.lastKnownName = name
@@ -38,10 +45,6 @@ class FrozenPlayers {
 
         constructor(trg: Player, invoker: PluginContainer) : this(trg, byPlugin = true) {
 
-        }
-
-        fun setLocation(l: Location<World>) {
-            this.location = Location(l.extent, l.blockX.toDouble(), l.blockY.toDouble(), l.blockZ.toDouble())
         }
 
         fun updateName(name: String?) {
@@ -59,10 +62,6 @@ class FrozenPlayers {
             this.updateVelocity(trg.velocity)
         }
 
-        fun getLocation(): Location<World> {
-            return location!!.copy()
-        }
-
         fun byPlugin(): Boolean {
             return byPlugin
         }
@@ -78,15 +77,14 @@ class FrozenPlayers {
 
     }
 
-    val offlineFrozen: MutableMap<UUID, Frozen> = HashMap()
-    val idFrozen: MutableMap<UUID, Frozen> = HashMap()
+    val map: MutableMap<UUID, Frozen> = HashMap()
 
     @Deprecated("suppressMessages argument is deprected")
     fun freezeOnline(invoker: Player, trg: Player, suppressMessages: Boolean): Boolean {
-        if (!this.idFrozen.containsKey(trg.uniqueId)) {
+        if (!this.map.containsKey(trg.uniqueId)) {
             val frozen = Frozen(trg)
             onFreezeOnline(frozen, trg)
-            this.idFrozen[trg.uniqueId] = frozen
+            this.map[trg.uniqueId] = frozen
             FreezerMessages.freeze(invoker, trg)
             return true
         }
@@ -94,7 +92,7 @@ class FrozenPlayers {
     }
 
     fun unfreezeOnline(invoker: Player, trg: Player): Boolean {
-        val frozen = this.idFrozen.remove(trg.uniqueId)
+        val frozen = this.map.remove(trg.uniqueId)
         if (frozen != null) {
             onUnfreezeOnline(frozen, trg)
             FreezerMessages.unfreeze(invoker, trg)
@@ -104,11 +102,11 @@ class FrozenPlayers {
     }
 
     fun toggleOnline(invoker: Player, trg: Player): Boolean {
-        var frozen: Frozen? = this.idFrozen.remove(trg.uniqueId)
+        var frozen: Frozen? = this.map.remove(trg.uniqueId)
         if (frozen == null) {
             frozen = Frozen(trg)
             onFreezeOnline(frozen, trg)
-            this.idFrozen[trg.uniqueId] = frozen
+            this.map[trg.uniqueId] = frozen
             FreezerMessages.freeze(invoker, trg)
             return true
         } else {
@@ -119,10 +117,10 @@ class FrozenPlayers {
     }
 
     fun freezeOffline(invoker: Player, trg: UUID, name: String): Boolean {
-        if (!this.offlineFrozen.containsKey(trg)) {
+        if (!this.map.containsKey(trg)) {
             val frozen = Frozen(trg, invoker.location, name)
             this.onFreezeOffline(frozen)
-            this.offlineFrozen[trg] = frozen
+            this.map[trg] = frozen
             FreezerMessages.freeze(invoker, frozen)
             return true
         }
@@ -130,7 +128,7 @@ class FrozenPlayers {
     }
 
     fun unfreezeOffline(invoker: Player, trg: UUID, name: String): Boolean {
-        val frozen = this.offlineFrozen.remove(trg)
+        val frozen = this.map.remove(trg)
         if (frozen != null) {
             frozen.updateName(name)
             this.onUnfreezeOffline(frozen)
@@ -141,11 +139,11 @@ class FrozenPlayers {
     }
 
     fun toggleOffline(invoker: Player, trg: UUID, name: String): Boolean {
-        var frozen: Frozen? = this.offlineFrozen.remove(trg)
+        var frozen: Frozen? = this.map.remove(trg)
         if (frozen == null) {
             frozen = Frozen(trg, invoker.location, name)
             this.onFreezeOffline(frozen)
-            this.offlineFrozen[trg] = frozen
+            this.map[trg] = frozen
             FreezerMessages.freeze(invoker, frozen)
             return true
         } else {
@@ -157,7 +155,7 @@ class FrozenPlayers {
     }
 
     fun unfreezeOnlineAll(invoker: Player, result: Freezer.Result) {
-        for (frozen in this.idFrozen.values) {
+        for (frozen in this.map.values) {
             val trg = Server_getPlayer(frozen.uniqueId)
             if (trg != null) {
                 onUnfreezeOnline(frozen, trg)
@@ -165,16 +163,16 @@ class FrozenPlayers {
                 result.unfreeze(frozen.name)
             }
         }
-        this.idFrozen.clear()
+        this.map.clear()
     }
 
     fun unfreezeOfflineAll(invoker: Player, result: Freezer.Result) {
-        for (frozen in this.offlineFrozen.values) {
+        for (frozen in this.map.values) {
             this.onUnfreezeOffline(frozen)
             FreezerMessages.unfreeze(invoker, frozen)
             result.unfreeze(frozen.name)
         }
-        this.offlineFrozen.clear()
+        this.map.clear()
     }
 
 
@@ -198,10 +196,10 @@ class FrozenPlayers {
     //////////////////////////////////////////////////////////////////////////////
 
     fun freezeOnline(invoker: PluginContainer, trg: Player): Boolean {
-        if (!this.idFrozen.containsKey(trg.uniqueId)) {
+        if (!this.map.containsKey(trg.uniqueId)) {
             val frozen = Frozen(trg, invoker)
             onFreezeOnline(frozen, trg)
-            this.idFrozen[trg.uniqueId] = frozen
+            this.map[trg.uniqueId] = frozen
             FreezerMessages.freeze(invoker, trg)
             return true
         }
@@ -209,7 +207,7 @@ class FrozenPlayers {
     }
 
     fun unfreezeOnline(invoker: PluginContainer, trg: Player): Boolean {
-        val frozen = this.idFrozen.remove(trg.uniqueId)
+        val frozen = this.map.remove(trg.uniqueId)
         if (frozen != null) {
             onUnfreezeOnline(frozen, trg)
             FreezerMessages.unfreeze(invoker, trg)
@@ -219,11 +217,11 @@ class FrozenPlayers {
     }
 
     fun toggleOnline(invoker: PluginContainer, trg: Player): Boolean {
-        var frozen: Frozen? = this.idFrozen.remove(trg.uniqueId)
+        var frozen: Frozen? = this.map.remove(trg.uniqueId)
         if (frozen == null) {
             frozen = Frozen(trg, invoker)
             onFreezeOnline(frozen, trg)
-            this.idFrozen[trg.uniqueId] = frozen
+            this.map[trg.uniqueId] = frozen
             FreezerMessages.freeze(invoker, trg)
             return true
         } else {
@@ -234,10 +232,10 @@ class FrozenPlayers {
     }
 
     fun freezeOffline(invoker: PluginContainer, loc: Location<World>, trg: UUID, name: String): Boolean {
-        if (!this.offlineFrozen.containsKey(trg)) {
+        if (!this.map.containsKey(trg)) {
             val frozen = Frozen(trg, loc, name)
             this.onFreezeOffline(frozen)
-            this.offlineFrozen[trg] = frozen
+            this.map[trg] = frozen
             FreezerMessages.freeze(invoker, frozen)
             return true
         }
@@ -245,7 +243,7 @@ class FrozenPlayers {
     }
 
     fun unfreezeOffline(invoker: PluginContainer, trg: UUID, name: String): Boolean {
-        val frozen = this.offlineFrozen.remove(trg)
+        val frozen = this.map.remove(trg)
         if (frozen != null) {
             frozen.updateName(name)
             this.onUnfreezeOffline(frozen)
@@ -256,11 +254,11 @@ class FrozenPlayers {
     }
 
     fun toggleOffline(invoker: PluginContainer, loc: Location<World>, trg: UUID, name: String): Boolean {
-        var frozen: Frozen? = this.offlineFrozen.remove(trg)
+        var frozen: Frozen? = this.map.remove(trg)
         if (frozen == null) {
             frozen = Frozen(trg, loc, name)
             this.onFreezeOffline(frozen)
-            this.offlineFrozen[trg] = frozen
+            this.map[trg] = frozen
             FreezerMessages.freeze(invoker, frozen)
             return true
         } else {
@@ -272,7 +270,7 @@ class FrozenPlayers {
     }
 
     fun unfreezeOnlineAll(invoker: PluginContainer, result: Freezer.Result) {
-        for (frozen in this.idFrozen.values) {
+        for (frozen in this.map.values) {
             val trg = Server_getPlayer(frozen.uniqueId)
             if (trg != null) {
                 onUnfreezeOnline(frozen, trg)
@@ -280,16 +278,16 @@ class FrozenPlayers {
                 result.unfreeze(frozen.name)
             }
         }
-        this.idFrozen.clear()
+        this.map.clear()
     }
 
     fun unfreezeOfflineAll(invoker: PluginContainer, result: Freezer.Result) {
-        for (frozen in this.offlineFrozen.values) {
+        for (frozen in this.map.values) {
             this.onUnfreezeOffline(frozen)
             FreezerMessages.unfreeze(invoker, frozen)
             result.unfreeze(frozen.name)
         }
-        this.offlineFrozen.clear()
+        this.map.clear()
     }
 
 }

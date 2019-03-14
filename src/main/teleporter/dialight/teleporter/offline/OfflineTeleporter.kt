@@ -22,11 +22,7 @@ class OfflineTeleporter(val plugin: TeleporterPlugin) {
     @Listener
     fun onJoin(event: ClientConnectionEvent.Join, @First player: Player) {
         val loc = registry.remove(player.uniqueId) ?: return
-        Sponge.getEventManager().post(PlayerTeleportEvent.ByPlugin(
-            player, plugin.container,
-            Cause.builder().append(player).build(EventContext.builder().build()),
-            player.location, loc
-        ))
+        Sponge.getEventManager().post(PlayerTeleportEvent.ByPlugin(player, plugin.container, player.location, loc))
         player.teleportSafe(loc)
     }
 

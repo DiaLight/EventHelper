@@ -9,6 +9,7 @@ import dialight.guilib.events.GuiOutsideClickEvent
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.property.Identifiable
+import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.text.Text
 
 
@@ -43,7 +44,9 @@ open class SimpleGui(
 
             }
             GuiOutsideClickEvent.Type.MIDDLE -> {
-                guiplugin.guistory.openPrev(event.player)
+                Task.builder().execute { task ->
+                    guiplugin.guistory.openPrev(event.player)
+                }.submit(guiplugin)
             }
             GuiOutsideClickEvent.Type.RIGHT -> {
 

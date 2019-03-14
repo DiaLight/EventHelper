@@ -4,6 +4,7 @@ import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.DyeColors
 import org.spongepowered.api.item.ItemTypes
 import dialight.extensions.ItemStackBuilderEx
+import dialight.extensions.closeInventoryLater
 import dialight.guilib.View
 import dialight.guilib.events.ItemClickEvent
 import dialight.guilib.mixin.*
@@ -11,7 +12,9 @@ import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
 import dialight.guilib.simple.SimpleGui
 import dialight.guilib.simple.SimpleItem
+import dialight.teleporter.TeleporterTool
 import dialight.toollib.Tool
+import org.spongepowered.api.scheduler.Task
 
 
 class EventHelperGui(val plugin: EventHelperPlugin) : SimpleGui(
@@ -42,7 +45,7 @@ class EventHelperGui(val plugin: EventHelperPlugin) : SimpleGui(
             .build()
         ) {
             if(it.type == ItemClickEvent.Type.LEFT) {
-                inventory.title = Text_colorized("Hello World!")
+
             }
         }
 
@@ -85,7 +88,12 @@ class EventHelperGui(val plugin: EventHelperPlugin) : SimpleGui(
                 ))
                 .build()
         ) {
-            plugin.toollib.giveTool(it.player, v.id)
+            when(it.type) {
+                ItemClickEvent.Type.LEFT -> {
+                    it.player.closeInventoryLater(plugin)
+                    plugin.toollib.giveTool(it.player, v.id)
+                }
+            }
         }
     }
 

@@ -2,13 +2,26 @@ package dialight.freezer
 
 import dialight.extensions.dump
 import dialight.teleporter.PlayerTeleportEvent
+import net.minecraft.entity.item.EntityItem
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.data.DataTransactionResult
+import org.spongepowered.api.data.key.Key
+import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.data.value.immutable.ImmutableValue
+import org.spongepowered.api.data.value.mutable.Value
+import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
+import org.spongepowered.api.event.action.InteractEvent
+import org.spongepowered.api.event.block.ChangeBlockEvent
 import org.spongepowered.api.event.cause.Cause
 import org.spongepowered.api.event.cause.EventContext
-import org.spongepowered.api.event.entity.MoveEntityEvent
+import org.spongepowered.api.event.cause.entity.damage.DamageModifier
+import org.spongepowered.api.event.data.ChangeDataHolderEvent
+import org.spongepowered.api.event.entity.*
 import org.spongepowered.api.event.filter.cause.First
+import org.spongepowered.api.event.item.inventory.DropItemEvent
+import org.spongepowered.api.event.network.ClientConnectionEvent
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
@@ -17,16 +30,15 @@ class FreezerListener(val plugin: FreezerPlugin) {
 
     @Listener
     fun onTeleport(event: PlayerTeleportEvent, @First player: Player) {
-        event.dump()
-        val frozen = plugin.freezer.frozen.idFrozen[player.uniqueId] ?: return
-        frozen.setLocation(event.getTo())
+        val frozen = plugin[player.uniqueId] ?: return
+        frozen.location = event.getTo()
     }
 
     @Listener
-    fun onMove(e: MoveEntityEvent, @First trg: Player) {
-        val frozen = plugin.freezer.frozen.idFrozen[trg.uniqueId] ?: return
-        if (!blockMoved(e.fromTransform.location, e.toTransform.location)) return
-//        this.teleportFrozen(frozen, trg)
+    fun onMove(event: MoveEntityEvent, @First trg: Player) {
+        val frozen = plugin[trg.uniqueId] ?: return
+        if (!blockMoved(frozen.location, event.toTransform.location)) return
+        trg.setLocationAndRotation(frozen.location, event.toTransform.rotation)
     }
 
     private fun blockMoved(f: Location<World>, t: Location<World>): Boolean {
@@ -38,227 +50,189 @@ class FreezerListener(val plugin: FreezerPlugin) {
 //    @EventHandler
 //    fun onPluginDisable(e: PluginDisableEvent) {
 //        if (e.getPlugin().getName() != eventHelper.plugin.getName()) return
-//        for (frozen in this.idFrozen.values) {
+//        for (frozen in this.map.values) {
 //            val trg = Bukkit.getPlayer(frozen.getUniqueId()) ?: continue
 //            FreezerMessages.unfreezeByReload(trg)
 //        }
 //    }
-//
-//    @EventHandler
-//    fun onJoin(e: PlayerJoinEvent) {
-//        val trg = e.getPlayer()
-//        val frozen = this.offlineFrozen.remove(trg.getUniqueId()) ?: return
-//        frozen.updateAll(trg)
-//        this.idFrozen.put(trg.getEntityId(), frozen)
-//        this.onFreezeOnline(frozen, trg)
-//        FreezerMessages.frozen(trg)
+
+//    @Listener
+//    fun onJoin(event: ClientConnectionEvent.Join, @First player: Player) {
+//        val frozen = this.map.remove(player.uniqueId) ?: return
+//        frozen.updateAll(player)
+//        this.map.put(player.getEntityId(), frozen)
+//        this.onFreezeOnline(frozen, player)
+//        FreezerMessages.frozen(player)
 //    }
-//
-//    @EventHandler
-//    fun onQuit(e: PlayerQuitEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
-//        this.offlineFrozen.put(e.getPlayer().getUniqueId(), frozen)
+//    @Listener
+//    fun onQuit(event: ClientConnectionEvent.Disconnect, @First player: Player) {
+//        val frozen = this.map.get(player.getEntityId()) ?: return
+//        this.map.put(player.getUniqueId(), frozen)
 //    }
-//
-//    protected fun teleportFrozen(frozen: Frozen, trg: Player) {
-//        trg.teleport(Utils.tpFix(frozen.getLocation(), trg.getLocation()))
-//    }
-//
-//    protected override fun onFreezeOnline(frozen: Frozen, trg: Player) {
-//        super.onFreezeOnline(frozen, trg)
+
+//    protected fun onFreezeOnline(frozen: FrozenPlayers.Frozen, trg: Player) {
 //        this.teleportFrozen(frozen, trg)
 //        this.freezeFlayers.setFly(trg)
 //    }
 //
-//    protected override fun onUnfreezeOnline(frozen: Frozen, trg: Player) {
-//        super.onUnfreezeOnline(frozen, trg)
+//    protected fun onUnfreezeOnline(frozen: FrozenPlayers.Frozen, trg: Player) {
 //        this.freezeFlayers.removeFly(trg)
 //        frozen.recoverVelocity(trg)
 //    }
 //
-//    protected override fun onFreezeOffline(frozen: Frozen) {
-//        super.onFreezeOffline(frozen)
-//        this.freezeFlayers.setFlyFuture(frozen.getUniqueId())
+//    protected fun onFreezeOffline(frozen: FrozenPlayers.Frozen) {
+//        this.freezeFlayers.setFlyFuture(frozen.uniqueId)
 //    }
 //
-//    protected override fun onUnfreezeOffline(frozen: Frozen) {
-//        super.onUnfreezeOffline(frozen)
-//        this.freezeFlayers.removeFlyFuture(frozen.getUniqueId())
+//    protected fun onUnfreezeOffline(frozen: FrozenPlayers.Frozen) {
+//        this.freezeFlayers.removeFlyFuture(frozen.uniqueId)
 //    }
-//
-//    //////////////////////////////HOLDER/////////////////////////////////
-//
-//    //ломать и ставить блоки
-//    @EventHandler
-//    fun onBlockBreak(e: BlockBreakEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
-//
-//    @EventHandler
-//    fun onBlockPlace(e: BlockPlaceEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
-//
-//    //садиться на шифт
-//    @EventHandler
-//    fun toggleSneak(e: PlayerToggleSneakEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
-//        e.getPlayer().setSneaking(false)
-//        e.setCancelled(true)
-//    }
-//
-//    //наносить и получать урон
-//    @EventHandler
-//    fun onDamage(e: EntityDamageEvent) {
-//        if (e.getEntity().getType() != EntityType.PLAYER) return
-//        val frozen = this.idFrozen.get(e.getEntity().getEntityId()) ?: return
-//        e.setDamage(0.0)
-//        e.setCancelled(true)
-//    }
-//
-//    @EventHandler
-//    fun onDealDamage(e: EntityDamageByEntityEvent) {
-//        if (e.getDamager().getType() != EntityType.PLAYER) return
-//        val frozen = this.idFrozen.get(e.getDamager().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
-//
-//    //выкидывать и подбирать вещи
-//    @EventHandler
-//    fun onDrop(e: PlayerDropItemEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
-//
-//    @EventHandler
-//    fun onPickup(e: PlayerPickupItemEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
-//
-//    //использовать транспорт
-//    @EventHandler
-//    fun enterVehicle(e: VehicleEnterEvent) {
-//        if (e.getEntered().getType() != EntityType.PLAYER) return
-//        val frozen = this.idFrozen.get(e.getEntered().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
-//
-//    @EventHandler
-//    fun exitVehicle(e: VehicleExitEvent) {
-//        if (e.getExited().getType() != EntityType.PLAYER) return
-//        val frozen = this.idFrozen.get(e.getExited().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
-//
-//    //выливать и набирать жидкости в ведра
-//    @EventHandler
-//    fun onEmpty(e: PlayerBucketEmptyEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
-//
-//    @EventHandler
-//    fun onFill(e: PlayerBucketFillEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
-//
-//    //использовать кровать
-//    @EventHandler
-//    fun onEnterBed(e: PlayerBedEnterEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
+
+    //////////////////////////////HOLDER/////////////////////////////////
+
+    //любые взаимодействия
+    @Listener
+    fun onInteract(e: InteractEvent, @First player: Player) {
+        val frozen = plugin[player.uniqueId] ?: return
+        e.isCancelled = true
+    }
+
+    //ломать и ставить блоки
+    @Listener
+    fun onBlockBreak(e: ChangeBlockEvent, @First player: Player) {
+        val frozen = plugin[player.uniqueId] ?: return
+        e.isCancelled = true
+    }
+
+    //садиться на шифт
+    fun DataTransactionResult.containsKey(vararg keys: Key<*>): Boolean {
+        for(data in successfulData) {
+            if(!keys.contains(data.key)) continue
+            data as ImmutableValue<Boolean>
+            if(!data.get()) continue
+            return true
+        }
+        return false
+    }
+    @Listener
+    fun onValueChange(e: ChangeDataHolderEvent.ValueChange, @First player: Player) {
+        val frozen = plugin[player.uniqueId] ?: return
+        if(e.endResult.containsKey(Keys.IS_SNEAKING, Keys.FOOD_LEVEL)) return
+        e.isCancelled = true
+    }
+
+    //наносить и получать урон
+    @Listener
+    fun onAttack(e: AttackEntityEvent, @First player: Player) {
+        val sourceFrozen = plugin[player.uniqueId]
+        if(sourceFrozen != null) {
+            e.isCancelled = true
+            return
+        }
+        if(e.targetEntity.type != EntityTypes.PLAYER) return
+        val target = e.targetEntity as Player
+        val targetFrozen = plugin[target.uniqueId]
+        if(targetFrozen != null) {
+            e.isCancelled = true
+            return
+        }
+    }
+    @Listener
+    fun onDamage(e: DamageEntityEvent, @First player: Player) {
+        val frozen = plugin[player.uniqueId] ?: return
+        e.isCancelled = true
+    }
+
+
+    //выкидывать и подбирать вещи
+    @Listener
+    fun onDrop(e: DropItemEvent, @First player: Player) {
+        val frozen = plugin[player.uniqueId] ?: return
+        e.isCancelled = true
+    }
+
+    @Listener
+    fun onPickup(event: CollideEntityEvent, @First player: Player) {
+        val frozen = plugin[player.uniqueId] ?: return
+        val entityItems = event.filterEntities { it !is EntityItem }
+    }
+
+    //использовать транспорт
+    @Listener
+    fun enterVehicle(e: RideEntityEvent, @First player: Player) {
+        val frozen = plugin[player.uniqueId] ?: return
+        e.isCancelled = true
+    }
+
+
 //
 //    //открывать и использовать инвентарь
 //    @EventHandler
 //    fun onInventory(e: InventoryClickEvent) {
 //        if (e.getWhoClicked().getType() != EntityType.PLAYER) return
-//        val frozen = this.idFrozen.get(e.getWhoClicked().getEntityId()) ?: return
+//        val frozen = this.map.get(e.getWhoClicked().getEntityId()) ?: return
 //        e.setCancelled(true)
 //    }
 //
 //    @EventHandler
 //    fun onOpen(e: InventoryOpenEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
-//
-//    @EventHandler
-//    fun onFoodLevelChange(e: FoodLevelChangeEvent) {
-//        if (e.getEntityType() != EntityType.PLAYER) return
-//        val frozen = this.idFrozen.get(e.getEntity().getEntityId()) ?: return
+//        val frozen = this.map.get(e.getPlayer().getEntityId()) ?: return
 //        e.setCancelled(true)
 //    }
 //
 //    @EventHandler
 //    fun sign(e: SignChangeEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
+//        val frozen = this.map.get(e.getPlayer().getEntityId()) ?: return
 //        e.setCancelled(true)
 //    }
 //
 //    @EventHandler
 //    fun blockDamage(e: BlockDamageEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
+//        val frozen = this.map.get(e.getPlayer().getEntityId()) ?: return
 //        e.setCancelled(true)
 //    }
 //
 //    @EventHandler
 //    fun enchantItem(e: EnchantItemEvent) {
-//        val frozen = this.idFrozen.get(e.getEnchanter().getEntityId()) ?: return
+//        val frozen = this.map.get(e.getEnchanter().getEntityId()) ?: return
 //        e.setCancelled(true)
 //    }
 //
 //    @EventHandler
 //    fun onPrepareEnchant(e: PrepareItemEnchantEvent) {
-//        val frozen = this.idFrozen.get(e.getEnchanter().getEntityId()) ?: return
+//        val frozen = this.map.get(e.getEnchanter().getEntityId()) ?: return
 //        e.setCancelled(true)
 //    }
 //
 //    @EventHandler
 //    fun onBreakHanging(e: HangingBreakByEntityEvent) {
 //        if (e.getRemover().getType() != EntityType.PLAYER) return
-//        val frozen = this.idFrozen.get(e.getRemover().getEntityId()) ?: return
+//        val frozen = this.map.get(e.getRemover().getEntityId()) ?: return
 //        e.setCancelled(true)
 //    }
 //
 //    @EventHandler
 //    fun onPlaceHanging(e: HangingPlaceEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
+//        val frozen = this.map.get(e.getPlayer().getEntityId()) ?: return
 //        e.setCancelled(true)
 //    }
 //
 //    @EventHandler
 //    fun onCraft(e: CraftItemEvent) {
 //        if (e.getWhoClicked().getType() != EntityType.PLAYER) return
-//        val frozen = this.idFrozen.get(e.getWhoClicked().getEntityId()) ?: return
+//        val frozen = this.map.get(e.getWhoClicked().getEntityId()) ?: return
 //        e.setCancelled(true)
 //    }
 //
 //    @EventHandler
 //    fun onFish(e: PlayerFishEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
+//        val frozen = this.map.get(e.getPlayer().getEntityId()) ?: return
 //        e.setCancelled(true)
 //    }
 //
 //    @EventHandler
 //    fun onItemConsume(e: PlayerItemConsumeEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
-//
-//    @EventHandler
-//    fun onShear(e: PlayerShearEntityEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
-//        e.setCancelled(true)
-//    }
-//
-//    @EventHandler
-//    fun onInteractEntity(e: PlayerInteractEntityEvent) {
-//        val frozen = this.idFrozen.get(e.getPlayer().getEntityId()) ?: return
+//        val frozen = this.map.get(e.getPlayer().getEntityId()) ?: return
 //        e.setCancelled(true)
 //    }
 

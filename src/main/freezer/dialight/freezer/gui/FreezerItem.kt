@@ -1,6 +1,7 @@
 package dialight.freezer.gui
 
 import dialight.extensions.ItemStackBuilderEx
+import dialight.extensions.closeInventoryLater
 import dialight.freezer.FreezerPlugin
 import dialight.freezer.FreezerTool
 import dialight.guilib.View
@@ -8,6 +9,7 @@ import dialight.guilib.events.ItemClickEvent
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
 import org.spongepowered.api.item.ItemTypes
+import org.spongepowered.api.scheduler.Task
 
 class FreezerItem(val plugin: FreezerPlugin) : View.Item {
 
@@ -29,7 +31,7 @@ class FreezerItem(val plugin: FreezerPlugin) : View.Item {
         val player = event.player
         when (event.type) {
             ItemClickEvent.Type.LEFT, ItemClickEvent.Type.SHIFT_LEFT -> {
-                player.closeInventory()
+                player.closeInventoryLater(plugin)
                 plugin.toollib.giveTool(player, FreezerTool.ID)
             }
             ItemClickEvent.Type.RIGHT -> {

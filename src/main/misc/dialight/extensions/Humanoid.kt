@@ -31,7 +31,3 @@ var Entity.direction: Vector3d
     get() = Quaterniond.fromAxesAnglesDeg(rotation.x, -rotation.y, rotation.z).direction
     set(value) { rotation = Quaterniond.from(value.x, value.y, value.z, 1.0).axesAnglesDeg.mul(.0, -1.0, .0) }
 
-
-fun Player.openInventoryLater(plugin: Any, inventory: Inventory) {
-    Task.builder().execute { task -> openInventory(inventory) }.submit(plugin)
-}

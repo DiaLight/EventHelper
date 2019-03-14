@@ -16,6 +16,7 @@ import org.spongepowered.api.event.game.state.GameStartedServerEvent
 import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.plugin.PluginManager
+import java.util.*
 
 @Plugin(id = "freezer")
 class FreezerPlugin @Inject constructor(
@@ -61,5 +62,7 @@ class FreezerPlugin @Inject constructor(
         logger.info("Freezer v${container.version.orElse("null")} has been Enabled")
         Sponge.getEventManager().registerListeners(this, FreezerListener(this))
     }
+
+    operator fun get(id: UUID): FrozenPlayers.Frozen? = freezer.frozen.map[id]
 
 }

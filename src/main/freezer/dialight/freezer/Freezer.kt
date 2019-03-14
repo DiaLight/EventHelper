@@ -7,7 +7,6 @@ import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
 import java.util.*
-import java.util.function.BiConsumer
 
 class Freezer {
 
@@ -59,13 +58,13 @@ class Freezer {
 
 
     fun forEachOnline(action: (UUID, String) -> Unit) {
-        for (frozen in frozen.idFrozen.values) {
+        for (frozen in frozen.map.values) {
             action(frozen.uniqueId, frozen.name)
         }
     }
 
     fun forEachOffline(action: (UUID, String) -> Unit) {
-        for (frozen in frozen.offlineFrozen.values) {
+        for (frozen in frozen.map.values) {
             action(frozen.uniqueId, frozen.name)
         }
     }
@@ -338,6 +337,6 @@ class Freezer {
         return result
     }
     
-    
+    fun forEach(op: (FrozenPlayers.Frozen) -> Unit) = frozen.map.values.forEach(op)
     
 }

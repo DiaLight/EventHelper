@@ -46,11 +46,7 @@ class TeleporterTool(val plugin: TeleporterPlugin) : Tool(TeleporterTool.ID) {
         }
         val trgLoc = e.lookingAtLoc()
         for (trg in online) {
-            Sponge.getEventManager().post(PlayerTeleportEvent.ByPlayer(
-                trg, e.player,
-                Cause.builder().append(trg).build(EventContext.builder().build()),
-                trg.location, trgLoc
-            ))
+            Sponge.getEventManager().post(PlayerTeleportEvent.ByPlayer(trg, e.player, trg.location, trgLoc))
             trg.teleportSafe(trgLoc)
             trg.sendMessage(TeleporterMessages.YouHBTp(e.player.name))
         }
@@ -69,10 +65,7 @@ class TeleporterTool(val plugin: TeleporterPlugin) : Tool(TeleporterTool.ID) {
                     plugin.teleporter[e.player].offline
                 )
             } else {
-                teleport(e,
-                    Server_getPlayers().filter { it.uniqueId != e.player.uniqueId },
-                    Server_getOfflineUsers()
-                )
+
             }
             ToolInteractEvent.Type.RIGHT_CLICK -> if(!e.sneaking) {
                 if (e.type == ToolInteractEvent.Target.ENTITY) {

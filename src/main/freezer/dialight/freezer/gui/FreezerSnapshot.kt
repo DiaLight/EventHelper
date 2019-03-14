@@ -1,15 +1,12 @@
-package dialight.teleporter.gui
+package dialight.freezer.gui
 
 import dialight.extensions.*
-import dialight.guilib.GuiPlugin
-import dialight.guilib.IdentifiableView
+import dialight.freezer.Freezer
+import dialight.freezer.FreezerPlugin
 import dialight.guilib.View
-import dialight.guilib.events.GuiOutsideClickEvent
 import dialight.guilib.events.ItemClickEvent
 import dialight.guilib.simple.SimpleItem
 import dialight.guilib.snapshot.Snapshot
-import dialight.teleporter.Teleporter
-import dialight.teleporter.TeleporterPlugin
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
 import org.spongepowered.api.data.key.Keys
@@ -24,9 +21,9 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.world.Location
 import java.util.*
 
-class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plugin.guilib!!, id) {
-    
-    class Builder(val plugin: TeleporterPlugin, val id: Identifiable, val player: Player) : Snapshot.Builder(
+class FreezerSnapshot(plugin: FreezerPlugin, id: Identifiable) : Snapshot(plugin.guilib!!, id) {
+
+    class Builder(val plugin: FreezerPlugin, val id: Identifiable, val player: Player) : Snapshot.Builder(
         Arrays.asList(
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
             'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -44,9 +41,9 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
             for (user in Server_getUsers()) {
                 players[user.uniqueId] = user
             }
-            plugin.teleporter.forEach(player) { uuid, name ->
-                val user = players.remove(uuid)
-                slots.add(Page.Item(plugin, uuid, name, true, user!!.isOnline))
+            plugin.freezer.forEach { frozen ->
+                val user = players.remove(frozen.uniqueId)
+                slots.add(Page.Item(plugin, frozen.uniqueId, frozen.name, true, user!!.isOnline))
             }
             for (user in players.values) {
                 slots.add(Page.Item(plugin, user.uniqueId, user.name, false, user.isOnline))
@@ -60,10 +57,10 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
             return slots
         }
 
-        fun build(): TaggerSnapshot {
+        fun build(): FreezerSnapshot {
             val slots = collect()
             val sorted = sort(slots)
-            val snap = TaggerSnapshot(plugin, id)
+            val snap = FreezerSnapshot(plugin, id)
 
             val maxLines = 6
             val maxColumns = 9
@@ -88,7 +85,7 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
     }
 
     class Page(
-        snap: TaggerSnapshot,
+        snap: FreezerSnapshot,
         title: Text,
         width: Int,
         height: Int,
@@ -106,55 +103,66 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
                 .also {
                     offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
                 }
-                .name(Text_colorized("Таггер"))
-                .lore(Text_colorizedList(
-                    "|y|Страница ${pageIndex + 1}/$total",
-                    "|r|Для верного отображения",
-                    "|r|заголовков столбцов",
-                    "|r|используйте шрифт Unicode.",
-                    "|g|ЛКМ снаружи инвертаря|y|:",
-                    "|y| Перейти на предыдущую страницу",
-                    "|g|ПКМ снаружи инвертаря|y|:",
-                    "|y| Перейти на следующую страницу",
-                    "|g|СКМ снаружи инвертаря|y|:",
-                    "|y| Вернуться назад",
-                    "",
-                    "|g|Плагин: |y|Телепорт",
-                    "|g|Версия: |y|v" + snap.plugin.container.version.orElse("null")
-            ))
-            .build()) {
+                .name(Text_colorized("Замораживатель"))
+                .lore(
+                    Text_colorizedList(
+                        "|y|Страница ${pageIndex + 1}/$total",
+                        "|r|Для корректного обображения",
+                        "|r|заголовков столбцов, используйте",
+                        "|r|узкий шрифт Майнкрафта.",
+                        "|g|ЛКМ снаружи инвертаря|y|:",
+                        "|y| Перейти на предыдущую страницу",
+                        "|g|ПКМ снаружи инвертаря|y|:",
+                        "|y| Перейти на следующую страницу",
+                        "|g|СКМ снаружи инвертаря|y|:",
+                        "|y| Вернуться назад",
+                        "",
+                        "|g|Плагин: |y|Замораживатель",
+                        "|g|Версия: |y|v" + snap.plugin.container.version.orElse("null")
+                    )
+                )
+                .build()) {
 
             }
-            val returnItem = SimpleItem(ItemStackBuilderEx(ItemTypes.CHEST)
-                .name(pageTitle)
-                .lore(Text_colorizedList(
-                    "|g|ЛКМ|y|: Вернуться назад"
-                ))
-                .build()) {
+            val returnItem = SimpleItem(
+                ItemStackBuilderEx(ItemTypes.CHEST)
+                    .name(pageTitle)
+                    .lore(
+                        Text_colorizedList(
+                            "|g|ЛКМ|y|: Вернуться назад"
+                        )
+                    )
+                    .build()) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         Task.builder().execute { task -> guiplugin.guistory.openPrev(it.player) }.submit(snap.plugin)
                     }
                 }
             }
-            val backwardItem = SimpleItem(ItemStackBuilderEx(ItemTypes.ARROW)
-                .name(pageTitle)
-                .lore(Text_colorizedList(
-                    "|g|ЛКМ|y|: Перейти на предыдущую страницу"
-                ))
-                .build()) {
+            val backwardItem = SimpleItem(
+                ItemStackBuilderEx(ItemTypes.ARROW)
+                    .name(pageTitle)
+                    .lore(
+                        Text_colorizedList(
+                            "|g|ЛКМ|y|: Перейти на Предыдущую страницу"
+                        )
+                    )
+                    .build()) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         snap.backward(it.player)
                     }
                 }
             }
-            val forwardItem = SimpleItem(ItemStackBuilderEx(ItemTypes.ARROW)
-                .name(pageTitle)
-                .lore(Text_colorizedList(
-                    "|g|ЛКМ|y|: Перейти на следующую страницу"
-                ))
-                .build()) {
+            val forwardItem = SimpleItem(
+                ItemStackBuilderEx(ItemTypes.ARROW)
+                    .name(pageTitle)
+                    .lore(
+                        Text_colorizedList(
+                            "|g|ЛКМ|y|: Перейти на следующую страницу"
+                        )
+                    )
+                    .build()) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         snap.forward(it.player)
@@ -175,19 +183,19 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
             }
         }
 
-        class Item(val plugin: TeleporterPlugin, val uuid: UUID, name: String, var tagged: Boolean, val online: Boolean) : Snapshot.Page.Item(name) {
+        class Item(val plugin: FreezerPlugin, val uuid: UUID, name: String, var tagged: Boolean, val online: Boolean) : Snapshot.Page.Item(name) {
 
             override val item: ItemStackSnapshot
                 get() = ItemStackBuilderEx(
                     if(online) {
                         if(tagged) {
-                            ItemTypes.DIAMOND
+                            ItemTypes.ICE
                         } else {
                             ItemTypes.COAL
                         }
                     } else {
                         if(tagged) {
-                            ItemTypes.DIAMOND_ORE
+                            ItemTypes.PACKED_ICE
                         } else {
                             ItemTypes.COAL_ORE
                         }
@@ -197,12 +205,11 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
                     .lore(
                         Text_colorizedList(
                             if (tagged) {
-                                "|g|ЛКМ|y|: отменить выбор"
+                                "|g|ЛКМ|y|: Заморозить игрока"
                             } else {
-                                "|g|ЛКМ|y|: выбрать игрока"
+                                "|g|ЛКМ|y|: Разморозить игрока"
                             },
-//                        "~|g|ПКМ|y|: Телепортировать игрока к другому игроку",
-                            "|g|Shift|y|+|g|ПКМ|y|: телепортироваться к игроку"
+                            "|g|shift|y|+|g|ПКМ|y|: Телепортироваться к игроку"
                         )
                     )
                     .build()
@@ -229,10 +236,10 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
             override fun onClick(event: ItemClickEvent) {
                 when(event.type) {
                     ItemClickEvent.Type.LEFT -> {
-                        val result = plugin.teleporter.invoke(event.player, Teleporter.Action.TOGGLE, uuid)
-                        if (!result.getTagged().isEmpty()) {
+                        val result = plugin.freezer.invoke(event.player, Freezer.Action.TOGGLE, uuid)
+                        if (!result.getFreezed().isEmpty()) {
                             tagged = true
-                        } else if (!result.getUntagged().isEmpty()) {
+                        } else if (!result.getUnfreezed().isEmpty()) {
                             tagged = false
                         }
                         event.updateItem = true
@@ -249,4 +256,5 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
             }
         }
     }
+
 }
