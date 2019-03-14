@@ -311,7 +311,7 @@ class TaggerSnapshot(val plugin: TeleporterPlugin) {
                 .lore(
                     Text_colorizedList(
                         if (tagged) {
-                            "|g|ЛКМ|y|: Отменить выбор игрока"
+                            "|g|ЛКМ|y|: Отменить выбор"
                         } else {
                             "|g|ЛКМ|y|: Выбрать игрока"
                         },
