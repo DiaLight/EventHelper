@@ -16,7 +16,7 @@ import dialight.toollib.Tool
 
 class EventHelperGui(val plugin: EventHelperPlugin) : SimpleGui(
     plugin.guilib,
-    Text_colorized("Инвентарь всея Майнкрафта"),
+    Text_colorized("Мегаинвентарь"),
     9, 6) {
 
     companion object {
@@ -35,7 +35,7 @@ class EventHelperGui(val plugin: EventHelperPlugin) : SimpleGui(
             }
             .name(Text_colorized("Краткое описание"))
             .lore(Text_colorizedList(
-                "|a|Тут лежат инструменты",
+                "|a|Здесь находятся различные инструменты",
                 "",
                 "|g|Версия: |y|v" + plugin.container.version.orElse("null")
             ))
