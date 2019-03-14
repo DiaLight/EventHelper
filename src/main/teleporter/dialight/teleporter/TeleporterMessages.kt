@@ -8,10 +8,10 @@ import java.util.*
 
 object TeleporterMessages {
 
-    var pluginPrefix = Text_colorized("|go|Телепортация|gr|: ")
+    var pluginPrefix = Text_colorized("|go|Телепорт|gr|: ")
 
     fun YouHBTp(name: String): Text {
-        return Text.of(pluginPrefix, Text_colorized("|g|Вас телепортировал |w|$name"))
+        return Text.of(pluginPrefix, Text_colorized("|w|$name |g|телепортировал вас"))
     }
     fun YouTp(online: Collection<Player>, offline: Collection<User>): Text {
         return Text.of(pluginPrefix, Text_colorized("|g|Телепортировано |w|${online.size}|g| онлайн-игроков и |w|${offline.size}|g| офлайн-игроков"))
