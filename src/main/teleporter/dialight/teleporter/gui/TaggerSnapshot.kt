@@ -209,9 +209,9 @@ class TaggerSnapshot(val plugin: TeleporterPlugin) {
                 .name(Text_colorized("Таггер"))
                 .lore(Text_colorizedList(
                     "|y|Страница ${pageIndex + 1}/$total",
-                    "|r|Для корректного обображения",
-                    "|r|заголовков столбцов, используйте",
-                    "|r|узкий шрифт Майнкрафта.",
+                    "|r|Для верного отображения",
+                    "|r|заголовков столбцов",
+                    "|r|используйте шрифт Unicode.",
                     "|g|ЛКМ снаружи инвертаря|y|:",
                     "|y| Перейти на предыдущую страницу",
                     "|g|ПКМ снаружи инвертаря|y|:",
@@ -219,7 +219,7 @@ class TaggerSnapshot(val plugin: TeleporterPlugin) {
                     "|g|СКМ снаружи инвертаря|y|:",
                     "|y| Вернуться назад",
                     "",
-                    "|g|Плагин: |y|Телепортер",
+                    "|g|Плагин: |y|Телепорт",
                     "|g|Версия: |y|v" + plugin.container.version.orElse("null")
                 ))
                 .build()) {
@@ -240,7 +240,7 @@ class TaggerSnapshot(val plugin: TeleporterPlugin) {
             val backwardItem = SimpleItem(ItemStackBuilderEx(ItemTypes.ARROW)
                 .name(pageTitle)
                 .lore(Text_colorizedList(
-                    "|g|ЛКМ|y|: Перейти на Предыдущую страницу"
+                    "|g|ЛКМ|y|: Перейти на предыдущую страницу"
                 ))
                 .build()) {
                 when(it.type) {
@@ -311,12 +311,12 @@ class TaggerSnapshot(val plugin: TeleporterPlugin) {
                 .lore(
                     Text_colorizedList(
                         if (tagged) {
-                            "|g|ЛКМ|y|: Убрать пометку с игрока"
+                            "|g|ЛКМ|y|: Отменить выбор игрока"
                         } else {
-                            "|g|ЛКМ|y|: Пометить игрока"
+                            "|g|ЛКМ|y|: Выбрать игрока"
                         },
 //                        "~|g|ПКМ|y|: Телепортировать игрока к другому игроку",
-                        "|g|shift|y|+|g|ПКМ|y|: Телепортироваться к игроку"
+                        "|g|Shift|y|+|g|ПКМ|y|: Телепортироваться к игроку"
                     )
                 )
                 .build()
