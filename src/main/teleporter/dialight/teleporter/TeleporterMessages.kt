@@ -8,7 +8,7 @@ import java.util.*
 
 object TeleporterMessages {
 
-    var pluginPrefix = Text_colorized("|go|Teleporter|gr|: ")
+    var pluginPrefix = Text_colorized("|go|Телепортация|gr|: ")
 
     fun YouHBTp(name: String): Text {
         return Text.of(pluginPrefix, Text_colorized("|g|Вас телепортировал |w|$name"))
