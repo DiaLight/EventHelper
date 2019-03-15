@@ -1,7 +1,8 @@
 package dialight.teleporter
 
 import dialight.extensions.*
-import dialight.teleporter.TeleporterMessages
+import dialight.teleporter.event.TeleporterEvent
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import java.util.*
 import java.util.UUID
@@ -25,32 +26,31 @@ class Teleporter {
 
     class Result {
 
-        private val tagged = ArrayList<String>()
-        private val untagged = ArrayList<String>()
+        val selected = ArrayList<Teleporter.Selected>()
+        val unselected = ArrayList<Teleporter.Selected>()
 
-        fun tag(name: String) {
-            tagged.add(name)
+        fun select(sel: Teleporter.Selected) {
+            selected.add(sel)
         }
 
-        fun untag(name: String) {
-            untagged.add(name)
+        fun unselect(sel: Teleporter.Selected) {
+            unselected.add(sel)
         }
 
         fun sendReport(invoker: Player) {
-            if (!tagged.isEmpty()) {
-                invoker.sendMessage(TeleporterMessages.tagged(tagged))
+            if (!selected.isEmpty()) {
+                invoker.sendMessage(TeleporterMessages.selected(selected))
             }
-            if (!untagged.isEmpty()) {
-                invoker.sendMessage(TeleporterMessages.untagged(untagged))
+            if (!unselected.isEmpty()) {
+                invoker.sendMessage(TeleporterMessages.unselected(unselected))
             }
         }
 
-        fun getTagged(): List<String> = tagged
-        fun getUntagged(): List<String> = untagged
+        fun getUnselected(): List<Teleporter.Selected> = unselected
 
         fun add(result: Result) {
-            this.tagged.addAll(result.tagged)
-            this.untagged.addAll(result.untagged)
+            this.selected.addAll(result.selected)
+            this.unselected.addAll(result.unselected)
         }
     }
 
@@ -79,65 +79,76 @@ class Teleporter {
 
     operator fun invoke(invoker: Player, action: Action, trg: UUID, name: String): Result {
         val result = Result()
-        val players = get(invoker)
+        val selections = get(invoker)
+        val sel = Selected(trg, name)
         when (action) {
-            Action.TAG -> if (players.tagOffline(trg, name)) {
-                result.tag(name)
+            Action.TAG -> if (selections.tagOffline(sel)) {
+                result.select(sel)
             }
-            Action.UNTAG -> if (players.untagOffline(trg, name)) {
-                result.untag(name)
+            Action.UNTAG -> if (selections.untagOffline(sel)) {
+                result.unselect(sel)
             }
-            Action.TOGGLE -> if (players.toggletagOffline(trg, name)) {
-                result.tag(name)
+            Action.TOGGLE -> if (selections.toggletagOffline(sel)) {
+                result.select(sel)
             } else {
-                result.untag(name)
+                result.unselect(sel)
             }
         }
+        Sponge.getEventManager().post(TeleporterEvent(invoker, result))
         return result
     }
 
-    private inner class Pair constructor(trg: User) {
-        val uuid: UUID = trg.uniqueId
-        val name: String = trg.name
+    data class Selected(
+        val uuid: UUID,
+        val name: String
+    ) {
+
+        constructor(trg: User) : this(trg.uniqueId, trg.name)
+
+        fun getPlayer(): Player? = Server_getPlayer(uuid)
+
+        fun getUser(): User = Server_getUser(uuid)!!
+
     }
 
     operator fun invoke(invoker: Player, action: Action, group: Group): Result {
         val result = Result()
-        val stream: Stream<Pair>
+        val stream: Stream<Selected>
         when (group) {
             Group.OFFLINE -> stream =
                 Server_getUsers().stream().filter { !it.isOnline }
-                    .map { Pair(it) }
+                    .map { Selected(it) }
             Group.ONLINE -> stream =
-                Server_getPlayers().stream().map { Pair(it) }
+                Server_getPlayers().stream().map { Selected(it) }
             Group.ALL -> stream =
-                Server_getUsers().stream().map { Pair(it) }
+                Server_getUsers().stream().map { Selected(it) }
             else -> stream = Stream.empty()
         }
         val players = get(invoker)
         when (action) {
-            Action.TAG -> stream.forEach { p ->
-                if (players.tagOffline(p.uuid, p.name)) {
-                    result.tag(p.name)
+            Action.TAG -> stream.forEach {
+                if (players.tagOffline(it)) {
+                    result.select(it)
                 }
             }
-            Action.UNTAG -> stream.forEach { p ->
-                if (players.untagOffline(p.uuid, p.name)) {
-                    result.untag(p.name)
+            Action.UNTAG -> stream.forEach {
+                if (players.untagOffline(it)) {
+                    result.unselect(it)
                 }
             }
-            Action.TOGGLE -> stream.forEach { p ->
-                if (players.toggletagOffline(p.uuid, p.name)) {
-                    result.tag(p.name)
+            Action.TOGGLE -> stream.forEach {
+                if (players.toggletagOffline(it)) {
+                    result.select(it)
                 } else {
-                    result.untag(p.name)
+                    result.unselect(it)
                 }
             }
         }
+        Sponge.getEventManager().post(TeleporterEvent(invoker, result))
         return result
     }
 
-    fun forEach(player: Player, action: (UUID, String) -> Unit) = get(player).forEach(action)
+    fun forEach(player: Player, action: (Selected) -> Unit) = get(player).forEach(action)
 
     fun sendTargetsReport(invoker: Player) {
         val targets = get(invoker)

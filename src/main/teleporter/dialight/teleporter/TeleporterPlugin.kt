@@ -5,7 +5,7 @@ import dialight.eventhelper.EventHelperPlugin
 import dialight.extensions.getPluginInstance
 import dialight.guilib.GuiPlugin
 import dialight.teleporter.offline.OfflineTeleporter
-import dialight.teleporter.gui.TaggerGui
+import dialight.teleporter.gui.TeleporterGui
 import dialight.teleporter.gui.TeleporterItem
 import dialight.toollib.ToolPlugin
 import org.slf4j.Logger
@@ -32,7 +32,7 @@ class TeleporterPlugin @Inject constructor(
         private set
 
     val tool = TeleporterTool(this)
-    lateinit var taggergui: TaggerGui
+    lateinit var teleportergui: TeleporterGui
         private set
 
     val teleporter = Teleporter()
@@ -53,7 +53,8 @@ class TeleporterPlugin @Inject constructor(
             it.registerToolItem(tool.id, TeleporterItem(this))
         }
         guilib?.also {
-            taggergui = TaggerGui(this)
+            teleportergui = TeleporterGui(this)
+            Sponge.getEventManager().registerListeners(this, teleportergui)
         }
 
         Sponge.getEventManager().registerListeners(this, offlineteleporter)

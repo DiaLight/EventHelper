@@ -1,18 +1,12 @@
-package dialight.teleporter
+package dialight.teleporter.event
 
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.cause.Cause
 import org.spongepowered.api.event.entity.living.humanoid.player.TargetPlayerEvent
 import org.spongepowered.api.event.impl.AbstractEvent
-import org.spongepowered.api.Sponge
-import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.cause.EventContext
 import org.spongepowered.api.event.cause.EventContextKey
-import org.spongepowered.api.event.cause.EventContextKeys
-import org.spongepowered.api.event.cause.entity.damage.DamageType
-import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.plugin.PluginContainer
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
@@ -50,7 +44,7 @@ abstract class PlayerTeleportEvent(
             .append(player)
             .build(
                 EventContext.builder()
-                    .add(PlayerTeleportEvent.BY_PLAYER, byPlayer)
+                    .add(BY_PLAYER, byPlayer)
                     .build()
             )
 
@@ -65,7 +59,7 @@ abstract class PlayerTeleportEvent(
             .append(player)
             .build(
                 EventContext.builder()
-                    .add(PlayerTeleportEvent.BY_PLUGIN, byPlugin)
+                    .add(BY_PLUGIN, byPlugin)
                     .build()
             )
 

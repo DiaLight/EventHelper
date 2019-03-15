@@ -11,16 +11,16 @@ object FreezerMessages {
 
     var pluginPrefix = Text_colorized("|go|Замораживатель|gr|: ")
 
-    fun untagged(names: List<String>): Text {
+    fun untagged(names: List<FrozenPlayers.Frozen>): Text {
         return if (names.size == 1) {
-            Text.of(FreezerMessages.pluginPrefix, Text_colorized("|y|Удалён: |w|" + names[0]))
-        } else Text.of(FreezerMessages.pluginPrefix, Text_colorized("|y|Удалены: |w|$names"))
+            Text.of(FreezerMessages.pluginPrefix, Text_colorized("|y|Удалён: |w|" + names[0].name))
+        } else Text.of(FreezerMessages.pluginPrefix, Text_colorized("|y|Удалены: |w|${names.map { it.name }}"))
     }
 
-    fun tagged(names: List<String>): Text {
+    fun tagged(names: List<FrozenPlayers.Frozen>): Text {
         return if (names.size == 1) {
-            Text.of(FreezerMessages.pluginPrefix, Text_colorized("|y|Добавлен: |w|" + names[0]))
-        } else Text.of(FreezerMessages.pluginPrefix, Text_colorized("|y|Добавлены: |w|$names"))
+            Text.of(FreezerMessages.pluginPrefix, Text_colorized("|y|Добавлен: |w|" + names[0].name))
+        } else Text.of(FreezerMessages.pluginPrefix, Text_colorized("|y|Добавлены: |w|${names.map { it.name }}"))
     }
 
     var areaSelSecondPoint = Text.of(pluginPrefix, "|y|Выберите 2-ю точку")

@@ -23,72 +23,9 @@ class GuiStory(val plugin: GuiPlugin) {
 
     companion object {
         private val DEBUG = false
-        private val UUID_ZERO = UUID.nameUUIDFromBytes(ByteArray(0) { 0 })
     }
 
     private val guiStory = HashMap<UUID, Story>()
-    private val guimap = observableMapOf<UUID, Inventory>()
-
-    private fun getPlayerInv(player: Player): Inventory? {
-        val oPlayerInv = player.openInventory
-        if(!oPlayerInv.isPresent) return null
-        return oPlayerInv.get()
-    }
-
-    fun inventoryClone(from: Inventory, player: Player) {
-        val usrinv = guimap[player.uniqueId] ?: return
-        inventoryClone(from, usrinv)
-    }
-    fun inventoryClone(from: Inventory, to: Inventory) {
-        to.title = from.title
-        var index = 0
-        for(slot in from.slots<Slot>()) {
-            val oitem = slot.peek()
-            to[index] = if(oitem.isPresent) oitem.get() else null
-            index++
-        }
-        val ofrprop = from.getInventoryProperty(Identifiable::class.java)
-        if(!ofrprop.isPresent) throw Exception("Can't identify from view")
-        val idfrprop = ofrprop.get()
-        val frid = idfrprop.value!!
-        val otoprop = to.getInventoryProperty(Identifiable::class.java)
-        if(!ofrprop.isPresent) throw Exception("Can't identify to view")
-        val idtoprop = otoprop.get()
-        idtoprop.setValue(frid)
-    }
-
-    private fun inventoryGetDimension(inv: Inventory): Vector2i? {
-        val oprop = inv.getInventoryProperty(InventoryDimension::class.java)
-        if(!oprop.isPresent) return null
-        return oprop.get().value
-    }
-
-    fun openView(player: Player, view: View) {
-        val inv = view.inventory
-        val dim = inventoryGetDimension(inv)
-        val usrinv = guimap.getOrPut(player.uniqueId) { Inventory.builder()
-            .of(inv.archetype)
-            .property(Identifiable(UUID_ZERO))
-            .apply {
-                if(dim != null) property(InventoryDimension.of(dim))
-            }
-            .build(plugin) }
-
-        val playerInv = getPlayerInv(player)
-        if(playerInv != null && playerInv.containsInventory(usrinv)) {  // update current inventory
-            // add delay for update to keep event update order
-            Task.builder().execute { task ->
-                plugin.guistory.inventoryClone(inv, usrinv)
-            }.submit(plugin)
-        } else {  // open new inventory
-            plugin.guistory.inventoryClone(inv, usrinv)  // update now
-            // add delay for open to keep event update order
-            Task.builder().execute { task ->
-                player.openInventory(usrinv)
-            }.submit(plugin)
-        }
-
-    }
 
     fun openGui(player: Player, gui: Gui) {
         val story = getOrCreate(player)
@@ -101,7 +38,7 @@ class GuiStory(val plugin: GuiPlugin) {
             }
         }
         if (story.queue.peekLast() !== gui) story.queue.addLast(gui)
-        openView(player, gui.getView(player))
+        plugin.openView(player, gui.getView(player))
         story.opened = true
         if (DEBUG) Sponge.getServer().broadcastChannel.send(Text.of("opened: " + toString(player)))
     }
@@ -113,7 +50,7 @@ class GuiStory(val plugin: GuiPlugin) {
             last.destroyFor(player)
             val prev = story.queue.peekFirst()
             if(prev != null) {
-                openView(player, prev.getView(player))
+                plugin.openView(player, prev.getView(player))
                 story.opened = true
                 return true
             }
@@ -126,7 +63,7 @@ class GuiStory(val plugin: GuiPlugin) {
     fun openLast(player: Player): Boolean {
         val story = guiStory[player.uniqueId] ?: return false
         val gui = story.queue.peekLast() ?: return false
-        openView(player, gui.getView(player))
+        plugin.openView(player, gui.getView(player))
         story.opened = true
         return true
     }

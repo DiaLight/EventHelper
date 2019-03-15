@@ -11,7 +11,6 @@ import jekarus.colorizer.Text_colorizedList
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.DyeColors
 import org.spongepowered.api.item.ItemTypes
-import org.spongepowered.api.scheduler.Task
 
 class TeleporterItem(val plugin: TeleporterPlugin) : View.Item {
 
@@ -40,7 +39,7 @@ class TeleporterItem(val plugin: TeleporterPlugin) : View.Item {
                 plugin.toollib.giveTool(player, TeleporterTool.ID)
             }
             ItemClickEvent.Type.RIGHT -> {
-                plugin.guilib?.openGui(player, plugin.taggergui)
+                plugin.guilib?.openGui(player, plugin.teleportergui)
             }
         }
     }

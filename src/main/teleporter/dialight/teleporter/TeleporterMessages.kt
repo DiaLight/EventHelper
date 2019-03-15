@@ -19,23 +19,23 @@ object TeleporterMessages {
 
 
     var PlayersBaseIsEmpty = Text.of(pluginPrefix, Text_colorized("|r|Никто не выбран!"))
-    var noPlayersTagged = Text.of(pluginPrefix, Text_colorized("|r|Некого телепортировать!"))
+    var noPlayersSelected = Text.of(pluginPrefix, Text_colorized("|r|Некого телепортировать!"))
     val AllPlayersRemoved = Text.of(pluginPrefix, Text_colorized("|g|Список игроков очищен!"))
 
-    fun untagged(names: List<String>): Text {
+    fun unselected(names: List<Teleporter.Selected>): Text {
         return if (names.size == 1) {
-            Text.of(pluginPrefix, Text_colorized("|y|Удалён: |w|" + names[0]))
-        } else Text.of(pluginPrefix, Text_colorized("|y|Удалены: |w|$names"))
+            Text.of(pluginPrefix, Text_colorized("|y|Удалён: |w|" + names[0].name))
+        } else Text.of(pluginPrefix, Text_colorized("|y|Удалены: |w|${names.map { it.name }}"))
     }
 
-    fun tagged(names: List<String>): Text {
+    fun selected(names: List<Teleporter.Selected>): Text {
         return if (names.size == 1) {
-            Text.of(pluginPrefix, Text_colorized("|y|Добавлен: |w|" + names[0]))
-        } else Text.of(pluginPrefix, Text_colorized("|y|Добавлены: |w|$names"))
+            Text.of(pluginPrefix, Text_colorized("|y|Добавлен: |w|" + names[0].name))
+        } else Text.of(pluginPrefix, Text_colorized("|y|Добавлены: |w|${names.map { it.name }}"))
     }
 
-    fun targets(names: Collection<String>): Text {
-        return Text.of(pluginPrefix, Text_colorized("|g|Выбраны: |w|$names"))
+    fun targets(names: Collection<Teleporter.Selected>): Text {
+        return Text.of(pluginPrefix, Text_colorized("|g|Выбраны: |w|${names.map { it.name }}"))
     }
 
     fun notFound(trgName: String): Text {

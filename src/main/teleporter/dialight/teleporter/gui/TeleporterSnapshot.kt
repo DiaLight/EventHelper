@@ -1,10 +1,6 @@
 package dialight.teleporter.gui
 
 import dialight.extensions.*
-import dialight.guilib.GuiPlugin
-import dialight.guilib.IdentifiableView
-import dialight.guilib.View
-import dialight.guilib.events.GuiOutsideClickEvent
 import dialight.guilib.events.ItemClickEvent
 import dialight.guilib.simple.SimpleItem
 import dialight.guilib.snapshot.Snapshot
@@ -24,7 +20,7 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.world.Location
 import java.util.*
 
-class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plugin.guilib!!, id) {
+class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable) : Snapshot<TeleporterSnapshot.Page>(plugin.guilib!!, id) {
     
     class Builder(val plugin: TeleporterPlugin, val id: Identifiable, val player: Player) : Snapshot.Builder(
         Arrays.asList(
@@ -44,26 +40,26 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
             for (user in Server_getUsers()) {
                 players[user.uniqueId] = user
             }
-            plugin.teleporter.forEach(player) { uuid, name ->
-                val user = players.remove(uuid)
-                slots.add(Page.Item(plugin, uuid, name, true, user!!.isOnline))
+            plugin.teleporter.forEach(player) {
+                val user = players.remove(it.uuid)
+                slots.add(Page.Item(plugin, it.uuid, it.name, true, user!!.isOnline))
             }
             for (user in players.values) {
                 slots.add(Page.Item(plugin, user.uniqueId, user.name, false, user.isOnline))
             }
             slots.sortWith(kotlin.Comparator { o1, o2 ->
-                if (o1.tagged && !o2.tagged) return@Comparator -1
-                if (!o1.tagged && o2.tagged) return@Comparator 1
+                if (o1.selected && !o2.selected) return@Comparator -1
+                if (!o1.selected && o2.selected) return@Comparator 1
                 if (!o2.online) return@Comparator -1
                 return@Comparator 0
             })
             return slots
         }
 
-        fun build(): TaggerSnapshot {
+        fun build(): TeleporterSnapshot {
             val slots = collect()
             val sorted = sort(slots)
-            val snap = TaggerSnapshot(plugin, id)
+            val snap = TeleporterSnapshot(plugin, id)
 
             val maxLines = 6
             val maxColumns = 9
@@ -88,7 +84,7 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
     }
 
     class Page(
-        snap: TaggerSnapshot,
+        snap: TeleporterSnapshot,
         title: Text,
         width: Int,
         height: Int,
@@ -106,12 +102,18 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
                 .also {
                     offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
                 }
-                .name(Text_colorized("Таггер"))
+                .name(Text_colorized("Телепорт"))
                 .lore(Text_colorizedList(
                     "|y|Страница ${pageIndex + 1}/$total",
                     "|r|Для верного отображения",
                     "|r|заголовков столбцов",
                     "|r|используйте шрифт Unicode.",
+                    "|w|Выделение",
+                    "|g|ЛКМ|y|: Выделить всех",
+                    "|g|ПКМ|y|: Снять со всех выделение",
+                    "|g|Shift|y|+|g|ЛКМ|y|: Выделить всех, кто онлайн",
+                    "|g|Shift|y|+|g|ПКМ|y|: Выделить всех, кто офлайн",
+                    "|w|Навигация",
                     "|g|ЛКМ снаружи инвертаря|y|:",
                     "|y| Перейти на предыдущую страницу",
                     "|g|ПКМ снаружи инвертаря|y|:",
@@ -120,10 +122,23 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
                     "|y| Вернуться назад",
                     "",
                     "|g|Плагин: |y|Телепорт",
-                    "|g|Версия: |y|v" + snap.plugin.container.version.orElse("null")
+                    "|g|Версия: |y|v" + snap.guiplugin.container.version.orElse("null")
             ))
             .build()) {
-
+                when(it.type) {
+                    ItemClickEvent.Type.LEFT -> {
+                        snap.plugin.teleporter.invoke(it.player, Teleporter.Action.TAG, Teleporter.Group.ALL)
+                    }
+                    ItemClickEvent.Type.SHIFT_LEFT -> {
+                        snap.plugin.teleporter.invoke(it.player, Teleporter.Action.TAG, Teleporter.Group.ONLINE)
+                    }
+                    ItemClickEvent.Type.RIGHT -> {
+                        snap.plugin.teleporter.invoke(it.player, Teleporter.Action.UNTAG, Teleporter.Group.ALL)
+                    }
+                    ItemClickEvent.Type.SHIFT_RIGHT -> {
+                        snap.plugin.teleporter.invoke(it.player, Teleporter.Action.TAG, Teleporter.Group.OFFLINE)
+                    }
+                }
             }
             val returnItem = SimpleItem(ItemStackBuilderEx(ItemTypes.CHEST)
                 .name(pageTitle)
@@ -133,7 +148,7 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
                 .build()) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
-                        Task.builder().execute { task -> guiplugin.guistory.openPrev(it.player) }.submit(snap.plugin)
+                        Task.builder().execute { task -> guiplugin.guistory.openPrev(it.player) }.submit(snap.guiplugin)
                     }
                 }
             }
@@ -175,18 +190,18 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
             }
         }
 
-        class Item(val plugin: TeleporterPlugin, val uuid: UUID, name: String, var tagged: Boolean, val online: Boolean) : Snapshot.Page.Item(name) {
+        class Item(val plugin: TeleporterPlugin, uuid: UUID, name: String, var selected: Boolean, val online: Boolean) : Snapshot.Page.Item(uuid, name) {
 
             override val item: ItemStackSnapshot
                 get() = ItemStackBuilderEx(
                     if(online) {
-                        if(tagged) {
+                        if(selected) {
                             ItemTypes.DIAMOND
                         } else {
                             ItemTypes.COAL
                         }
                     } else {
-                        if(tagged) {
+                        if(selected) {
                             ItemTypes.DIAMOND_ORE
                         } else {
                             ItemTypes.COAL_ORE
@@ -196,7 +211,7 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
                     .name(Text_colorized(if(online) name else "$name |r|(Офлайн)"))
                     .lore(
                         Text_colorizedList(
-                            if (tagged) {
+                            if (selected) {
                                 "|g|ЛКМ|y|: отменить выбор"
                             } else {
                                 "|g|ЛКМ|y|: выбрать игрока"
@@ -230,12 +245,11 @@ class TaggerSnapshot(plugin: TeleporterPlugin, id: Identifiable) : Snapshot(plug
                 when(event.type) {
                     ItemClickEvent.Type.LEFT -> {
                         val result = plugin.teleporter.invoke(event.player, Teleporter.Action.TOGGLE, uuid)
-                        if (!result.getTagged().isEmpty()) {
-                            tagged = true
-                        } else if (!result.getUntagged().isEmpty()) {
-                            tagged = false
+                        if (!result.selected.isEmpty()) {
+                            selected = true
+                        } else if (!result.unselected.isEmpty()) {
+                            selected = false
                         }
-                        event.updateItem = true
                     }
 //                    ItemClickEvent.Type.RIGHT -> {
 //                        event.player.sendMessage(DefMes.notImplementedYet)

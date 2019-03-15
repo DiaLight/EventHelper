@@ -1,6 +1,8 @@
 package dialight.freezer
 
 import dialight.extensions.*
+import dialight.freezer.events.FreezerEvent
+import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.plugin.PluginContainer
@@ -24,15 +26,15 @@ class Freezer {
 
     class Result {
 
-        private val freezed = ArrayList<String>()
-        private val unfreezed = ArrayList<String>()
+        val freezed = ArrayList<FrozenPlayers.Frozen>()
+        val unfreezed = ArrayList<FrozenPlayers.Frozen>()
 
-        fun freeze(name: String) {
-            freezed.add(name)
+        fun freeze(frozen: FrozenPlayers.Frozen) {
+            freezed.add(frozen)
         }
 
-        fun unfreeze(name: String) {
-            unfreezed.add(name)
+        fun unfreeze(frozen: FrozenPlayers.Frozen) {
+            unfreezed.add(frozen)
         }
 
         fun sendReport(invoker: Player) {
@@ -44,14 +46,6 @@ class Freezer {
             }
         }
 
-        fun getFreezed(): List<String> {
-            return freezed
-        }
-
-        fun getUnfreezed(): List<String> {
-            return unfreezed
-        }
-
     }
 
     val frozen = FrozenPlayers()
@@ -59,13 +53,13 @@ class Freezer {
 
     fun forEachOnline(action: (UUID, String) -> Unit) {
         for (frozen in frozen.map.values) {
-            action(frozen.uniqueId, frozen.name)
+            action(frozen.uuid, frozen.name)
         }
     }
 
     fun forEachOffline(action: (UUID, String) -> Unit) {
         for (frozen in frozen.map.values) {
-            action(frozen.uniqueId, frozen.name)
+            action(frozen.uuid, frozen.name)
         }
     }
 
@@ -103,36 +97,22 @@ class Freezer {
     operator fun invoke(invoker: Player, action: Action, trg: Player): Result {
         val result = Result()
         when (action) {
-            Action.FREEZE -> if (frozen.freezeOnline(invoker, trg, false)) {
-                result.freeze(trg.name)
-            }
-            Action.UNFREEZE -> if (frozen.unfreezeOnline(invoker, trg)) {
-                result.unfreeze(trg.name)
-            }
-            Action.TOGGLE -> if (frozen.toggleOnline(invoker, trg)) {
-                result.freeze(trg.name)
-            } else {
-                result.unfreeze(trg.name)
-            }
+            Action.FREEZE -> frozen.freezeOnline(invoker, trg, result)
+            Action.UNFREEZE -> frozen.unfreezeOnline(invoker, trg, result)
+            Action.TOGGLE -> frozen.toggleOnline(invoker, trg, result)
         }
+        Sponge.getEventManager().post(FreezerEvent.ByPlayer(invoker, result))
         return result
     }
 
     operator fun invoke(invoker: Player, action: Action, trg: UUID, name: String): Result {
         val result = Result()
         when (action) {
-            Action.FREEZE -> if (frozen.freezeOffline(invoker, trg, name)) {
-                result.freeze(name)
-            }
-            Action.UNFREEZE -> if (frozen.unfreezeOffline(invoker, trg, name)) {
-                result.unfreeze(name)
-            }
-            Action.TOGGLE -> if (frozen.toggleOffline(invoker, trg, name)) {
-                result.freeze(name)
-            } else {
-                result.unfreeze(name)
-            }
+            Action.FREEZE -> frozen.freezeOffline(invoker, trg, name, result)
+            Action.UNFREEZE -> frozen.unfreezeOffline(invoker, trg, name, result)
+            Action.TOGGLE -> frozen.toggleOffline(invoker, trg, name, result)
         }
+        Sponge.getEventManager().post(FreezerEvent.ByPlayer(invoker, result))
         return result
     }
 
@@ -140,78 +120,43 @@ class Freezer {
         val result = Result()
         when (group) {
             Group.OFFLINE -> when (action) {
-                Action.FREEZE -> for (trg in Server_getOfflineUsers()) {
-                    if (frozen.freezeOffline(invoker, trg.uniqueId, trg.name)) {
-                        result.freeze(trg.name)
-                    }
-                }
+                Action.FREEZE -> for (trg in Server_getOfflineUsers()) { frozen.freezeOffline(invoker, trg.uniqueId, trg.name, result) }
                 Action.UNFREEZE -> frozen.unfreezeOfflineAll(invoker, result)
-                Action.TOGGLE -> for (trg in Server_getOfflineUsers()) {
-                    if (frozen.toggleOffline(invoker, trg.uniqueId, trg.name)) {
-                        result.freeze(trg.name)
-                    } else {
-                        result.unfreeze(trg.name)
-                    }
-                }
+                Action.TOGGLE -> for (trg in Server_getOfflineUsers()) { frozen.toggleOffline(invoker, trg.uniqueId, trg.name, result) }
             }
             Group.ONLINE -> when (action) {
-                Action.FREEZE -> for (trg in Server_getPlayers()) {
-                    if (frozen.freezeOnline(invoker, trg, true)) {
-                        result.freeze(trg.name)
-                    }
-                }
+                Action.FREEZE -> for (trg in Server_getPlayers()) frozen.freezeOnline(invoker, trg, result)
                 Action.UNFREEZE -> frozen.unfreezeOnlineAll(invoker, result)
-                Action.TOGGLE -> for (trg in Server_getPlayers()) {
-                    if (frozen.toggleOnline(invoker, trg)) {
-                        result.freeze(trg.name)
-                    } else {
-                        result.unfreeze(trg.name)
-                    }
-                }
+                Action.TOGGLE -> for (trg in Server_getPlayers()) { frozen.toggleOnline(invoker, trg, result) }
             }
             Group.ALL -> when (action) {
                 Action.FREEZE -> for (trg in Server_getUsers()) {
                     val player = trg.player.getOrNull()
                     if (player != null) {
-                        if (frozen.freezeOnline(invoker, player, true)) {
-                            result.freeze(trg.name)
-                        }
+                        frozen.freezeOnline(invoker, player, result)
                     } else {
-                        if (frozen.freezeOffline(invoker, trg.uniqueId, trg.name)) {
-                            result.freeze(trg.name)
-                        }
+                        frozen.freezeOffline(invoker, trg.uniqueId, trg.name, result)
                     }
                 }
                 Action.UNFREEZE -> for (trg in Server_getUsers()) {
                     val player = trg.player.getOrNull()
                     if (player != null) {
-                        if (frozen.unfreezeOnline(invoker, player)) {
-                            result.unfreeze(trg.name)
-                        }
+                        frozen.unfreezeOnline(invoker, player, result)
                     } else {
-                        if (frozen.unfreezeOffline(invoker, trg.uniqueId, trg.name)) {
-                            result.unfreeze(trg.name)
-                        }
+                        frozen.unfreezeOffline(invoker, trg.uniqueId, trg.name, result)
                     }
                 }
                 Action.TOGGLE -> for (trg in Server_getUsers()) {
                     val player = trg.player.getOrNull()
                     if (player != null) {
-                        if (frozen.toggleOnline(invoker, player)) {
-                            result.freeze(trg.name)
-                        } else {
-                            result.unfreeze(trg.name)
-                        }
+                        frozen.toggleOnline(invoker, player, result)
                     } else {
-                        if (frozen.toggleOffline(invoker, trg.uniqueId, trg.name)) {
-                            result.freeze(trg.name)
-                        } else {
-                            result.unfreeze(trg.name)
-                        }
+                        frozen.toggleOffline(invoker, trg.uniqueId, trg.name, result)
                     }
                 }
             }
         }
+        Sponge.getEventManager().post(FreezerEvent.ByPlayer(invoker, result))
         return result
     }
 
@@ -223,18 +168,11 @@ class Freezer {
     operator fun invoke(invoker: PluginContainer, action: Action, trg: Player): Result {
         val result = Result()
         when (action) {
-            Action.FREEZE -> if (frozen.freezeOnline(invoker, trg)) {
-                result.freeze(trg.name)
-            }
-            Action.UNFREEZE -> if (frozen.unfreezeOnline(invoker, trg)) {
-                result.unfreeze(trg.name)
-            }
-            Action.TOGGLE -> if (frozen.toggleOnline(invoker, trg)) {
-                result.freeze(trg.name)
-            } else {
-                result.unfreeze(trg.name)
-            }
+            Action.FREEZE -> frozen.freezeOnline(invoker, trg, result)
+            Action.UNFREEZE -> frozen.unfreezeOnline(invoker, trg, result)
+            Action.TOGGLE -> frozen.toggleOnline(invoker, trg, result)
         }
+        Sponge.getEventManager().post(FreezerEvent.ByPlugin(invoker, result))
         return result
     }
 
@@ -246,40 +184,20 @@ class Freezer {
                     if (loc == null) {
                         throw NullPointerException("location can not be null then using Action.FREEZE ang Group.OFFLINE")
                     }
-                    for (trg in Server_getOfflineUsers()) {
-                        if (frozen.freezeOffline(invoker, loc, trg.uniqueId, trg.name)) {
-                            result.freeze(trg.name)
-                        }
-                    }
+                    for (trg in Server_getOfflineUsers()) { frozen.freezeOffline(invoker, loc, trg.uniqueId, trg.name, result) }
                 }
                 Action.UNFREEZE -> frozen.unfreezeOfflineAll(invoker, result)
                 Action.TOGGLE -> {
                     if (loc == null) {
                         throw NullPointerException("location can not be null then using Action.TOGGLE ang Group.OFFLINE")
                     }
-                    for (trg in Server_getOfflineUsers()) {
-                        if (frozen.toggleOffline(invoker, loc, trg.uniqueId, trg.name)) {
-                            result.freeze(trg.name)
-                        } else {
-                            result.unfreeze(trg.name)
-                        }
-                    }
+                    for (trg in Server_getOfflineUsers()) { frozen.toggleOffline(invoker, loc, trg.uniqueId, trg.name, result) }
                 }
             }
             Group.ONLINE -> when (action) {
-                Action.FREEZE -> for (trg in Server_getPlayers()) {
-                    if (frozen.freezeOnline(invoker, trg)) {
-                        result.freeze(trg.name)
-                    }
-                }
+                Action.FREEZE -> for (trg in Server_getPlayers()) { frozen.freezeOnline(invoker, trg, result) }
                 Action.UNFREEZE -> frozen.unfreezeOnlineAll(invoker, result)
-                Action.TOGGLE -> for (trg in Server_getPlayers()) {
-                    if (frozen.toggleOnline(invoker, trg)) {
-                        result.freeze(trg.name)
-                    } else {
-                        result.unfreeze(trg.name)
-                    }
-                }
+                Action.TOGGLE -> for (trg in Server_getPlayers()) { frozen.toggleOnline(invoker, trg, result) }
             }
             Group.ALL -> when (action) {
                 Action.FREEZE -> {
@@ -289,26 +207,18 @@ class Freezer {
                     for (trg in Server_getUsers()) {
                         val player = trg.player.getOrNull()
                         if (player != null) {
-                            if (frozen.freezeOnline(invoker, player)) {
-                                result.freeze(trg.name)
-                            }
+                            frozen.freezeOnline(invoker, player, result)
                         } else {
-                            if (frozen.freezeOffline(invoker, loc, trg.uniqueId, trg.name)) {
-                                result.freeze(trg.name)
-                            }
+                            frozen.freezeOffline(invoker, loc, trg.uniqueId, trg.name, result)
                         }
                     }
                 }
                 Action.UNFREEZE -> for (trg in Server_getUsers()) {
                     val player = trg.player.getOrNull()
                     if (player != null) {
-                        if (frozen.unfreezeOnline(invoker, player)) {
-                            result.unfreeze(trg.name)
-                        }
+                        frozen.unfreezeOnline(invoker, player, result)
                     } else {
-                        if (frozen.unfreezeOffline(invoker, trg.uniqueId, trg.name)) {
-                            result.unfreeze(trg.name)
-                        }
+                        frozen.unfreezeOffline(invoker, trg.uniqueId, trg.name, result)
                     }
                 }
                 Action.TOGGLE -> {
@@ -318,22 +228,15 @@ class Freezer {
                     for (trg in Server_getUsers()) {
                         val player = trg.player.getOrNull()
                         if (player != null) {
-                            if (frozen.toggleOnline(invoker, player)) {
-                                result.freeze(trg.name)
-                            } else {
-                                result.unfreeze(trg.name)
-                            }
+                            frozen.toggleOnline(invoker, player, result)
                         } else {
-                            if (frozen.toggleOffline(invoker, loc, trg.uniqueId, trg.name)) {
-                                result.freeze(trg.name)
-                            } else {
-                                result.unfreeze(trg.name)
-                            }
+                            frozen.toggleOffline(invoker, loc, trg.uniqueId, trg.name, result)
                         }
                     }
                 }
             }
         }
+        Sponge.getEventManager().post(FreezerEvent.ByPlugin(invoker, result))
         return result
     }
     

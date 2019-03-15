@@ -3,7 +3,6 @@ package dialight.freezer.gui
 import dialight.extensions.*
 import dialight.freezer.Freezer
 import dialight.freezer.FreezerPlugin
-import dialight.guilib.View
 import dialight.guilib.events.ItemClickEvent
 import dialight.guilib.simple.SimpleItem
 import dialight.guilib.snapshot.Snapshot
@@ -21,7 +20,7 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.world.Location
 import java.util.*
 
-class FreezerSnapshot(plugin: FreezerPlugin, id: Identifiable) : Snapshot(plugin.guilib!!, id) {
+class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<FreezerSnapshot.Page>(plugin.guilib!!, id) {
 
     class Builder(val plugin: FreezerPlugin, val id: Identifiable, val player: Player) : Snapshot.Builder(
         Arrays.asList(
@@ -42,8 +41,8 @@ class FreezerSnapshot(plugin: FreezerPlugin, id: Identifiable) : Snapshot(plugin
                 players[user.uniqueId] = user
             }
             plugin.freezer.forEach { frozen ->
-                val user = players.remove(frozen.uniqueId)
-                slots.add(Page.Item(plugin, frozen.uniqueId, frozen.name, true, user!!.isOnline))
+                val user = players.remove(frozen.uuid)
+                slots.add(Page.Item(plugin, frozen.uuid, frozen.name, true, user!!.isOnline))
             }
             for (user in players.values) {
                 slots.add(Page.Item(plugin, user.uniqueId, user.name, false, user.isOnline))
@@ -107,9 +106,15 @@ class FreezerSnapshot(plugin: FreezerPlugin, id: Identifiable) : Snapshot(plugin
                 .lore(
                     Text_colorizedList(
                         "|y|Страница ${pageIndex + 1}/$total",
-                        "|r|Для корректного обображения",
-                        "|r|заголовков столбцов, используйте",
-                        "|r|узкий шрифт Майнкрафта.",
+                        "|r|Для верного отображения",
+                        "|r|заголовков столбцов",
+                        "|r|используйте шрифт Unicode.",
+                        "|w|Выделение",
+                        "|g|ЛКМ|y|: Выделить всех",
+                        "|g|ПКМ|y|: Снять со всех выделение",
+                        "|g|Shift|y|+|g|ЛКМ|y|: Выделить всех, кто онлайн",
+                        "|g|Shift|y|+|g|ПКМ|y|: Выделить всех, кто офлайн",
+                        "|w|Навигация",
                         "|g|ЛКМ снаружи инвертаря|y|:",
                         "|y| Перейти на предыдущую страницу",
                         "|g|ПКМ снаружи инвертаря|y|:",
@@ -118,11 +123,25 @@ class FreezerSnapshot(plugin: FreezerPlugin, id: Identifiable) : Snapshot(plugin
                         "|y| Вернуться назад",
                         "",
                         "|g|Плагин: |y|Замораживатель",
-                        "|g|Версия: |y|v" + snap.plugin.container.version.orElse("null")
+                        "|g|Версия: |y|v" + snap.guiplugin.container.version.orElse("null")
                     )
                 )
                 .build()) {
 
+                when(it.type) {
+                    ItemClickEvent.Type.LEFT -> {
+                        snap.plugin.freezer.invoke(it.player, Freezer.Action.FREEZE, Freezer.Group.ALL)
+                    }
+                    ItemClickEvent.Type.SHIFT_LEFT -> {
+                        snap.plugin.freezer.invoke(it.player, Freezer.Action.FREEZE, Freezer.Group.ONLINE)
+                    }
+                    ItemClickEvent.Type.RIGHT -> {
+                        snap.plugin.freezer.invoke(it.player, Freezer.Action.UNFREEZE, Freezer.Group.ALL)
+                    }
+                    ItemClickEvent.Type.SHIFT_RIGHT -> {
+                        snap.plugin.freezer.invoke(it.player, Freezer.Action.FREEZE, Freezer.Group.OFFLINE)
+                    }
+                }
             }
             val returnItem = SimpleItem(
                 ItemStackBuilderEx(ItemTypes.CHEST)
@@ -135,7 +154,7 @@ class FreezerSnapshot(plugin: FreezerPlugin, id: Identifiable) : Snapshot(plugin
                     .build()) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
-                        Task.builder().execute { task -> guiplugin.guistory.openPrev(it.player) }.submit(snap.plugin)
+                        Task.builder().execute { task -> guiplugin.guistory.openPrev(it.player) }.submit(snap.guiplugin)
                     }
                 }
             }
@@ -183,7 +202,7 @@ class FreezerSnapshot(plugin: FreezerPlugin, id: Identifiable) : Snapshot(plugin
             }
         }
 
-        class Item(val plugin: FreezerPlugin, val uuid: UUID, name: String, var tagged: Boolean, val online: Boolean) : Snapshot.Page.Item(name) {
+        class Item(val plugin: FreezerPlugin, uuid: UUID, name: String, var tagged: Boolean, val online: Boolean) : Snapshot.Page.Item(uuid, name) {
 
             override val item: ItemStackSnapshot
                 get() = ItemStackBuilderEx(
@@ -237,9 +256,9 @@ class FreezerSnapshot(plugin: FreezerPlugin, id: Identifiable) : Snapshot(plugin
                 when(event.type) {
                     ItemClickEvent.Type.LEFT -> {
                         val result = plugin.freezer.invoke(event.player, Freezer.Action.TOGGLE, uuid)
-                        if (!result.getFreezed().isEmpty()) {
+                        if (!result.freezed.isEmpty()) {
                             tagged = true
-                        } else if (!result.getUnfreezed().isEmpty()) {
+                        } else if (!result.unfreezed.isEmpty()) {
                             tagged = false
                         }
                         event.updateItem = true

@@ -7,9 +7,9 @@ import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.property.Identifiable
 import java.util.*
 
-abstract class SnapshotGui : Gui {
+abstract class SnapshotGui<T : Snapshot<*>> : Gui {
 
-    val opened = hashMapOf<UUID, Snapshot>()
+    val opened = hashMapOf<UUID, T>()
 
     val id = Identifiable()
 
@@ -19,7 +19,7 @@ abstract class SnapshotGui : Gui {
         return id.value!! == oprop.get().value!!
     }
 
-    abstract fun createSnapshot(player: Player): Snapshot
+    abstract fun createSnapshot(player: Player): T
 
     override fun getView(player: Player): View {
         val snap = createSnapshot(player)

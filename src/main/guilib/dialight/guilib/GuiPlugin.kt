@@ -19,6 +19,7 @@ class GuiPlugin @Inject constructor(
     val logger: Logger
 ) {
 
+    val guimap = GuiMap(this)
     val guistory = GuiStory(this)
 
     @Listener
@@ -27,7 +28,7 @@ class GuiPlugin @Inject constructor(
         logger.info("GuiLib v${container.version.orElse("null")} has been Enabled")
     }
 
-    fun openView(player: Player, view: View) = guistory.openView(player, view)
+    fun openView(player: Player, view: View) = guimap.openView(player, view)
     fun openGui(player: Player, gui: Gui) = guistory.openGui(player, gui)
     fun openLast(player: Player) = guistory.openLast(player)
     fun clearStory(player: Player) = guistory.clearStory(player)

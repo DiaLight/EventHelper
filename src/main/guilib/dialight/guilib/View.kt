@@ -12,8 +12,8 @@ interface View {
 
     val inventory: Inventory
 
-    operator fun get(index: Int): Item?
-    operator fun set(index: Int, item: Item?)
+    operator fun get(index: Int): View.Item?
+    operator fun set(index: Int, item: View.Item?)
 
     fun onOutsideClick(event: GuiOutsideClickEvent)
 

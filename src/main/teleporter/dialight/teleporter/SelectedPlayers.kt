@@ -9,20 +9,19 @@ import java.util.stream.Collectors
 
 class SelectedPlayers {
 
-    val selected = HashMap<UUID, String>()
+    val selected = HashMap<UUID, Teleporter.Selected>()
 
-    fun toggletagOffline(trg: UUID, name: String): Boolean {
-        if (selected.remove(trg) != null) {
+    fun toggletagOffline(sel: Teleporter.Selected): Boolean {
+        if (selected.remove(sel.uuid) != null) {
             return false
         }
-        selected[trg] = name
+        selected[sel.uuid] = sel
         return true
     }
 
-    fun tagOffline(trg: UUID, name: String): Boolean = selected.put(trg, name) == null
-    fun untagOffline(trg: UUID, name: String): Boolean = selected.remove(trg) != null
-    fun getAll(): Collection<UUID> = selected.keys
-    fun getAllNames(): Collection<String> = selected.values
+    fun tagOffline(sel: Teleporter.Selected): Boolean = selected.put(sel.uuid, sel) == null
+    fun untagOffline(trg: UUID): Teleporter.Selected? = selected.remove(trg)
+    fun untagOffline(sel: Teleporter.Selected): Boolean = selected.remove(sel.uuid) != null
 
 
     val offline: Collection<User>
@@ -44,7 +43,7 @@ class SelectedPlayers {
                 .collect(Collectors.toCollection<Player, ArrayList<Player>> { ArrayList() })
         }
 
-    fun forEach(action: (UUID, String) -> Unit) = selected.forEach(action)
+    fun forEach(action: (Teleporter.Selected) -> Unit) = selected.values.forEach(action)
 
 
 }

@@ -1,14 +1,12 @@
 package dialight.teleporter.offline
 
-import dialight.teleporter.PlayerTeleportEvent
+import dialight.teleporter.event.PlayerTeleportEvent
 import dialight.teleporter.TeleporterPlugin
 import dialight.teleporter.teleportSafe
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.event.Listener
-import org.spongepowered.api.event.cause.Cause
-import org.spongepowered.api.event.cause.EventContext
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.event.network.ClientConnectionEvent
 import org.spongepowered.api.world.Location

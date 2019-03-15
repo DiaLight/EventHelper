@@ -4,24 +4,23 @@ import dialight.guilib.GuiPlugin
 import dialight.guilib.IdentifiableView
 import dialight.guilib.View
 import dialight.guilib.events.GuiOutsideClickEvent
-import dialight.teleporter.gui.TaggerSnapshot
+import dialight.teleporter.gui.TeleporterSnapshot
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.inventory.property.Identifiable
 import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.text.Text
-import java.util.ArrayList
-import java.util.HashMap
+import java.util.*
 
-open class Snapshot(
-    val plugin: GuiPlugin,
+open class Snapshot<T : Snapshot.Page>(
+    val guiplugin: GuiPlugin,
     val id: Identifiable
 ) {
 
-    val pages = ArrayList<Page>()
+    val pages = ArrayList<T>()
 
     var pageIndex = 0
 
-    val current: Page
+    val current: T
         get() = pages[pageIndex]
     var changingPage = false
 
@@ -31,7 +30,7 @@ open class Snapshot(
         if(prevIndex < 0) return false
         pageIndex = prevIndex
         changingPage = true
-        plugin.openView(player, current)
+        guiplugin.openView(player, current)
         return true
     }
 
@@ -40,21 +39,23 @@ open class Snapshot(
         if(nextIndex >= pages.size) return false
         pageIndex = nextIndex
         changingPage = true
-        plugin.openView(player, current)
+        guiplugin.openView(player, current)
         return true
     }
 
 
     open class Page(
-        val snap: Snapshot,
+        val snap: Snapshot<*>,
         title: Text,
         width: Int,
         height: Int,
         pageIndex: Int,
         total: Int
     ) : IdentifiableView(
-        snap.plugin, snap.id, title, width, height
+        snap.guiplugin, snap.id, title, width, height
     ) {
+
+        private val items = HashMap<UUID, Pair<Int, Item>>()
 
         override fun onOutsideClick(event: GuiOutsideClickEvent) {
             when(event.type) {
@@ -62,7 +63,7 @@ open class Snapshot(
                     snap.backward(event.player)
                 }
                 GuiOutsideClickEvent.Type.MIDDLE -> {
-                    Task.builder().execute { task -> guiplugin.guistory.openPrev(event.player) }.submit(snap.plugin)
+                    Task.builder().execute { task -> guiplugin.guistory.openPrev(event.player) }.submit(snap.guiplugin)
                 }
                 GuiOutsideClickEvent.Type.RIGHT -> {
                     snap.forward(event.player)
@@ -70,7 +71,24 @@ open class Snapshot(
             }
         }
 
-        abstract class Item(val name: String) : View.Item {
+        operator fun get(uuid: UUID) = items[uuid]
+        override operator fun set(index: Int, item: View.Item?) {
+            if(item == null) {
+                val oldItem = this[index]
+                if(oldItem != null)  {
+                    if(oldItem is Item) {
+                        items.remove(oldItem.uuid)
+                    }
+                }
+            } else {
+                if(item is Item) {
+                    items[item.uuid] = Pair(index, item)
+                }
+            }
+            super.set(index, item)
+        }
+
+        abstract class Item(val uuid: UUID, val name: String) : View.Item {
 
         }
 

@@ -25,7 +25,7 @@ abstract class IdentifiableView(
         .property(id)
         .build(guiplugin)
 
-    val items = Array<View.Item?>(width * height) { null }
+    private val items = Array<View.Item?>(width * height) { null }
 
     override operator fun get(index: Int) = items[index]
     override operator fun set(index: Int, item: View.Item?) {

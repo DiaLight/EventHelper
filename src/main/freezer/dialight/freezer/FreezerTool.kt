@@ -21,10 +21,9 @@ class FreezerTool(val plugin: FreezerPlugin) : Tool(FreezerTool.ID) {
     override val title = Text_colorized("|a|Замораживатель игроков")
     override val lore = Text_colorizedList(
         "|w|Заморозка",
-        "|g|ЛКМ/ПКМ по игроку|y|: заморозить игрока",
+        "|g|ЛКМ по игроку|y|: заморозить/разморозить игрока",
         "|w|Выбор игроков",
-        "|g|ЛКМ/ПКМ|y|: открыть замораживатель",
-        "|g|Shift|y|+|g|ЛКМ|y|: разморозить всех",
+        "|g|ПКМ|y|: открыть замораживатель",
         "|g|Shift|y|+|g|ПКМ|y|: добавить замороженных",
         "|y| в список телепортируемых",
         "",
@@ -42,32 +41,16 @@ class FreezerTool(val plugin: FreezerPlugin) : Tool(FreezerTool.ID) {
                     }
                 } else {
                     val p2 = Utils.getEnByDirection(e.player, 20.0, 1.5, EntityTypes.PLAYER) as? Player
-                    if (p2 == null) {
-                        plugin.guilib?.also { guilib ->
-                            guilib.openGui(e.player, plugin.freezergui)
-                        }
-                    } else {
+                    if (p2 != null) {
                         plugin.freezer.invoke(e.player, Freezer.Action.TOGGLE, p2)
                     }
                 }
             } else {
-                plugin.freezer.invoke(e.player, Freezer.Action.UNFREEZE, Freezer.Group.ONLINE)
+
             }
             ToolInteractEvent.Type.RIGHT_CLICK -> if (!e.sneaking) {
-                if (e.type == ToolInteractEvent.Target.ENTITY) {
-                    e as ToolInteractEvent.Entity
-                    if (e.entity.type == EntityTypes.PLAYER) {
-                        plugin.freezer.invoke(e.player, Freezer.Action.TOGGLE, e.entity as Player)
-                    }
-                } else {
-                    val p2 = Utils.getEnByDirection(e.player, 20.0, 1.5, EntityTypes.PLAYER) as? Player
-                    if (p2 == null) {
-                        plugin.guilib?.also { guilib ->
-                            guilib.openGui(e.player, plugin.freezergui)
-                        }
-                    } else {
-                        plugin.freezer.invoke(e.player, Freezer.Action.TOGGLE, p2)
-                    }
+                plugin.guilib?.also { guilib ->
+                    guilib.openGui(e.player, plugin.freezergui)
                 }
             } else {
                 val teleporter = plugin.teleporter.teleporter

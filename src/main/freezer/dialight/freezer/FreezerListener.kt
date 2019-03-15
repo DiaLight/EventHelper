@@ -1,28 +1,20 @@
 package dialight.freezer
 
-import dialight.extensions.dump
-import dialight.teleporter.PlayerTeleportEvent
+import dialight.teleporter.event.PlayerTeleportEvent
 import net.minecraft.entity.item.EntityItem
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.DataTransactionResult
 import org.spongepowered.api.data.key.Key
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.value.immutable.ImmutableValue
-import org.spongepowered.api.data.value.mutable.Value
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.action.InteractEvent
 import org.spongepowered.api.event.block.ChangeBlockEvent
-import org.spongepowered.api.event.cause.Cause
-import org.spongepowered.api.event.cause.EventContext
-import org.spongepowered.api.event.cause.entity.damage.DamageModifier
 import org.spongepowered.api.event.data.ChangeDataHolderEvent
 import org.spongepowered.api.event.entity.*
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.event.item.inventory.DropItemEvent
-import org.spongepowered.api.event.network.ClientConnectionEvent
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
 
@@ -51,7 +43,7 @@ class FreezerListener(val plugin: FreezerPlugin) {
 //    fun onPluginDisable(e: PluginDisableEvent) {
 //        if (e.getPlugin().getName() != eventHelper.plugin.getName()) return
 //        for (frozen in this.map.values) {
-//            val trg = Bukkit.getPlayer(frozen.getUniqueId()) ?: continue
+//            val trg = Bukkit.getPlayer(frozen.getUuid()) ?: continue
 //            FreezerMessages.unfreezeByReload(trg)
 //        }
 //    }
@@ -81,11 +73,11 @@ class FreezerListener(val plugin: FreezerPlugin) {
 //    }
 //
 //    protected fun onFreezeOffline(frozen: FrozenPlayers.Frozen) {
-//        this.freezeFlayers.setFlyFuture(frozen.uniqueId)
+//        this.freezeFlayers.setFlyFuture(frozen.uuid)
 //    }
 //
 //    protected fun onUnfreezeOffline(frozen: FrozenPlayers.Frozen) {
-//        this.freezeFlayers.removeFlyFuture(frozen.uniqueId)
+//        this.freezeFlayers.removeFlyFuture(frozen.uuid)
 //    }
 
     //////////////////////////////HOLDER/////////////////////////////////

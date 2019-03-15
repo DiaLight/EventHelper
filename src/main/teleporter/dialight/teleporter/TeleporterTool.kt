@@ -2,6 +2,7 @@ package dialight.teleporter
 
 import dialight.eventhelper.EventHelperTool
 import dialight.extensions.*
+import dialight.teleporter.event.PlayerTeleportEvent
 import dialight.toollib.Tool
 import dialight.toollib.events.ToolInteractEvent
 import jekarus.colorizer.Colorizer
@@ -12,8 +13,6 @@ import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.User
-import org.spongepowered.api.event.cause.Cause
-import org.spongepowered.api.event.cause.EventContext
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
@@ -41,7 +40,7 @@ class TeleporterTool(val plugin: TeleporterPlugin) : Tool(TeleporterTool.ID) {
 
     private fun teleport(e: ToolInteractEvent, online: Collection<Player>, offline: Collection<User>) {
         if (online.isEmpty() && offline.isEmpty()) {
-            e.player.sendMessage(TeleporterMessages.noPlayersTagged)
+            e.player.sendMessage(TeleporterMessages.noPlayersSelected)
             return
         }
         val trgLoc = e.lookingAtLoc()
@@ -79,7 +78,7 @@ class TeleporterTool(val plugin: TeleporterPlugin) : Tool(TeleporterTool.ID) {
                 } else {
                     val p2 = Utils.getEnByDirection(e.player, 20.0, 1.5, EntityTypes.PLAYER)
                     if (p2 == null) {
-                        plugin.guilib?.openGui(e.player, plugin.taggergui)
+                        plugin.guilib?.openGui(e.player, plugin.teleportergui)
                     } else {
                         val result = plugin.teleporter.invoke(e.player, Teleporter.Action.TOGGLE, p2 as Player)
                         result.sendReport(e.player)
