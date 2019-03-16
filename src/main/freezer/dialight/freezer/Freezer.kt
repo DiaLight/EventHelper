@@ -1,5 +1,6 @@
 package dialight.freezer
 
+import com.google.common.collect.Iterators
 import dialight.extensions.*
 import dialight.freezer.events.FreezerEvent
 import org.spongepowered.api.Sponge
@@ -24,7 +25,7 @@ class Freezer {
         ALL
     }
 
-    class Result {
+    class Result : Iterable<FrozenPlayers.Frozen> {
 
         val freezed = ArrayList<FrozenPlayers.Frozen>()
         val unfreezed = ArrayList<FrozenPlayers.Frozen>()
@@ -36,6 +37,8 @@ class Freezer {
         fun unfreeze(frozen: FrozenPlayers.Frozen) {
             unfreezed.add(frozen)
         }
+
+        override fun iterator() = Iterators.concat(freezed.iterator(), unfreezed.iterator())
 
         fun sendReport(invoker: Player) {
             if (!freezed.isEmpty()) {

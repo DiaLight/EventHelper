@@ -8,6 +8,7 @@ import dialight.teleporter.event.TeleporterEvent
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.filter.cause.First
+import org.spongepowered.api.event.network.ClientConnectionEvent
 import org.spongepowered.api.scheduler.Task
 
 class TeleporterGui(val plugin: TeleporterPlugin) : SnapshotGui<TeleporterSnapshot>() {
@@ -21,14 +22,35 @@ class TeleporterGui(val plugin: TeleporterPlugin) : SnapshotGui<TeleporterSnapsh
             val inv = plugin.guilib!!.guimap[player] ?: return@execute
             for(sel in e.result.selected) {
                 val (index, item) = snap.current[sel.uuid] ?: continue
-//                println("$index $sel ${item.item.type} ${item.item.type.block}")
                 inv[index] = item.item.createStack()
             }
             for(sel in e.result.unselected) {
                 val (index, item) = snap.current[sel.uuid] ?: continue
                 inv[index] = item.item.createStack()
             }
-        }.delayTicks(10).submit(plugin)
+        }.submit(plugin)
+        snap.update(e.result)
+    }
+
+    @Listener
+    fun onJoin(event: ClientConnectionEvent.Join, @First player: Player) {
+        for ((uuid, snap) in opened) {
+            snap.update(player.uniqueId)
+            val inv = plugin.guilib!!.guimap[uuid] ?: continue
+            val (index, item) = snap.current[player.uniqueId] ?: continue
+            inv[index] = item.item.createStack()
+        }
+    }
+    @Listener
+    fun onExit(event: ClientConnectionEvent.Disconnect, @First player: Player) {
+        Task.builder().execute { task ->
+            for ((uuid, snap) in opened) {
+                snap.update(player.uniqueId)
+                val inv = plugin.guilib!!.guimap[uuid] ?: continue
+                val (index, item) = snap.current[player.uniqueId] ?: continue
+                inv[index] = item.item.createStack()
+            }
+        }.submit(plugin)
     }
 
 }

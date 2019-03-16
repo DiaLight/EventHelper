@@ -24,7 +24,6 @@ open class Snapshot<T : Snapshot.Page>(
         get() = pages[pageIndex]
     var changingPage = false
 
-
     fun backward(player: Player): Boolean {
         val prevIndex = pageIndex - 1
         if(prevIndex < 0) return false
@@ -49,8 +48,7 @@ open class Snapshot<T : Snapshot.Page>(
         title: Text,
         width: Int,
         height: Int,
-        pageIndex: Int,
-        total: Int
+        val index: Int
     ) : IdentifiableView(
         snap.guiplugin, snap.id, title, width, height
     ) {
@@ -69,6 +67,10 @@ open class Snapshot<T : Snapshot.Page>(
                     snap.forward(event.player)
                 }
             }
+        }
+
+        fun forEach(op: (Int, Item) -> Unit) {
+            items.values.forEach { op(it.first, it.second) }
         }
 
         operator fun get(uuid: UUID) = items[uuid]

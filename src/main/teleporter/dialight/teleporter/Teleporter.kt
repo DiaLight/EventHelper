@@ -1,5 +1,6 @@
 package dialight.teleporter
 
+import com.google.common.collect.Iterators
 import dialight.extensions.*
 import dialight.teleporter.event.TeleporterEvent
 import org.spongepowered.api.Sponge
@@ -24,7 +25,7 @@ class Teleporter {
         ALL
     }
 
-    class Result {
+    class Result : Iterable<Teleporter.Selected> {
 
         val selected = ArrayList<Teleporter.Selected>()
         val unselected = ArrayList<Teleporter.Selected>()
@@ -37,6 +38,9 @@ class Teleporter {
             unselected.add(sel)
         }
 
+        override fun iterator() = Iterators.concat(selected.iterator(), unselected.iterator())
+
+
         fun sendReport(invoker: Player) {
             if (!selected.isEmpty()) {
                 invoker.sendMessage(TeleporterMessages.selected(selected))
@@ -46,8 +50,6 @@ class Teleporter {
             }
         }
 
-        fun getUnselected(): List<Teleporter.Selected> = unselected
-
         fun add(result: Result) {
             this.selected.addAll(result.selected)
             this.unselected.addAll(result.unselected)
@@ -55,9 +57,8 @@ class Teleporter {
     }
 
     private val registry = HashMap<UUID, SelectedPlayers>()
-    operator fun get(invoker: Player): SelectedPlayers {
-        return registry.getOrPut(invoker.uniqueId) { SelectedPlayers() }
-    }
+    operator fun get(invoker: Player) = get(invoker.uniqueId)
+    operator fun get(uuid: UUID) = registry.getOrPut(uuid) { SelectedPlayers() }
     
     @Deprecated("Search for player by name is long time process. ")
     operator fun invoke(invoker: Player, action: Action, trgName: String): Result {

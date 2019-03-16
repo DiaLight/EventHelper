@@ -11,6 +11,8 @@ class SelectedPlayers {
 
     val selected = HashMap<UUID, Teleporter.Selected>()
 
+    operator fun get(uuid: UUID) = selected[uuid]
+
     fun toggletagOffline(sel: Teleporter.Selected): Boolean {
         if (selected.remove(sel.uuid) != null) {
             return false

@@ -4,6 +4,7 @@ import dialight.extensions.*
 import dialight.guilib.events.ItemClickEvent
 import dialight.guilib.simple.SimpleItem
 import dialight.guilib.snapshot.Snapshot
+import dialight.teleporter.SelectedPlayers
 import dialight.teleporter.Teleporter
 import dialight.teleporter.TeleporterPlugin
 import jekarus.colorizer.Text_colorized
@@ -20,8 +21,24 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.world.Location
 import java.util.*
 
-class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable) : Snapshot<TeleporterSnapshot.Page>(plugin.guilib!!, id) {
-    
+class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uuid: UUID, val name: String) : Snapshot<TeleporterSnapshot.Page>(plugin.guilib!!, id) {
+
+    val selected: SelectedPlayers
+        get() = plugin.teleporter[uuid]
+
+    fun update(result: Teleporter.Result) {
+        val sels = selected
+        for(sel in result) {
+            update(sel.uuid, sels)
+        }
+    }
+
+    fun update(uuid: UUID, sels: SelectedPlayers = selected) {
+        for(page in pages) {
+            if(page.update(sels, uuid)) break
+        }
+    }
+
     class Builder(val plugin: TeleporterPlugin, val id: Identifiable, val player: Player) : Snapshot.Builder(
         Arrays.asList(
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -33,6 +50,7 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable) : Snaps
         )
     ) {
 
+        private val snap = TeleporterSnapshot(plugin, id, player.uniqueId, player.name)
 
         private fun collect(): ArrayList<Page.Item> {
             val slots = ArrayList<Page.Item>()
@@ -42,14 +60,16 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable) : Snaps
             }
             plugin.teleporter.forEach(player) {
                 val user = players.remove(it.uuid)
-                slots.add(Page.Item(plugin, it.uuid, it.name, true, user!!.isOnline))
+                slots.add(Page.Item(snap, it.uuid, it.name))
             }
             for (user in players.values) {
-                slots.add(Page.Item(plugin, user.uniqueId, user.name, false, user.isOnline))
+                slots.add(Page.Item(snap, user.uniqueId, user.name))
             }
             slots.sortWith(kotlin.Comparator { o1, o2 ->
-                if (o1.selected && !o2.selected) return@Comparator -1
-                if (!o1.selected && o2.selected) return@Comparator 1
+                val o1sel = o1.selected != null
+                val o2sel = o2.selected != null
+                if (o1sel && !o2sel) return@Comparator -1
+                if (!o1sel && o2sel) return@Comparator 1
                 if (!o2.online) return@Comparator -1
                 return@Comparator 0
             })
@@ -59,7 +79,6 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable) : Snaps
         fun build(): TeleporterSnapshot {
             val slots = collect()
             val sorted = sort(slots)
-            val snap = TeleporterSnapshot(plugin, id)
 
             val maxLines = 6
             val maxColumns = 9
@@ -88,23 +107,23 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable) : Snaps
         title: Text,
         width: Int,
         height: Int,
-        pageIndex: Int,
+        index: Int,
         total: Int
     ): Snapshot.Page(
-        snap, title, width, height, pageIndex, total
+        snap, title, width, height, index
     ) {
 
         init {
             val botleft = (height - 1) * width
             val botmid = botleft + width / 2
-            val pageTitle = Text_colorized("Страница ${pageIndex + 1}/$total")
+            val pageTitle = Text_colorized("Страница ${index + 1}/$total")
             val descriptionItem = SimpleItem(ItemStackBuilderEx(ItemTypes.STAINED_GLASS_PANE)
                 .also {
                     offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
                 }
                 .name(Text_colorized("Телепорт"))
                 .lore(Text_colorizedList(
-                    "|y|Страница ${pageIndex + 1}/$total",
+                    "|y|Страница ${index + 1}/$total",
                     "|r|Для верного отображения",
                     "|r|заголовков столбцов",
                     "|r|используйте шрифт Unicode.",
@@ -176,42 +195,60 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable) : Snaps
                     }
                 }
             }
-            for (index in botleft..(botleft + width - 1)) {
-                val item = if(index == botmid) {
+            for (itemId in botleft..(botleft + width - 1)) {
+                val item = if(itemId == botmid) {
                     returnItem
-                } else if(pageIndex != 0 && index == botmid - 1) {
+                } else if(index != 0 && itemId == botmid - 1) {
                     backwardItem
-                } else if(pageIndex + 1 != total && index == botmid + 1) {
+                } else if(index + 1 != total && itemId == botmid + 1) {
                     forwardItem
                 } else {
                     descriptionItem
                 }
-                this[index] = item
+                this[itemId] = item
             }
         }
 
-        class Item(val plugin: TeleporterPlugin, uuid: UUID, name: String, var selected: Boolean, val online: Boolean) : Snapshot.Page.Item(uuid, name) {
+        fun update(sels: SelectedPlayers, uuid: UUID): Boolean {
+            val (index, item) = this[uuid] ?: return false
+            item as Item
+            inventory[index] = item.getItem(sels).createStack()
+            return true
+        }
+
+        class Item(val snap: TeleporterSnapshot, uuid: UUID, name: String) : Snapshot.Page.Item(uuid, name) {
+
+            val selected: Teleporter.Selected?
+                get() = snap.selected[uuid]
+
+            val online: Boolean
+                get() = Server_getUser(uuid)?.isOnline ?: false
 
             override val item: ItemStackSnapshot
-                get() = ItemStackBuilderEx(
-                    if(online) {
-                        if(selected) {
+                get() = getItem(snap.selected)
+
+
+            fun getItem(sels: SelectedPlayers): ItemStackSnapshot{
+                val selected = sels[uuid]
+                return ItemStackBuilderEx(
+                    if (online) {
+                        if (selected != null) {
                             ItemTypes.DIAMOND
                         } else {
                             ItemTypes.COAL
                         }
                     } else {
-                        if(selected) {
+                        if (selected != null) {
                             ItemTypes.DIAMOND_ORE
                         } else {
                             ItemTypes.COAL_ORE
                         }
                     }
                 )
-                    .name(Text_colorized(if(online) name else "$name |r|(Офлайн)"))
+                    .name(Text_colorized(if (online) name else "$name |r|(Офлайн)"))
                     .lore(
                         Text_colorizedList(
-                            if (selected) {
+                            if (selected != null) {
                                 "|g|ЛКМ|y|: отменить выбор"
                             } else {
                                 "|g|ЛКМ|y|: выбрать игрока"
@@ -221,12 +258,12 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable) : Snaps
                         )
                     )
                     .build()
-
+            }
 
             private fun teleport(player: Player): Boolean {
                 val trg = Server_getPlayer(uuid)
                 if (trg != null) {
-                    Task.builder().execute { task -> player.location = trg.location }.submit(plugin)
+                    Task.builder().execute { task -> player.location = trg.location }.submit(snap.plugin)
                     return true
                 }
                 val usr = Server_getUser(uuid) ?: return false
@@ -237,25 +274,20 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable) : Snaps
                 if(!oToWorld.isPresent) return false
                 val toWorld = oToWorld.get()
                 if(toWorld != worldId) return false
-                Task.builder().execute { task -> player.location = Location(player.world, usr.position) }.submit(plugin)
+                Task.builder().execute { task -> player.location = Location(player.world, usr.position) }.submit(snap.plugin)
                 return true
             }
 
             override fun onClick(event: ItemClickEvent) {
-                when(event.type) {
+                when (event.type) {
                     ItemClickEvent.Type.LEFT -> {
-                        val result = plugin.teleporter.invoke(event.player, Teleporter.Action.TOGGLE, uuid)
-                        if (!result.selected.isEmpty()) {
-                            selected = true
-                        } else if (!result.unselected.isEmpty()) {
-                            selected = false
-                        }
+                        val result = snap.plugin.teleporter.invoke(event.player, Teleporter.Action.TOGGLE, uuid)
                     }
 //                    ItemClickEvent.Type.RIGHT -> {
 //                        event.player.sendMessage(DefMes.notImplementedYet)
 //                    }
                     ItemClickEvent.Type.SHIFT_RIGHT -> {
-                        if(!teleport(event.player)) {
+                        if (!teleport(event.player)) {
                             event.player.sendMessage(Text_colorized("|r|Не могу телепортировать к игроку"))
                         }
                     }

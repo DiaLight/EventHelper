@@ -3,9 +3,11 @@ package dialight.freezer.gui
 import dialight.extensions.*
 import dialight.freezer.Freezer
 import dialight.freezer.FreezerPlugin
+import dialight.freezer.FrozenPlayers
 import dialight.guilib.events.ItemClickEvent
 import dialight.guilib.simple.SimpleItem
 import dialight.guilib.snapshot.Snapshot
+import dialight.teleporter.gui.TeleporterSnapshot
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
 import org.spongepowered.api.data.key.Keys
@@ -22,7 +24,20 @@ import java.util.*
 
 class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<FreezerSnapshot.Page>(plugin.guilib!!, id) {
 
-    class Builder(val plugin: FreezerPlugin, val id: Identifiable, val player: Player) : Snapshot.Builder(
+    fun update(result: Freezer.Result) {
+        for(frz in result) {
+            update(frz.uuid)
+        }
+    }
+
+    fun update(uuid: UUID) {
+        val frozen = plugin.freezer.frozen
+        for(page in pages) {
+            if(page.update(frozen, uuid)) break
+        }
+    }
+
+    class Builder(val plugin: FreezerPlugin, val id: Identifiable) : Snapshot.Builder(
         Arrays.asList(
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
             'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -42,14 +57,16 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<Fr
             }
             plugin.freezer.forEach { frozen ->
                 val user = players.remove(frozen.uuid)
-                slots.add(Page.Item(plugin, frozen.uuid, frozen.name, true, user!!.isOnline))
+                slots.add(Page.Item(plugin, frozen.uuid, frozen.name))
             }
             for (user in players.values) {
-                slots.add(Page.Item(plugin, user.uniqueId, user.name, false, user.isOnline))
+                slots.add(Page.Item(plugin, user.uniqueId, user.name))
             }
             slots.sortWith(kotlin.Comparator { o1, o2 ->
-                if (o1.tagged && !o2.tagged) return@Comparator -1
-                if (!o1.tagged && o2.tagged) return@Comparator 1
+                val o1tg = o1.tagged != null
+                val o2tg = o2.tagged != null
+                if (o1tg && !o2tg) return@Comparator -1
+                if (!o1tg && o2tg) return@Comparator 1
                 if (!o2.online) return@Comparator -1
                 return@Comparator 0
             })
@@ -88,16 +105,16 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<Fr
         title: Text,
         width: Int,
         height: Int,
-        pageIndex: Int,
+        index: Int,
         total: Int
     ): Snapshot.Page(
-        snap, title, width, height, pageIndex, total
+        snap, title, width, height, index
     ) {
 
         init {
             val botleft = (height - 1) * width
             val botmid = botleft + width / 2
-            val pageTitle = Text_colorized("Страница ${pageIndex + 1}/$total")
+            val pageTitle = Text_colorized("Страница ${index + 1}/$total")
             val descriptionItem = SimpleItem(ItemStackBuilderEx(ItemTypes.STAINED_GLASS_PANE)
                 .also {
                     offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
@@ -105,7 +122,7 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<Fr
                 .name(Text_colorized("Замораживатель"))
                 .lore(
                     Text_colorizedList(
-                        "|y|Страница ${pageIndex + 1}/$total",
+                        "|y|Страница ${index + 1}/$total",
                         "|r|Для верного отображения",
                         "|r|заголовков столбцов",
                         "|r|используйте шрифт Unicode.",
@@ -188,39 +205,57 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<Fr
                     }
                 }
             }
-            for (index in botleft..(botleft + width - 1)) {
-                val item = if(index == botmid) {
+            for (itemId in botleft..(botleft + width - 1)) {
+                val item = if(itemId == botmid) {
                     returnItem
-                } else if(pageIndex != 0 && index == botmid - 1) {
+                } else if(index != 0 && itemId == botmid - 1) {
                     backwardItem
-                } else if(pageIndex + 1 != total && index == botmid + 1) {
+                } else if(index + 1 != total && itemId == botmid + 1) {
                     forwardItem
                 } else {
                     descriptionItem
                 }
-                this[index] = item
+                this[itemId] = item
             }
         }
 
-        class Item(val plugin: FreezerPlugin, uuid: UUID, name: String, var tagged: Boolean, val online: Boolean) : Snapshot.Page.Item(uuid, name) {
+        fun update(frozen: FrozenPlayers, uuid: UUID): Boolean {
+            val (index, item) = this[uuid] ?: return false
+            item as Item
+            inventory[index] = item.getItem(frozen).createStack()
+            return true
+        }
+
+        class Item(val plugin: FreezerPlugin, uuid: UUID, name: String) : Snapshot.Page.Item(uuid, name) {
+
+            val tagged: FrozenPlayers.Frozen?
+                get() = plugin.freezer.frozen.map[uuid]
+
+            val online: Boolean
+                get() = Server_getUser(uuid)?.isOnline ?: false
+
 
             override val item: ItemStackSnapshot
-                get() = ItemStackBuilderEx(
-                    if(online) {
-                        if(tagged) {
-                            ItemTypes.ICE
+                get() = getItem(plugin.freezer.frozen)
+
+            fun getItem(frzs: FrozenPlayers): ItemStackSnapshot {
+                val tagged = frzs.map[uuid] != null
+                return ItemStackBuilderEx(
+                    if (online) {
+                        if (tagged) {
+                            ItemTypes.SNOWBALL
                         } else {
                             ItemTypes.COAL
                         }
                     } else {
-                        if(tagged) {
+                        if (tagged) {
                             ItemTypes.PACKED_ICE
                         } else {
                             ItemTypes.COAL_ORE
                         }
                     }
                 )
-                    .name(Text_colorized(if(online) name else "$name |r|(Офлайн)"))
+                    .name(Text_colorized(if (online) name else "$name |r|(Офлайн)"))
                     .lore(
                         Text_colorizedList(
                             if (tagged) {
@@ -232,7 +267,7 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<Fr
                         )
                     )
                     .build()
-
+            }
 
             private fun teleport(player: Player): Boolean {
                 val trg = Server_getPlayer(uuid)
@@ -253,21 +288,15 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<Fr
             }
 
             override fun onClick(event: ItemClickEvent) {
-                when(event.type) {
+                when (event.type) {
                     ItemClickEvent.Type.LEFT -> {
                         val result = plugin.freezer.invoke(event.player, Freezer.Action.TOGGLE, uuid)
-                        if (!result.freezed.isEmpty()) {
-                            tagged = true
-                        } else if (!result.unfreezed.isEmpty()) {
-                            tagged = false
-                        }
-                        event.updateItem = true
                     }
 //                    ItemClickEvent.Type.RIGHT -> {
 //                        event.player.sendMessage(DefMes.notImplementedYet)
 //                    }
                     ItemClickEvent.Type.SHIFT_RIGHT -> {
-                        if(!teleport(event.player)) {
+                        if (!teleport(event.player)) {
                             event.player.sendMessage(Text_colorized("|r|Не могу телепортировать к игроку"))
                         }
                     }
