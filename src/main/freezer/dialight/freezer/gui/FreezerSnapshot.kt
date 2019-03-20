@@ -6,8 +6,8 @@ import dialight.freezer.FreezerPlugin
 import dialight.freezer.FrozenPlayers
 import dialight.guilib.events.ItemClickEvent
 import dialight.guilib.simple.SimpleItem
-import dialight.guilib.snapshot.Snapshot
-import dialight.teleporter.gui.TeleporterSnapshot
+import dialight.guilib.snapshot.PlayersSnapshot
+import dialight.guilib.snapshot.SortedPlayersPageBuilder
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
 import org.spongepowered.api.data.key.Keys
@@ -22,7 +22,7 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.world.Location
 import java.util.*
 
-class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<FreezerSnapshot.Page>(plugin.guilib!!, id) {
+class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : PlayersSnapshot<FreezerSnapshot.Page>(plugin.guilib!!, id) {
 
     fun update(result: Freezer.Result) {
         for(frz in result) {
@@ -30,14 +30,15 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<Fr
         }
     }
 
-    fun update(uuid: UUID) {
+    fun update(uuid: UUID): Boolean {
         val frozen = plugin.freezer.frozen
         for(page in pages) {
-            if(page.update(frozen, uuid)) break
+            if(page.update(frozen, uuid)) return true
         }
+        return false
     }
 
-    class Builder(val plugin: FreezerPlugin, val id: Identifiable) : Snapshot.Builder(
+    class Builder(val plugin: FreezerPlugin, val id: Identifiable) : PlayersSnapshot.Builder(
         Arrays.asList(
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
             'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -80,7 +81,7 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<Fr
 
             val maxLines = 6
             val maxColumns = 9
-            val pages = Snapshot.PageBuilderIt(maxLines - 1, maxColumns, sorted, chars).toList()
+            val pages = SortedPlayersPageBuilder(maxColumns, maxLines - 1, sorted, chars).toList()
             for((name, slotCache) in pages) {
 //                var newMaxLines = 0
 //                for((index, slot) in slotCache) {
@@ -107,7 +108,7 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<Fr
         height: Int,
         index: Int,
         total: Int
-    ): Snapshot.Page(
+    ): PlayersSnapshot.Page(
         snap, title, width, height, index
     ) {
 
@@ -226,7 +227,7 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : Snapshot<Fr
             return true
         }
 
-        class Item(val plugin: FreezerPlugin, uuid: UUID, name: String) : Snapshot.Page.Item(uuid, name) {
+        class Item(val plugin: FreezerPlugin, uuid: UUID, name: String) : PlayersSnapshot.Page.Item(uuid, name) {
 
             val tagged: FrozenPlayers.Frozen?
                 get() = plugin.freezer.frozen.map[uuid]

@@ -1,19 +1,9 @@
 package dialight.guilib
 
-import com.flowpowered.math.vector.Vector2i
-import dialight.extensions.openInventoryLater
-import dialight.extensions.set
-import dialight.guilib.mixin.*
-import dialight.observable.map.observableMapOf
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.inventory.Inventory
-import org.spongepowered.api.item.inventory.Slot
 import org.spongepowered.api.item.inventory.property.Identifiable
-import org.spongepowered.api.item.inventory.property.InventoryDimension
-import org.spongepowered.api.item.inventory.property.SlotIndex
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes
-import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.text.Text
 import java.util.*
 import java.util.stream.Collectors
@@ -69,8 +59,8 @@ class GuiStory(val plugin: GuiPlugin) {
     }
 
     fun currentGui(player: Player, inv: Inventory, remove: Boolean = false): Gui? {
-        val oprop = inv.getInventoryProperty(Identifiable::class.java)
-        if(!oprop.isPresent) return null
+//        val oprop = inv.getInventoryProperty(Identifiable::class.java)
+//        if(!oprop.isPresent) return null
         val story = guiStory[player.uniqueId]
         if (story == null) {
             if (DEBUG) Sponge.getServer().broadcastChannel.send(Text.of("story == null"))
@@ -82,7 +72,7 @@ class GuiStory(val plugin: GuiPlugin) {
         var toRemove = 0
         while (iterator.hasNext()) {
             gui = iterator.next()
-            if (gui.ownerOf(inv)) {
+            if (gui.ownerOf(player, inv)) {
                 if (DEBUG) {
 //                    val uuid = inv.getProperty(Identifiable::class.java).let { if(it.isPresent) it.get() else null } ?.value
                     val uuid = inv.getInventoryProperty(Identifiable::class.java).let { if(it.isPresent) it.get() else null } ?.value
@@ -117,7 +107,7 @@ class GuiStory(val plugin: GuiPlugin) {
             return
         }
         gui = iterator.next()
-        if (gui.ownerOf(inv)) {
+        if (gui.ownerOf(player, inv)) {
             gui.destroyFor(player)
             story.opened = false
             if (DEBUG) Sponge.getServer().broadcastChannel.send(Text.of("closed: " + toString(gui) + " " + toString(player)))
@@ -126,7 +116,7 @@ class GuiStory(val plugin: GuiPlugin) {
 
         if (!iterator.hasNext()) return  //2
         gui = iterator.next()
-        if (gui.ownerOf(inv)) {
+        if (gui.ownerOf(player, inv)) {
             if (DEBUG) Sponge.getServer().broadcastChannel.send(Text.of("closed for open: " + toString(gui) + " " + toString(player)))
             return
         }

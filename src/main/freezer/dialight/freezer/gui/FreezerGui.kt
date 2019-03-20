@@ -21,7 +21,7 @@ import java.util.*
 
 class FreezerGui(val plugin: FreezerPlugin) : SnapshotGui<FreezerSnapshot>() {
 
-    val snap = FreezerSnapshot.Builder(plugin, id).build()
+    private var snap = FreezerSnapshot.Builder(plugin, id).build()
 
     override fun createSnapshot(player: Player) = snap
 
@@ -30,12 +30,13 @@ class FreezerGui(val plugin: FreezerPlugin) : SnapshotGui<FreezerSnapshot>() {
         Task.builder().execute { task ->
             for ((uuid, snap) in opened) {
                 val inv = plugin.guilib!!.guimap[uuid] ?: continue
+                val current = snap.current(uuid)
                 for(sel in e.result.freezed) {
-                    val (index, item) = snap.current[sel.uuid] ?: continue
+                    val (index, item) = current[sel.uuid] ?: continue
                     inv[index] = item.item.createStack()
                 }
                 for(sel in e.result.unfreezed) {
-                    val (index, item) = snap.current[sel.uuid] ?: continue
+                    val (index, item) = current[sel.uuid] ?: continue
                     inv[index] = item.item.createStack()
                 }
             }
@@ -47,17 +48,21 @@ class FreezerGui(val plugin: FreezerPlugin) : SnapshotGui<FreezerSnapshot>() {
     fun onJoin(event: ClientConnectionEvent.Join, @First player: Player) {
         for ((uuid, snap) in opened) {
             val inv = plugin.guilib!!.guimap[uuid] ?: continue
-            val (index, item) = snap.current[player.uniqueId] ?: continue
+            val current = snap.current(uuid)
+            val (index, item) = current[player.uniqueId] ?: continue
             inv[index] = item.item.createStack()
         }
-        snap.update(player.uniqueId)
+        if(!snap.update(player.uniqueId)) {  // rebuild snap
+            snap = FreezerSnapshot.Builder(plugin, id).build()
+        }
     }
     @Listener
     fun onExit(event: ClientConnectionEvent.Disconnect, @First player: Player) {
         Task.builder().execute { task ->
             for ((uuid, snap) in opened) {
                 val inv = plugin.guilib!!.guimap[uuid] ?: continue
-                val (index, item) = snap.current[player.uniqueId] ?: continue
+                val current = snap.current(uuid)
+                val (index, item) = current[player.uniqueId] ?: continue
                 inv[index] = item.item.createStack()
             }
             snap.update(player.uniqueId)

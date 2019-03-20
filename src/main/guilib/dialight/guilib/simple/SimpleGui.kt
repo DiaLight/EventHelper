@@ -1,6 +1,6 @@
 package dialight.guilib.simple
 
-import dialight.extensions.openInventoryLater
+import dialight.extensions.getOrNull
 import dialight.guilib.Gui
 import dialight.guilib.GuiPlugin
 import dialight.guilib.IdentifiableView
@@ -23,10 +23,12 @@ open class SimpleGui(
 //    val id = Identifiable.random()
 //    val id = Identifiable()
 
-    override fun ownerOf(inv: Inventory): Boolean {
-        val oprop = inv.getInventoryProperty(Identifiable::class.java)
-        if(!oprop.isPresent) throw Exception("not present $inv")
-        return id.value!! == oprop.get().value!!
+    override fun ownerOf(
+        player: Player,
+        inv: Inventory
+    ): Boolean {
+        val prop = inv.getInventoryProperty(Identifiable::class.java).getOrNull() ?: return false
+        return id.value!! == prop.value!!
     }
 
     override fun getView(player: Player): View = this

@@ -3,7 +3,8 @@ package dialight.teleporter.gui
 import dialight.extensions.*
 import dialight.guilib.events.ItemClickEvent
 import dialight.guilib.simple.SimpleItem
-import dialight.guilib.snapshot.Snapshot
+import dialight.guilib.snapshot.PlayersSnapshot
+import dialight.guilib.snapshot.SortedPlayersPageBuilder
 import dialight.teleporter.SelectedPlayers
 import dialight.teleporter.Teleporter
 import dialight.teleporter.TeleporterPlugin
@@ -21,7 +22,7 @@ import org.spongepowered.api.text.Text
 import org.spongepowered.api.world.Location
 import java.util.*
 
-class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uuid: UUID, val name: String) : Snapshot<TeleporterSnapshot.Page>(plugin.guilib!!, id) {
+class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uuid: UUID, val name: String) : PlayersSnapshot<TeleporterSnapshot.Page>(plugin.guilib!!, id) {
 
     val selected: SelectedPlayers
         get() = plugin.teleporter[uuid]
@@ -33,13 +34,14 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uui
         }
     }
 
-    fun update(uuid: UUID, sels: SelectedPlayers = selected) {
+    fun update(uuid: UUID, sels: SelectedPlayers = selected): Boolean {
         for(page in pages) {
-            if(page.update(sels, uuid)) break
+            if(page.update(sels, uuid)) return true
         }
+        return false
     }
 
-    class Builder(val plugin: TeleporterPlugin, val id: Identifiable, val player: Player) : Snapshot.Builder(
+    class Builder(val plugin: TeleporterPlugin, val id: Identifiable, val player: Player) : PlayersSnapshot.Builder(
         Arrays.asList(
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
             'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
@@ -82,7 +84,7 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uui
 
             val maxLines = 6
             val maxColumns = 9
-            val pages = Snapshot.PageBuilderIt(maxLines - 1, maxColumns, sorted, chars).toList()
+            val pages = SortedPlayersPageBuilder(maxColumns, maxLines - 1, sorted, chars).toList()
             for((name, slotCache) in pages) {
 //                var newMaxLines = 0
 //                for((index, slot) in slotCache) {
@@ -109,7 +111,7 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uui
         height: Int,
         index: Int,
         total: Int
-    ): Snapshot.Page(
+    ): PlayersSnapshot.Page(
         snap, title, width, height, index
     ) {
 
@@ -216,7 +218,7 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uui
             return true
         }
 
-        class Item(val snap: TeleporterSnapshot, uuid: UUID, name: String) : Snapshot.Page.Item(uuid, name) {
+        class Item(val snap: TeleporterSnapshot, uuid: UUID, name: String) : PlayersSnapshot.Page.Item(uuid, name) {
 
             val selected: Teleporter.Selected?
                 get() = snap.selected[uuid]

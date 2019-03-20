@@ -5,7 +5,10 @@ import org.spongepowered.api.item.inventory.Inventory
 
 interface Gui {
 
-    fun ownerOf(inv: Inventory): Boolean
+    fun ownerOf(
+        player: Player,
+        inv: Inventory
+    ): Boolean
 
     fun getView(player: Player): View
     fun destroyFor(player: Player)

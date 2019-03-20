@@ -7,6 +7,7 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle
 import org.spongepowered.api.item.inventory.property.SlotIndex
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes
 import dialight.extensions.*
+import org.spongepowered.api.item.inventory.type.GridInventory
 import org.spongepowered.api.text.Text
 
 abstract class IdentifiableView(

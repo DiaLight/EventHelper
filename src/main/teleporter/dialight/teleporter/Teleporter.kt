@@ -113,7 +113,6 @@ class Teleporter {
     }
 
     operator fun invoke(invoker: Player, action: Action, group: Group): Result {
-        val result = Result()
         val stream: Stream<Selected>
         when (group) {
             Group.OFFLINE -> stream =
@@ -125,6 +124,13 @@ class Teleporter {
                 Server_getUsers().stream().map { Selected(it) }
             else -> stream = Stream.empty()
         }
+        return invoke(invoker, action, stream)
+    }
+    operator fun invoke(invoker: Player, action: Action, list: Collection<User>): Result {
+        return invoke(invoker, action, list.stream().map { Selected(it) })
+    }
+    private fun invoke(invoker: Player, action: Action, stream: Stream<Selected>): Result {
+        val result = Result()
         val players = get(invoker)
         when (action) {
             Action.TAG -> stream.forEach {
@@ -159,4 +165,5 @@ class Teleporter {
             invoker.sendMessage(TeleporterMessages.targets(targets.selected.values))
         }
     }
+
 }

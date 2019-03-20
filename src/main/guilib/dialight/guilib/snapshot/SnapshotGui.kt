@@ -1,5 +1,6 @@
 package dialight.guilib.snapshot
 
+import dialight.extensions.getOrNull
 import dialight.guilib.Gui
 import dialight.guilib.View
 import org.spongepowered.api.entity.living.player.Player
@@ -13,10 +14,12 @@ abstract class SnapshotGui<T : Snapshot<*>> : Gui {
 
     val id = Identifiable()
 
-    override fun ownerOf(inv: Inventory): Boolean {
-        val oprop = inv.getInventoryProperty(Identifiable::class.java)
-        if(!oprop.isPresent) throw Exception("not present $inv")
-        return id.value!! == oprop.get().value!!
+    override fun ownerOf(
+        player: Player,
+        inv: Inventory
+    ): Boolean {
+        val prop = inv.getInventoryProperty(Identifiable::class.java).getOrNull() ?: return false
+        return id.value!! == prop.value!!
     }
 
     abstract fun createSnapshot(player: Player): T
@@ -24,7 +27,7 @@ abstract class SnapshotGui<T : Snapshot<*>> : Gui {
     override fun getView(player: Player): View {
         val snap = createSnapshot(player)
         opened[player.uniqueId] = snap
-        return snap.current
+        return snap.current(player)
     }
 
     override fun destroyFor(player: Player) {
@@ -33,13 +36,14 @@ abstract class SnapshotGui<T : Snapshot<*>> : Gui {
 
     override fun getViewOf(player: Player): View {
         val snap = opened[player.uniqueId] ?: throw Exception("There is no gui snapshot for ${player.name}")
-        return snap.current
+        return snap.current(player)
     }
 
     override fun onCloseView(player: Player): Boolean {
         val snap = opened[player.uniqueId] ?: throw Exception("There is no gui snapshot for ${player.name}")
-        if(snap.changingPage) {
-            snap.changingPage = false
+        val state = snap.state(player)
+        if(state.changingPage) {
+            state.changingPage = false
             return false
         }
         return true

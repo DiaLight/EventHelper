@@ -2,20 +2,20 @@ package dialight.observable.list
 
 
 class ObservableListWrapper<E>(
-    val collection: MutableList<E> = mutableListOf()
+    val list: MutableList<E> = mutableListOf()
 ) : ObservableList<E>(), MutableList<E> {
 
 
     override fun set(index: Int, element: E): E {
-        val old = collection[index]
-        collection[index] = element
+        val old = list[index]
+        list[index] = element
         fireChange(old, element, index)
         return element
     }
 
     override fun add(element: E): Boolean {
-        val result = collection.add(element)
-        val index = collection.size - 1
+        val result = list.add(element)
+        val index = list.size - 1
         if (result) {
             fireAdd(element, index)
         }
@@ -23,14 +23,14 @@ class ObservableListWrapper<E>(
     }
 
     override fun add(index: Int, element: E) {
-        collection.add(index, element)
+        list.add(index, element)
         fireAdd(element, index)
     }
 
     override fun addAll(elements: Collection<E>): Boolean {
-        var index = collection.size
+        var index = list.size
         for (e in elements) {
-            collection.add(e)
+            list.add(e)
             fireAdd(e, index)
             index++
         }
@@ -40,7 +40,7 @@ class ObservableListWrapper<E>(
     override fun addAll(index: Int, elements: Collection<E>): Boolean {
         var currentIndex = index
         for (e in elements) {
-            collection.add(currentIndex, e)
+            list.add(currentIndex, e)
             fireAdd(e, currentIndex)
             currentIndex++
         }
@@ -51,13 +51,13 @@ class ObservableListWrapper<E>(
     override fun remove(element: E): Boolean {
         val index = indexOf(element)
         if (index == -1) return false
-        collection.removeAt(index)
+        list.removeAt(index)
         fireRemove(element, index)
         return true
     }
 
     override fun removeAt(index: Int): E {
-        val element = collection.removeAt(index)
+        val element = list.removeAt(index)
         fireRemove(element, index)
         return element
     }
@@ -78,15 +78,15 @@ class ObservableListWrapper<E>(
     }
 
     override fun clear() {
-        for (e in collection) {
+        for (e in list) {
             fireRemove(e, 0)
         }
-        collection.clear()
+        list.clear()
     }
 
-    override fun isEmpty(): Boolean = collection.isEmpty()
-    override fun contains(element: E): Boolean = collection.contains(element)
-    override fun containsAll(elements: Collection<E>): Boolean = collection.containsAll(elements)
+    override fun isEmpty(): Boolean = list.isEmpty()
+    override fun contains(element: E): Boolean = list.contains(element)
+    override fun containsAll(elements: Collection<E>): Boolean = list.containsAll(elements)
     override fun listIterator(): MutableListIterator<E> = throw UnsupportedOperationException()
     override fun listIterator(index: Int): MutableListIterator<E> = throw UnsupportedOperationException()
     /**
@@ -97,7 +97,7 @@ class ObservableListWrapper<E>(
      * YOU HAVE BEEN WARNED.
      */
     override fun iterator(): MutableIterator<E> = object : MutableIterator<E> {
-        val inner = collection.iterator()
+        val inner = list.iterator()
         var lastIndex: Int = -1
         var lastElement: E? = null
         override fun hasNext(): Boolean = inner.hasNext()
@@ -115,20 +115,20 @@ class ObservableListWrapper<E>(
         }
 
     }
-    override fun subList(fromIndex: Int, toIndex: Int): MutableList<E> = collection.subList(fromIndex, toIndex)
-    override fun get(index: Int): E = collection[index]
-    override fun indexOf(element: E): Int = collection.indexOf(element)
-    override fun lastIndexOf(element: E): Int = collection.lastIndexOf(element)
-    override val size: Int get() = collection.size
+    override fun subList(fromIndex: Int, toIndex: Int): MutableList<E> = list.subList(fromIndex, toIndex)
+    override fun get(index: Int): E = list[index]
+    override fun indexOf(element: E): Int = list.indexOf(element)
+    override fun lastIndexOf(element: E): Int = list.lastIndexOf(element)
+    override val size: Int get() = list.size
 
     override fun replace(list: List<E>) {
-        collection.clear()
-        collection.addAll(list)
+        this.list.clear()
+        this.list.addAll(list)
     }
 
     override fun move(fromIndex: Int, toIndex: Int) {
-        val item = collection.removeAt(fromIndex)
-        collection.add(toIndex, item)
+        val item = list.removeAt(fromIndex)
+        list.add(toIndex, item)
         fireMove(item, fromIndex, toIndex)
     }
 

@@ -1,7 +1,11 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.google.code.regexp.Pattern
+import org.apache.commons.io.FilenameUtils
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.spongepowered.asm.gradle.plugins.MixinExtension
 import org.spongepowered.asm.gradle.plugins.MixinGradlePlugin
+import java.util.Properties
 
 buildscript {
     repositories {
@@ -30,7 +34,6 @@ apply {
 }
 val mixin = the<MixinExtension>()
 
-
 //val pluginGroup: String by project
 //val pluginVersion: String by project
 //val libDir: String by project
@@ -43,15 +46,32 @@ fun getSourceSet(name: String): SourceSet {
     return java.sourceSets[name]
 }
 
+val buildPropsFile = file(File(buildDir, "build.properties"))
+val buildProps = Properties()
+if(buildPropsFile.exists()) buildProps.load(buildPropsFile.inputStream())
+val buildVersion = buildProps.getProperty("build-version", "0").toInt() + 1
+val mcVersion = "1.12.2"
+val allVersion = "~build-$buildVersion"
+
 group = pluginGroup as String
-version = pluginVersion as String
+version = "$mcVersion"
+
+
+
+tasks["build"].apply { this as DefaultTask
+    doFirst {
+        buildProps["build-version"] = buildVersion.toString()
+        println("build-version: buildVersion")
+        buildProps.store(buildPropsFile.writer(), null)
+    }
+}
 
 sponge {
     this.plugins.apply {
         this.create("toollib") {
             this.meta.apply {
                 this.setName("ToolLib")
-                setVersion(project.version)
+                setVersion(allVersion)
                 this.authors.add("DiaLight")
                 this.setDescription("Useful tool to help event masters with theirs job")
             }
@@ -59,7 +79,7 @@ sponge {
         this.create("guilib") {
             this.meta.apply {
                 this.setName("GuiLib")
-                setVersion(project.version)
+                setVersion(allVersion)
                 this.authors.add("DiaLight")
                 this.setDescription("Useful tool to help event masters with theirs job")
             }
@@ -67,7 +87,7 @@ sponge {
         this.create("eventhelper") {
             this.meta.apply {
                 this.setName("EventHelper")
-                setVersion(project.version)
+                setVersion(allVersion)
                 this.authors.add("DiaLight")
                 this.setDescription("Useful tool to help event masters with theirs job")
                 this.dependencies.apply {
@@ -79,7 +99,7 @@ sponge {
         this.create("teleporter") {
             this.meta.apply {
                 this.setName("Teleporter")
-                setVersion(project.version)
+                setVersion(allVersion)
                 this.authors.add("DiaLight")
                 this.setDescription("Useful tool to help event masters with theirs job")
                 this.dependencies.apply {
@@ -96,7 +116,7 @@ sponge {
         this.create("freezer") {
             this.meta.apply {
                 this.setName("Freezer")
-                setVersion(project.version)
+                setVersion(allVersion)
                 this.authors.add("DiaLight")
                 this.setDescription("Useful tool to help event masters with theirs job")
                 this.dependencies.apply {
@@ -105,6 +125,26 @@ sponge {
                         this.optional = true
                     }
                     this.create("eventhelper") {
+                        this.optional = true
+                    }
+                }
+            }
+        }
+        this.create("teams") {
+            this.meta.apply {
+                this.setName("Teams")
+                setVersion(allVersion)
+                this.authors.add("DiaLight")
+                this.setDescription("Useful tool to help event masters with theirs job")
+                this.dependencies.apply {
+                    this.create("toollib")
+                    this.create("guilib") {
+                        this.optional = true
+                    }
+                    this.create("eventhelper") {
+                        this.optional = true
+                    }
+                    this.create("teleporter") {
                         this.optional = true
                     }
                 }
@@ -127,16 +167,13 @@ repositories {
     maven("http://repo.dmulloy2.net/content/groups/public/") { name = "dmulloy2-repo" }
 }
 
-base {
-    libsDirName = libDir as String
-}
-
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
     // mixin works only with java
     sourceSets.getByName("main").java.srcDirs(
-        "src/main/guilib"
+        "src/main/guilib",
+        "src/main/teams"
     )
 }
 
@@ -147,12 +184,13 @@ kotlin {
         "src/main/toollib",
         "src/main/misc",
         "src/main/teleporter",
-        "src/main/freezer"
+        "src/main/freezer",
+        "src/main/teams"
     )
 }
-
 mixin.apply {
-    this.add(getSourceSet("main"), "mixins.gulib.refmap.json")
+//    this.add(getSourceSet("main"), "mixins.gulib.refmap.json")
+    this.add(getSourceSet("main"), "mixins.teams.refmap.json")
 }
 
 configurations {
@@ -171,8 +209,8 @@ dependencies {
 }
 
 minecraft {
-    version = "1.12.2"
-    mappings = "snapshot_20180131"
+    version = mcVersion
+    mappings = "snapshot_20180814"
     makeObfSourceJar = false
 }
 
@@ -182,15 +220,35 @@ tasks.withType<Jar> {
         attributes(mapOf(
             "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker",
             "Main-Class" to "org.spongepowered.asm.launch.MixinTweaker",
-            "MixinConfigs" to "mixins.guilib.json",
+            "MixinConfigs" to "mixins.guilib.json,mixins.teams.json",
             "FMLCorePluginContainsFMLMod" to "true"
             ))
     }
-//    archiveName = "${application.applicationName}-$version.jar"
     from(
         getSourceSet("main").output,
         configurations.shadow.map { if (it.isDirectory) it else zipTree(it) }
     )
+}
+task("collectReleaseJars", Copy::class) {
+    val jar = tasks["jar"] as Jar
+    dependsOn(jar)
+    tasks["build"].dependsOn(this)
+    val binDir = file("bin")
+    doFirst {
+        binDir.deleteRecursively()
+    }
+    from(jar.outputs.files.singleFile)
+    into(binDir)
+    this.rename { "${FilenameUtils.getFullPathNoEndSeparator(it)}/EventHelper-all-sponge-$version-build-$buildVersion.jar" }
+}
+
+task("copyToServer", Copy::class) {
+    val jar = tasks["jar"] as Jar
+    dependsOn(jar)
+    tasks["build"].dependsOn(this)
+    from(jar.outputs.files.singleFile)
+    into(libDir as String)
+    this.rename { "${FilenameUtils.getFullPathNoEndSeparator(it)}/EventHelper.jar" }
 }
 
 tasks.withType<KotlinCompile> {

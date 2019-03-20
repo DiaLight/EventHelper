@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.5.7",
+  "package": "dialight.teams.mixin.shadow",
+  "refmap": "mixins.teams.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "server": [
+    "MixinScoreboard",
+    "MixinServerScoreboard"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

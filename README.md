@@ -48,13 +48,20 @@ Useful tool to help event masters with theirs job
 * [X] Реализовано
   * [X] структура данных замороженных игроков (Model)
   * [X] функцинал и события замораживания игроков (Control)
-  * [X] гуи для заморженных игроков игроков (View)
+  * [X] гуи для заморженных игроков (View)
+
+##### teams
+Зависит от: `kotlinlib`, `toollib`, [`guilib`], [`eventhelper`], [`teleporter`]
+* [X] Реализовано
+  * [X] структура данных команд (Model)
+  * [X] функцинал и события добавления/удаления из команды (Control)
+  * [X] гуи для игроков в командах (View)
 
 #### Модули
 ##### captain
-Зависит от: `kotlinlib`, `modulelib`, [`guilib`], [`eventhelper`]
+Зависит от: `kotlinlib`, `modulelib`, `teams`, [`guilib`], [`eventhelper`]
 * [ ] Реализовано
 
 ##### random
-Зависит от: `kotlinlib`, `modulelib`, [`guilib`], [`eventhelper`]
+Зависит от: `kotlinlib`, `modulelib`, `teams`, [`guilib`], [`eventhelper`]
 * [ ] Реализовано

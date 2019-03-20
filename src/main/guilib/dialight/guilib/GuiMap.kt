@@ -21,6 +21,7 @@ class GuiMap(val plugin: GuiPlugin) {
     }
 
     private val guimap = observableMapOf<UUID, Inventory>()
+    private val openmap = observableMapOf<UUID, UUID>()
 
     operator fun get(player: Player) = guimap[player.uniqueId]
     operator fun get(uuid: UUID) = guimap[uuid]
@@ -33,51 +34,63 @@ class GuiMap(val plugin: GuiPlugin) {
         to.title = from.title
         var index = 0
         for(slot in from.slots<Slot>()) {
-            val oitem = slot.peek()
-            to[index] = if(oitem.isPresent) oitem.get() else null
+            to[index] = slot.peek().getOrNull()
             index++
         }
-        val ofrprop = from.getInventoryProperty(Identifiable::class.java)
-        if(!ofrprop.isPresent) throw Exception("Can't identify from view")
-        val idfrprop = ofrprop.get()
-        val frid = idfrprop.value!!
-        val otoprop = to.getInventoryProperty(Identifiable::class.java)
-        if(!ofrprop.isPresent) throw Exception("Can't identify to view")
-        val idtoprop = otoprop.get()
-        idtoprop.setValue(frid)
+        val idfrprop = from.getInventoryProperty(Identifiable::class.java).getOrNull()?.value ?: throw Exception("Can't identify from view")
+        val idtoprop = to.getInventoryProperty(Identifiable::class.java).getOrNull() ?: throw Exception("Can't identify to view")
+        idtoprop.setValue(idfrprop)
     }
 
-    private fun inventoryGetDimension(inv: Inventory): Vector2i? {
-        val oprop = inv.getInventoryProperty(InventoryDimension::class.java)
-        if(!oprop.isPresent) return null
-        return oprop.get().value
+
+    fun createInventoryFromView(view: View): Inventory {
+        val inv = view.inventory
+        val dim = inv.getInventoryProperty(InventoryDimension::class.java).getOrNull()?.value
+        return Inventory.builder()
+        .of(inv.archetype)
+        .property(Identifiable(GuiMap.UUID_ZERO))
+        .apply {
+            if(dim != null) property(InventoryDimension.of(dim))
+        }
+        .build(plugin)
     }
 
     fun openView(player: Player, view: View) {
-        val inv = view.inventory
-        val dim = inventoryGetDimension(inv)
-        val usrinv = guimap.getOrPut(player.uniqueId) { Inventory.builder()
-            .of(inv.archetype)
-            .property(Identifiable(GuiMap.UUID_ZERO))
-            .apply {
-                if(dim != null) property(InventoryDimension.of(dim))
+        var usrinv = guimap[player.uniqueId]
+        if(usrinv == null) {
+            usrinv = createInventoryFromView(view)
+            guimap[player.uniqueId] = usrinv
+        } else {
+            if(usrinv.archetype != view.inventory.archetype) {
+                usrinv = createInventoryFromView(view)
+                guimap[player.uniqueId] = usrinv
             }
-            .build(plugin) }
+        }
 
         val playerInv = player.openInventory.getOrNull()
         if(playerInv != null && playerInv.containsInventory(usrinv)) {  // update current inventory
             // add delay for update to keep event update order
             Task.builder().execute { task ->
-                inventoryClone(inv, usrinv)
+                openmap[player.uniqueId] = view.inventory.getInventoryProperty(Identifiable::class.java).getOrNull()!!.value!!
+                inventoryClone(view.inventory, usrinv)
             }.submit(plugin)
         } else {  // open new inventory
-            inventoryClone(inv, usrinv)  // update now
+            inventoryClone(view.inventory, usrinv)  // update now
             // add delay for open to keep event update order
             Task.builder().execute { task ->
+                openmap[player.uniqueId] = view.inventory.getInventoryProperty(Identifiable::class.java).getOrNull()!!.value!!
                 player.openInventory(usrinv)
             }.submit(plugin)
         }
 
+    }
+
+    fun closeInventory(gui: Gui, player: Player) {
+        openmap.remove(player.uniqueId)
+    }
+
+    fun getCurrentUuid(player: Player): UUID? {
+        return openmap[player.uniqueId]
     }
 
 }

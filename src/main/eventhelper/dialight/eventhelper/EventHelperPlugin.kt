@@ -1,6 +1,7 @@
 package dialight.eventhelper
 
 import com.google.inject.Inject
+import dialight.eventhelper.gui.EventHelperGui
 import dialight.guilib.GuiPlugin
 import dialight.guilib.View
 import dialight.observable.map.observableMapOf

@@ -1,6 +1,6 @@
 package dialight.observable.map
 
-class ObservableMapWrapper<K, V>(
+open class ObservableMapWrapper<K, V>(
     val map: MutableMap<K, V> = hashMapOf()
 ) : ObservableMap<K, V>(), MutableMap<K, V> {
 

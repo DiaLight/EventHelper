@@ -18,30 +18,46 @@ open class Snapshot<T : Snapshot.Page>(
 
     val pages = ArrayList<T>()
 
-    var pageIndex = 0
+    val opened = hashMapOf<UUID, State>()
 
-    val current: T
-        get() = pages[pageIndex]
-    var changingPage = false
+    fun state(player: Player): State = state(player.uniqueId)
+    fun state(uuid: UUID): State = opened.getOrPut(uuid) { State() }
+
+    fun current(player: Player): T = state(player).current
+    fun current(uuid: UUID): T = state(uuid).current
 
     fun backward(player: Player): Boolean {
-        val prevIndex = pageIndex - 1
+        val state = state(player)
+        val prevIndex = state.pageIndex - 1
         if(prevIndex < 0) return false
-        pageIndex = prevIndex
-        changingPage = true
-        guiplugin.openView(player, current)
+        state.pageIndex = prevIndex
+        state.changingPage = true
+        guiplugin.openView(player, state.current)
         return true
     }
 
     fun forward(player: Player): Boolean {
-        val nextIndex = pageIndex + 1
+        val state = state(player)
+        val nextIndex = state.pageIndex + 1
         if(nextIndex >= pages.size) return false
-        pageIndex = nextIndex
-        changingPage = true
-        guiplugin.openView(player, current)
+        state.pageIndex = nextIndex
+        state.changingPage = true
+        guiplugin.openView(player, state.current)
         return true
     }
 
+    inner class State {
+
+        var pageIndex = 0
+
+        val current: T
+            get() {
+                if(pageIndex >= pages.size) pageIndex = pages.size - 1
+                return pages[pageIndex]
+            }
+        var changingPage = false
+
+    }
 
     open class Page(
         val snap: Snapshot<*>,
@@ -52,8 +68,6 @@ open class Snapshot<T : Snapshot.Page>(
     ) : IdentifiableView(
         snap.guiplugin, snap.id, title, width, height
     ) {
-
-        private val items = HashMap<UUID, Pair<Int, Item>>()
 
         override fun onOutsideClick(event: GuiOutsideClickEvent) {
             when(event.type) {
@@ -67,122 +81,6 @@ open class Snapshot<T : Snapshot.Page>(
                     snap.forward(event.player)
                 }
             }
-        }
-
-        fun forEach(op: (Int, Item) -> Unit) {
-            items.values.forEach { op(it.first, it.second) }
-        }
-
-        operator fun get(uuid: UUID) = items[uuid]
-        override operator fun set(index: Int, item: View.Item?) {
-            if(item == null) {
-                val oldItem = this[index]
-                if(oldItem != null)  {
-                    if(oldItem is Item) {
-                        items.remove(oldItem.uuid)
-                    }
-                }
-            } else {
-                if(item is Item) {
-                    items[item.uuid] = Pair(index, item)
-                }
-            }
-            super.set(index, item)
-        }
-
-        abstract class Item(val uuid: UUID, val name: String) : View.Item {
-
-        }
-
-    }
-
-
-    class PageBuilderIt(
-        val maxLines: Int,
-        val maxColumns: Int,
-        val sorted: Map<Char, List<View.Item>>,
-        chars: List<Char>
-    ): Iterator<Pair<String, HashMap<Int, View.Item>>> {
-
-        private var currentChar: Char = ' '
-        private val charsIt = chars.iterator()
-        private var slotsIt: Iterator<View.Item> = emptyArray<View.Item>().iterator()
-
-        override fun hasNext(): Boolean {
-            if(slotsIt.hasNext()) return true
-            nextChar()
-            return slotsIt.hasNext()
-        }
-
-        override fun next(): Pair<String, HashMap<Int, View.Item>> {
-            val builder = ColumnBuilderIt(maxLines, maxColumns)
-            while(builder.hasNext() && hasNext()) {
-                builder.next(slotsIt, currentChar)
-            }
-            return Pair(builder.nameBuilder.toString(), builder.slotCache)
-        }
-
-        fun nextChar() {
-            while(charsIt.hasNext()) {
-                currentChar = charsIt.next()
-                val slots = sorted[currentChar]
-                if(slots != null) {
-                    slotsIt = slots.iterator()
-                    break
-                }
-            }
-        }
-
-        class ColumnBuilderIt(
-            val maxLines: Int,
-            val maxColumns: Int
-        ) {
-            var displayChar: Char = ' '
-            val nameBuilder = StringBuilder()
-            val slotCache = HashMap<Int, View.Item>()
-            var column = 0
-
-            fun hasNext(): Boolean {
-                return column != maxColumns
-            }
-
-            fun next(slotsIt: Iterator<View.Item>, currentChar: Char) {
-                displayChar = currentChar
-                while(slotsIt.hasNext() && column != maxColumns) {
-                    nameBuilder.append("  ").append(displayChar)
-                    nameBuilder.append(if (column % 2 == 0) " " else "  ")
-                    displayChar = ' '
-                    var row = 0
-                    while (slotsIt.hasNext()) {
-                        val slot = slotsIt.next()
-                        slotCache[column + row * maxColumns] = slot
-                        row++
-                        if (row == maxLines) {
-                            break
-                        }
-                    }
-                    column++
-                }
-            }
-        }
-    }
-
-    open class Builder(val chars: List<Char>) {
-
-        private fun findChar(name: String): Char {
-            for (c in name.toLowerCase()) {
-                if (chars.contains(c)) return c
-            }
-            return '_'
-        }
-        fun <T : Page.Item> sort(slots: ArrayList<T>): HashMap<Char, MutableList<T>> {
-            val sorted = HashMap<Char, MutableList<T>>()
-            for (slot in slots) {
-                val c = findChar(slot.name)
-                val charSlots = sorted.getOrPut(c) { ArrayList() }
-                charSlots.add(slot)
-            }
-            return sorted
         }
 
     }
