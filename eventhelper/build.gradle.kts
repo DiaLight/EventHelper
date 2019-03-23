@@ -81,7 +81,7 @@ task("fatJar", Jar::class) {
     from(sourceSets["main"].output)
     doFirst {
         join.forEach {
-            from(project(it).tasks["jar"].outputs.files.map { zipTree(it) })
+            from(project(it).tasks["joinJar"].outputs.files.map { zipTree(it) })
         }
     }
     baseName = "${project.name}-fat"

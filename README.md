@@ -59,9 +59,11 @@ Useful tool to help event masters with theirs job
 
 #### Модули
 ##### captain
+Распределение игроков по камандам при помощи выбранных капитанов
 Зависит от: `kotlinrt`, `modulelib`, `teams`, [`guilib`], [`eventhelper`]
 * [ ] Реализовано
 
 ##### random
+Рандомное распределение игроков по командам
 Зависит от: `kotlinrt`, `modulelib`, `teams`, [`guilib`], [`eventhelper`]
 * [ ] Реализовано
