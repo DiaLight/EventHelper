@@ -1,5 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.util.*
+import org.spongepowered.gradle.meta.MetadataBaseExtension
 
 buildscript {
     repositories {
@@ -14,41 +14,31 @@ buildscript {
 }
 
 plugins {
-    id("org.spongepowered.plugin") version "0.8.1"
-    id("com.github.johnrengelman.shadow") version "2.0.1"
-    kotlin("jvm") version "1.3.21"
+    id("org.spongepowered.plugin")
+    kotlin("jvm")
     java
     base
 }
 
-val pluginGroup: String by project
-val pluginVersion: String by project
+val allVersion: String by rootProject.ext
 
-val buildPropsFile = file(File(buildDir, "build.properties"))
-val buildProps = Properties()
-if(buildPropsFile.exists()) buildProps.load(buildPropsFile.inputStream())
-val buildVersion = buildProps.getProperty("build-version", "0").toInt() + 1
-val libDir = buildProps.getProperty("libDir", "$buildDir/libs")
-val mcVersion = "1.12.2"
-val allVersion = "~build-$buildVersion"
-
-project.ext.set("buildVersion", buildVersion)
-project.ext.set("allVersion", allVersion)
-project.ext.set("mcVersion", mcVersion)
-project.ext.set("libDir", libDir)
-
-group = pluginGroup as String
-version = "$mcVersion"
-
-
-
-task("incrementVersion") { this as DefaultTask
-    doFirst {
-        buildProps["build-version"] = buildVersion.toString()
-        buildProps.store(buildPropsFile.writer(), null)
+val conf: MetadataBaseExtension.() -> Unit = {
+    this.plugins.apply {
+        this.create("kotlinrt") {
+            this.meta.apply {
+                this.setName("KotlinRt")
+                setVersion(allVersion)
+                this.authors.add("DiaLight")
+            }
+        }
     }
 }
+ext.set("sponge_conf", conf)
+sponge.conf()
 
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
+}
 
 repositories {
     mavenCentral()
@@ -64,21 +54,35 @@ repositories {
     maven("http://maven.fabricmc.net/") { name = "fabricmc-repo" }
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
 configurations {
-    val shadow = this.getByName("shadow")
-    this.getByName("compile") {
-        extendsFrom(shadow)
-    }
+    val shadow = this.create("shadow")
+    this.getByName("compile").extendsFrom(shadow)
 }
 
 dependencies {
     val shadow by configurations
+    implementation("org.spongepowered:spongeapi:7.1.0-SNAPSHOT")
+    shadow("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+}
+
+tasks["jar"].apply { this as Jar
+    from(
+        sourceSets["main"].output
+    )
+    configurations["shadow"].forEach {
+        from(zipTree(it.absoluteFile))
+    }
+    exclude("mcmod.info")
+}
+task("fatJar", Jar::class) {
+    from(
+        sourceSets["main"].output
+    )
+    configurations["shadow"].forEach {
+        from(zipTree(it.absoluteFile))
+    }
+}
+
+tasks["build"].apply {
+    dependsOn(":incrementVersion")
 }

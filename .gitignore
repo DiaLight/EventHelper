@@ -18,6 +18,7 @@ artifacts/
 ## Gradle
 .gradle
 build/
+classes/
 bin/
 
 # Ignore Gradle GUI config
@@ -38,6 +39,7 @@ templates/
 #Marker for local files
 *.local
 *.local/
+local.*
 
 # Compiled class file
 *.class
@@ -62,5 +64,3 @@ templates/
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-
-settings.gradle
