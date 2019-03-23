@@ -118,8 +118,11 @@ dependencies {
     join.forEach { implementation(project(it)) }
 }
 
-tasks["jar"].apply { this as Jar
+task("joinJar", Jar::class) {
+    dependsOn(tasks["reobfJar"])
+    from(tasks["jar"].outputs.files.map { zipTree(it) })  // we need reobfuscated content
     exclude("mcmod.info")
+    baseName = "${project.name}-join"
 }
 task("fatJar", Jar::class) {
     manifest {
@@ -134,7 +137,7 @@ task("fatJar", Jar::class) {
     from(tasks["jar"].outputs.files.map { zipTree(it) })
     doFirst {
         join.forEach {
-            from(project(it).tasks["jar"].outputs.files.map { zipTree(it) })
+            from(project(it).tasks["joinJar"].outputs.files.map { zipTree(it) })
         }
     }
     baseName = "${project.name}-fat"

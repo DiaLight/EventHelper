@@ -31,6 +31,7 @@ val conf: MetadataBaseExtension.() -> Unit = {
         this.create("toollib") {
             this.meta.apply {
                 this.setName("ToolLib")
+                setVersion(allVersion)
                 this.authors.add("DiaLight")
                 this.setDescription("Useful tool to help event masters with theirs job")
                 this.dependencies.apply {
@@ -67,14 +68,16 @@ dependencies {
     join.forEach { implementation(project(it)) }
 }
 
-tasks["jar"].apply { this as Jar
+task("joinJar", Jar::class) {
+    from(sourceSets["main"].output)
     exclude("mcmod.info")
+    baseName = "${project.name}-join"
 }
 task("fatJar", Jar::class) {
     from(sourceSets["main"].output)
     doFirst {
         join.forEach {
-            from(project(it).tasks["jar"].outputs.files.map { zipTree(it) })
+            from(project(it).tasks["joinJar"].outputs.files.map { zipTree(it) })
         }
     }
     baseName = "${project.name}-fat"

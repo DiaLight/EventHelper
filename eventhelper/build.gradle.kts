@@ -72,8 +72,10 @@ dependencies {
     join.forEach { implementation(project(it)) }
 }
 
-tasks["jar"].apply { this as Jar
+task("joinJar", Jar::class) {
+    from(sourceSets["main"].output)
     exclude("mcmod.info")
+    baseName = "${project.name}-join"
 }
 task("fatJar", Jar::class) {
     from(sourceSets["main"].output)

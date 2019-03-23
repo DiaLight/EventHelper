@@ -66,18 +66,21 @@ dependencies {
 }
 
 tasks["jar"].apply { this as Jar
-    from(
-        sourceSets["main"].output
-    )
+    from(sourceSets["main"].output)
+    configurations["shadow"].forEach {
+        from(zipTree(it.absoluteFile))
+    }
+}
+task("joinJar", Jar::class) {
+    from(sourceSets["main"].output)
     configurations["shadow"].forEach {
         from(zipTree(it.absoluteFile))
     }
     exclude("mcmod.info")
+    baseName = "${project.name}-join"
 }
 task("fatJar", Jar::class) {
-    from(
-        sourceSets["main"].output
-    )
+    from(sourceSets["main"].output)
     configurations["shadow"].forEach {
         from(zipTree(it.absoluteFile))
     }

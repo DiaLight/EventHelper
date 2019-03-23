@@ -24,26 +24,33 @@ plugins {
 val pluginGroup: String by project
 val pluginVersion: String by project
 
-val buildPropsFile = file(File(buildDir, "build.properties"))
-val buildProps = Properties()
-if(buildPropsFile.exists()) buildProps.load(buildPropsFile.inputStream())
-val buildVersion = buildProps.getProperty("build-version", "0").toInt() + 1
-val libDir = buildProps.getProperty("libDir", "$buildDir/libs")
-val mcVersion = "1.12.2"
-val allVersion = "~build-$buildVersion"
+val self = this
+allprojects {
+    if(!self.ext.has("buildProps")) {
+        val buildPropsFile = self.file(File(buildDir, "build.properties"))
+        val buildProps = Properties()
+        if(buildPropsFile.exists()) buildProps.load(buildPropsFile.inputStream())
+        val buildVersion = buildProps.getProperty("build-version", "0").toInt() + 1
+        val libDir = buildProps.getProperty("libDir", "$buildDir/libs")
+        val mcVersion = "1.12.2"
+        val allVersion = "~build-$buildVersion"
 
-project.ext.set("buildVersion", buildVersion)
-project.ext.set("allVersion", allVersion)
-project.ext.set("mcVersion", mcVersion)
-project.ext.set("libDir", libDir)
+        self.ext.set("buildPropsFile", buildPropsFile)
+        self.ext.set("buildProps", buildProps)
+        self.ext.set("buildVersion", buildVersion)
+        self.ext.set("allVersion", allVersion)
+        self.ext.set("mcVersion", mcVersion)
+        self.ext.set("libDir", libDir)
+    }
+}
 
 group = pluginGroup as String
-version = "$mcVersion"
-
-
 
 task("incrementVersion") { this as DefaultTask
     doFirst {
+        val buildPropsFile: File by ext
+        val buildProps: Properties by ext
+        val buildVersion: Int by ext
         buildProps["build-version"] = buildVersion.toString()
         buildProps.store(buildPropsFile.writer(), null)
     }

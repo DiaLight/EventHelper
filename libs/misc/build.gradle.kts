@@ -45,8 +45,10 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 }
 
-tasks["jar"].apply { this as Jar
+task("joinJar", Jar::class) {
+    from(sourceSets["main"].output)
     exclude("mcmod.info")
+    baseName = "${project.name}-join"
 }
 
 repositories {

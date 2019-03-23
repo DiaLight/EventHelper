@@ -96,16 +96,20 @@ task("fatJar", Jar::class) {
         ))
     }
     ehProjects.forEach {
-        dependsOn("$it:build")
+        dependsOn("$it:build")  // we need execution if reobfJar task if it exists
+        dependsOn("$it:joinJar")
     }
     doFirst {
         ehProjects.forEach {
-            from(project(it).tasks["jar"].outputs.files.map { zipTree(it) })
+            from(project(it).tasks["joinJar"].outputs.files.map { zipTree(it) })
         }
+    }
+    join.forEach {
+        dependsOn("$it:joinJar")
     }
     doFirst {
         join.forEach {
-            from(project(it).tasks["jar"].outputs.files.map { zipTree(it) })
+            from(project(it).tasks["joinJar"].outputs.files.map { zipTree(it) })
         }
     }
     baseName = "all"
@@ -142,7 +146,7 @@ task("collectReleaseJars", Copy::class) {
     outputs.upToDateWhen { false }  // update every time
 }
 
-val allTestMode = true
+val allTestMode = false
 
 task("copyToServer", Copy::class) {
     doFirst {

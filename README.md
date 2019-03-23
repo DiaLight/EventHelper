@@ -11,47 +11,47 @@ Useful tool to help event masters with theirs job
 
 ### Структура проекта
 #### Библиотеки
-##### kotlinlib
+##### kotlinrt
 Включает в себя kotlin runtime
-* [ ] Реализовано
+* [X] Реализовано
 
 ##### toollib
-Зависит от: `kotlinlib`
+Зависит от: `kotlinrt`
 * [X] Реализовано
 
 ##### modulelib
-Зависит от: `kotlinlib`
+Зависит от: `kotlinrt`
 * [ ] Реализовано
 
 ##### guilib
-Зависит от: `kotlinlib`
+Зависит от: `kotlinrt`
 * [X] Реализовано
 
 #### Инструменты
 ##### eventhelper
 Используя `guilib`, реализует гуи, содержимое которого отражает список инструмнтов, зарегистрировнных в `toollib` и модулей, зарегистрированных в `modulelib`.
 
-Зависит от: `kotlinlib`, `toollib`, `modulelib`, `guilib`
+Зависит от: `kotlinrt`, `toollib`, `modulelib`, `guilib`
 * [ ] Реализовано
   * [X] гуи для отображения и получения интрументов (View)
   * [ ] гуи для отображения и управления модулями (View)
 
 ##### teleporter
-Зависит от: `kotlinlib`, `toollib`, [`guilib`], [`eventhelper`]
+Зависит от: `kotlinrt`, `toollib`, [`guilib`], [`eventhelper`]
 * [X] Реализовано
   * [X] структура данных выделенных игроков (Model)
   * [X] функцинал выделения/телепортирования и события телепортирования и вобора игроков (Control)
   * [X] гуи для выделенных игроков (View)
 
 ##### freezer
-Зависит от: `kotlinlib`, `toollib`, [`guilib`], [`eventhelper`], [`teleporter`]
+Зависит от: `kotlinrt`, `toollib`, [`guilib`], [`eventhelper`], [`teleporter`]
 * [X] Реализовано
   * [X] структура данных замороженных игроков (Model)
   * [X] функцинал и события замораживания игроков (Control)
   * [X] гуи для заморженных игроков (View)
 
 ##### teams
-Зависит от: `kotlinlib`, `toollib`, [`guilib`], [`eventhelper`], [`teleporter`]
+Зависит от: `kotlinrt`, `toollib`, [`guilib`], [`eventhelper`], [`teleporter`]
 * [X] Реализовано
   * [X] структура данных команд (Model)
   * [X] функцинал и события добавления/удаления из команды (Control)
@@ -59,9 +59,9 @@ Useful tool to help event masters with theirs job
 
 #### Модули
 ##### captain
-Зависит от: `kotlinlib`, `modulelib`, `teams`, [`guilib`], [`eventhelper`]
+Зависит от: `kotlinrt`, `modulelib`, `teams`, [`guilib`], [`eventhelper`]
 * [ ] Реализовано
 
 ##### random
-Зависит от: `kotlinlib`, `modulelib`, `teams`, [`guilib`], [`eventhelper`]
+Зависит от: `kotlinrt`, `modulelib`, `teams`, [`guilib`], [`eventhelper`]
 * [ ] Реализовано
