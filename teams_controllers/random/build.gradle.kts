@@ -29,15 +29,16 @@ val mcVersion: String by rootProject.ext
 var sponge_conf: MetadataBaseExtension.() -> Unit by ext
 sponge_conf = {
     this.plugins.apply {
-        this.create("teleporter") {
+        this.create("random") {
             this.meta.apply {
-                this.setName("Teleporter")
+                this.setName("Random")
                 setVersion(allVersion)
                 this.authors.add("DiaLight")
                 this.setDescription("Useful tool to help event masters with theirs job")
                 this.dependencies.apply {
                     this.create("kotlinrt")
-                    this.create("toollib")
+                    this.create("modulelib")
+                    this.create("teams")
                     this.create("guilib") {
                         this.optional = true
                     }
@@ -71,8 +72,9 @@ dependencies {
     implementation("org.spongepowered:spongeapi:7.1.0-SNAPSHOT")
     implementation("org.spongepowered:spongevanilla:1.12.2-7.1.5")
     implementation(kotlin("stdlib-jdk8"))
-    implementation(project(":toollib"))
+    implementation(project(":modulelib"))
     implementation(project(":guilib"))
+    implementation(project(":teams"))
     implementation(project(":eventhelper"))
     join.forEach { implementation(project(it)) }
 }

@@ -12,17 +12,16 @@ import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
 import dialight.guilib.simple.SimpleGui
 import dialight.guilib.simple.SimpleItem
+import dialight.guilib.snapshot.SnapshotGui
 import dialight.toollib.Tool
+import org.spongepowered.api.entity.living.player.Player
 
 
-class EventHelperGui(val plugin: EventHelperPlugin) : SimpleGui(
-    plugin.guilib,
-    Text_colorized("Инвентарь EventHelper"),
-    9, 6) {
+class EventHelperGui(val plugin: EventHelperPlugin) : SnapshotGui<EventHelperSnapshot>() {
 
-    companion object {
-        val ID = "main"
-    }
+    private var snap = EventHelperSnapshot(plugin, id)
+
+    override fun createSnapshot(player: Player) = snap
 
     val toolsInfo: View.Item
 
@@ -47,13 +46,13 @@ class EventHelperGui(val plugin: EventHelperPlugin) : SimpleGui(
             }
         }
 
-        updateItems()
+        snap.updateItems()
         plugin.toollib.toolregistry.apply {
             onPut{ k, v ->
-                updateItems()
+                snap.updateItems()
             }
             onRemove { s, tool ->
-                updateItems()
+                snap.updateItems()
             }
             onReplace { key, old, new ->
 
@@ -61,58 +60,26 @@ class EventHelperGui(val plugin: EventHelperPlugin) : SimpleGui(
         }
         plugin.toolItemRegistry.apply {
             onPut{ k, v ->
-                updateItems()
+                snap.updateItems()
             }
             onRemove { s, tool ->
-                updateItems()
+                snap.updateItems()
             }
             onReplace { key, old, new ->
 
             }
         }
-    }
+        plugin.modulelib.moduleregistry.apply {
+            onPut{ k, v ->
+                snap.updateItems()
+            }
+            onRemove { s, tool ->
+                snap.updateItems()
+            }
+            onReplace { key, old, new ->
 
-    fun createDefault(k: String, v: Tool): View.Item {
-        return SimpleItem(
-            ItemStackBuilderEx(v.type)
-//                .also {
-//                    offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
-//                }
-                .name(v.title)
-                .lore(Text_colorizedList(
-                        "|g|ЛКМ|y|: Получить инструмент"
-//                    "",
-//                    "|g|Версия: |y|v" + plugin.container.version.orElse("null")
-                ))
-                .build()
-        ) {
-            when(it.type) {
-                ItemClickEvent.Type.LEFT -> {
-                    it.player.closeInventoryLater(plugin)
-                    plugin.toollib.giveTool(it.player, v.id)
-                }
             }
         }
-    }
-
-    fun updateItems() {
-        var itemIndex = 0
-        val toolit = plugin.toollib.toolregistry.iterator()
-        while(toolit.hasNext() && itemIndex < capacity) {
-            if((itemIndex % width) == 0) {
-                this[itemIndex] = toolsInfo
-            } else {
-                val (k, v) = toolit.next()
-                val item = plugin.toolItemRegistry[k] ?: createDefault(k, v)
-                this[itemIndex] = item
-            }
-            itemIndex++
-        }
-        while(itemIndex < capacity) {
-            if((itemIndex % width) == 0) break
-            itemIndex++
-        }
-//        val modit = plugin.toollib.toolregistry.iterator()
     }
 
 }

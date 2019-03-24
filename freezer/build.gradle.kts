@@ -26,7 +26,8 @@ val pluginVersion: String by project
 val allVersion: String by rootProject.ext
 val mcVersion: String by rootProject.ext
 
-val conf: MetadataBaseExtension.() -> Unit = {
+var sponge_conf: MetadataBaseExtension.() -> Unit by ext
+sponge_conf = {
     this.plugins.apply {
         this.create("freezer") {
             this.meta.apply {
@@ -48,8 +49,7 @@ val conf: MetadataBaseExtension.() -> Unit = {
         }
     }
 }
-ext.set("sponge_conf", conf)
-sponge.conf()
+sponge.sponge_conf()
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -60,8 +60,8 @@ tasks.withType<KotlinCompile> {
 }
 
 configurations {
-    val shadow = this.create("shadow")
-    this.getByName("compile").extendsFrom(shadow)
+    val shadow = create("shadow")
+    this["compile"].extendsFrom(shadow)
 }
 
 val join = listOf(":misc")
@@ -70,7 +70,6 @@ dependencies {
     val shadow by configurations
     implementation("org.spongepowered:spongeapi:7.1.0-SNAPSHOT")
     implementation("org.spongepowered:spongevanilla:1.12.2-7.1.5")
-    implementation("org.spongepowered:mixin:0.7.5-SNAPSHOT")
     implementation(kotlin("stdlib-jdk8"))
     implementation(project(":toollib"))
     implementation(project(":guilib"))

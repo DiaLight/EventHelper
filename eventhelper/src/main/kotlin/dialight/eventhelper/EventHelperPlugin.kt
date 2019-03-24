@@ -2,8 +2,10 @@ package dialight.eventhelper
 
 import com.google.inject.Inject
 import dialight.eventhelper.gui.EventHelperGui
+import dialight.extensions.getPluginInstance
 import dialight.guilib.GuiPlugin
 import dialight.guilib.View
+import dialight.modulelib.ModulePlugin
 import dialight.observable.map.observableMapOf
 import dialight.toollib.ToolPlugin
 import org.slf4j.Logger
@@ -24,31 +26,29 @@ class EventHelperPlugin @Inject constructor(
 
     lateinit var toollib: ToolPlugin
         private set
+    lateinit var modulelib: ModulePlugin
+        private set
     lateinit var guilib: GuiPlugin
         private set
     lateinit var maingui: EventHelperGui
         private set
 
     val toolItemRegistry = observableMapOf<String, View.Item>()
+    val moduleItemRegistry = observableMapOf<String, View.Item>()
 
     fun registerToolItem(id: String, item: View.Item) {
         toolItemRegistry[id] = item
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun <T> getPluginInstance(id: String): T? {
-        val oplugin = pluginManager.getPlugin(id)
-        if(!oplugin.isPresent) return null
-        val plugin = oplugin.get()
-        val oinstance = plugin.instance
-        if(!oinstance.isPresent) return null
-        return oinstance.get() as T
+    fun registerModuleItem(id: String, item: View.Item) {
+        moduleItemRegistry[id] = item
     }
 
     @Listener
     fun onConstruction(event: GameConstructionEvent) {
-        toollib = getPluginInstance("toollib")!!
-        guilib = getPluginInstance("guilib")!!
+        toollib = pluginManager.getPluginInstance("toollib")!!
+        modulelib = pluginManager.getPluginInstance("modulelib")!!
+        guilib = pluginManager.getPluginInstance("guilib")!!
     }
 
     @Listener

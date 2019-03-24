@@ -119,7 +119,7 @@ class TeamsSnapshot(val plugin: TeamsPlugin, id: Identifiable) : Snapshot<TeamsS
         pages.clear()
         val maxLines = 6
         val maxColumns = 9
-        val pagesitems = SequentialPageBuilder(maxColumns, maxLines - 1, items).toList()
+        val pagesitems = SequentialPageBuilder(maxColumns, maxLines - 1, maxColumns, items).toList()
         var index = 0
         for(pageitems in pagesitems) {
             val page = Page(this, Text_colorized("Команды ${index + 1}/${pagesitems.size}"), maxColumns, maxLines, index, pagesitems.size)

@@ -4,16 +4,16 @@ open class ObservableMapWrapper<K, V>(
     val map: MutableMap<K, V> = hashMapOf()
 ) : ObservableMap<K, V>(), MutableMap<K, V> {
 
-    override val size = map.size
+    override val size get() = map.size
     override fun containsKey(key: K) = map.containsKey(key)
     override fun containsValue(value: V) = map.containsValue(value)
     override fun get(key: K) = map.get(key)
 
     override fun isEmpty() = map.isEmpty()
 
-    override val entries = map.entries
-    override val keys = map.keys
-    override val values = map.values
+    override val entries get() = map.entries
+    override val keys get() = map.keys
+    override val values get() = map.values
 
     override fun clear() {
         for ((k, v) in map) {

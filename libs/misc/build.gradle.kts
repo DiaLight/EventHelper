@@ -34,8 +34,8 @@ tasks.withType<KotlinCompile> {
 }
 
 configurations {
-    val shadow = this.create("shadow")
-    this.getByName("compile").extendsFrom(shadow)
+    val shadow = create("shadow")
+    this["compile"].extendsFrom(shadow)
 }
 
 dependencies {

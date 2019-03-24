@@ -4,7 +4,7 @@ class ObservableCollectionWrapper<E>(
     val collection: MutableCollection<E> = mutableListOf()
 ) : ObservableCollection<E>(), MutableCollection<E> {
 
-    override val size = collection.size
+    override val size get() = collection.size
     override fun contains(element: E) = collection.contains(element)
     override fun containsAll(elements: Collection<E>) = collection.containsAll(elements)
     override fun isEmpty() = collection.isEmpty()

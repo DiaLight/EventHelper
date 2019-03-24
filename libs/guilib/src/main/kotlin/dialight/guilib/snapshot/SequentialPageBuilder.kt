@@ -4,8 +4,9 @@ import dialight.guilib.View
 import java.util.HashMap
 
 class SequentialPageBuilder(
+    val columns: Int,
+    val lines: Int,
     val maxColumns: Int,
-    val maxLines: Int,
     val items: List<View.Item>,
     val offsetColumn: Int = 0,
     val offsetLine: Int = 0
@@ -20,9 +21,9 @@ class SequentialPageBuilder(
 
     override fun next(): HashMap<Int, View.Item> {
         val map = HashMap<Int, View.Item>()
-        for (i in offsetLine..(maxLines - 1)) {
-            for (j in offsetColumn..(maxColumns - 1)) {
-                val index = (i * 9 + j)
+        for (i in offsetLine..(lines - 1)) {
+            for (j in offsetColumn..(columns - 1)) {
+                val index = (i * maxColumns + j)
                 if(!slotsIt.hasNext()) return map
                 val item = slotsIt.next()
                 map[index] = item

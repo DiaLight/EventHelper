@@ -39,10 +39,10 @@ object TeleporterMessages {
     }
 
     fun notFound(trgName: String): Text {
-        return Text_colorized("Игрок с ником $trgName не найден")
+        return Text.of(pluginPrefix, Text_colorized("Игрок с ником $trgName не найден"))
     }
     fun notFound(uuid: UUID): Text {
-        return Text_colorized("Игрок с UUID $uuid не найден")
+        return Text.of(pluginPrefix, Text_colorized("Игрок с UUID $uuid не найден"))
     }
 
 }

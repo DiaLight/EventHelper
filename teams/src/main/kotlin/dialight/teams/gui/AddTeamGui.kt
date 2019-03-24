@@ -76,7 +76,7 @@ class AddTeamGui(val plugin: TeamsPlugin) : SimpleGui(plugin.guilib!!, Text_colo
                 }
             })
         }
-        val pages = SequentialPageBuilder(width, height, items).toList()
+        val pages = SequentialPageBuilder(width, height - 1, width, items).toList()
         for((index, item) in pages.first()) {
             this[index] = item
         }

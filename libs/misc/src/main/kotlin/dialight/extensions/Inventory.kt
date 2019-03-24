@@ -13,7 +13,8 @@ operator fun Inventory.set(index: Int, item: ItemStack?) {
     if (item == null) {
         slot.clear()
     } else {
-        slot.set(item)
+        slot.clear()
+        slot.offer(item)
     }
 }
 

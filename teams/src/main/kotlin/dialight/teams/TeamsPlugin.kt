@@ -73,6 +73,10 @@ class TeamsPlugin @Inject constructor(
         logger.info("TeamsTool v${container.version.orElse("null")} has been Enabled")
     }
 
+    fun getAll() {
+
+    }
+
 
 }
 

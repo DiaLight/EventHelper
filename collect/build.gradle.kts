@@ -40,8 +40,8 @@ tasks.withType<KotlinCompile> {
 }
 
 configurations {
-    val shadow = this.create("shadow")
-    this.getByName("compile").extendsFrom(shadow)
+    val shadow = create("shadow")
+    this["compile"].extendsFrom(shadow)
 }
 
 val ehProjects = listOf(
@@ -52,7 +52,8 @@ val ehProjects = listOf(
     ":eventhelper",
     ":teleporter",
     ":freezer",
-    ":teams"
+    ":teams",
+    ":random"
 )
 
 val join = listOf(":misc")

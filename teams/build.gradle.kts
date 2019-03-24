@@ -1,4 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.google.code.regexp.Pattern
 import org.apache.commons.io.FilenameUtils
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -42,7 +41,8 @@ val mcVersion: String by rootProject.ext
 
 version = "$mcVersion"
 
-val conf: MetadataBaseExtension.() -> Unit = {
+var sponge_conf: MetadataBaseExtension.() -> Unit by ext
+sponge_conf = {
     this.plugins.apply {
         this.create("teams") {
             this.meta.apply {
@@ -67,8 +67,7 @@ val conf: MetadataBaseExtension.() -> Unit = {
         }
     }
 }
-ext.set("sponge_conf", conf)
-sponge.conf()
+sponge.sponge_conf()
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -79,8 +78,8 @@ tasks.withType<KotlinCompile> {
 }
 
 configurations {
-    val shadow = this.create("shadow")
-    this.getByName("compile").extendsFrom(shadow)
+    val shadow = create("shadow")
+    this["compile"].extendsFrom(shadow)
 }
 
 mixin.apply {

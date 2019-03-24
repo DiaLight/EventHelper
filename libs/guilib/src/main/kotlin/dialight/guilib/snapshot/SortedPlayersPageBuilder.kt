@@ -6,7 +6,7 @@ import java.util.HashMap
 
 class SortedPlayersPageBuilder(
     val maxColumns: Int,
-    val maxLines: Int,
+    val lines: Int,
     val sorted: Map<Char, List<View.Item>>,
     chars: List<Char>
 ): Iterator<Pair<String, HashMap<Int, View.Item>>>, Iterable<Pair<String, HashMap<Int, View.Item>>> {
@@ -23,7 +23,7 @@ class SortedPlayersPageBuilder(
     }
 
     override fun next(): Pair<String, HashMap<Int, View.Item>> {
-        val builder = ColumnBuilderIt(maxLines, maxColumns)
+        val builder = ColumnBuilderIt(lines, maxColumns)
         while(builder.hasNext() && hasNext()) {
             builder.next(slotsIt, currentChar)
         }
@@ -42,7 +42,7 @@ class SortedPlayersPageBuilder(
     }
 
     class ColumnBuilderIt(
-        val maxLines: Int,
+        val lines: Int,
         val maxColumns: Int
     ) {
         var displayChar: Char = ' '
@@ -65,7 +65,7 @@ class SortedPlayersPageBuilder(
                     val slot = slotsIt.next()
                     slotCache[column + row * maxColumns] = slot
                     row++
-                    if (row == maxLines) {
+                    if (row == lines) {
                         break
                     }
                 }

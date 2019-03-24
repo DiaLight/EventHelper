@@ -22,7 +22,8 @@ plugins {
 
 val allVersion: String by rootProject.ext
 
-val conf: MetadataBaseExtension.() -> Unit = {
+var sponge_conf: MetadataBaseExtension.() -> Unit by ext
+sponge_conf = {
     this.plugins.apply {
         this.create("kotlinrt") {
             this.meta.apply {
@@ -33,8 +34,7 @@ val conf: MetadataBaseExtension.() -> Unit = {
         }
     }
 }
-ext.set("sponge_conf", conf)
-sponge.conf()
+sponge.sponge_conf()
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
@@ -55,8 +55,8 @@ repositories {
 }
 
 configurations {
-    val shadow = this.create("shadow")
-    this.getByName("compile").extendsFrom(shadow)
+    val shadow = create("shadow")
+    this["compile"].extendsFrom(shadow)
 }
 
 dependencies {

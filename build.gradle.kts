@@ -15,7 +15,6 @@ buildscript {
 
 plugins {
     id("org.spongepowered.plugin") version "0.8.1"
-    id("com.github.johnrengelman.shadow") version "2.0.1"
     kotlin("jvm") version "1.3.21"
     java
     base
@@ -24,25 +23,20 @@ plugins {
 val pluginGroup: String by project
 val pluginVersion: String by project
 
-val self = this
-allprojects {
-    if(!self.ext.has("buildProps")) {
-        val buildPropsFile = self.file(File(buildDir, "build.properties"))
-        val buildProps = Properties()
-        if(buildPropsFile.exists()) buildProps.load(buildPropsFile.inputStream())
-        val buildVersion = buildProps.getProperty("build-version", "0").toInt() + 1
-        val libDir = buildProps.getProperty("libDir", "$buildDir/libs")
-        val mcVersion = "1.12.2"
-        val allVersion = "~build-$buildVersion"
+var buildPropsFile: File by ext
+var buildProps: Properties by ext
+var buildVersion: Int by ext
+var libDir: String by ext
+var mcVersion: String by ext
+var allVersion: String by ext
 
-        self.ext.set("buildPropsFile", buildPropsFile)
-        self.ext.set("buildProps", buildProps)
-        self.ext.set("buildVersion", buildVersion)
-        self.ext.set("allVersion", allVersion)
-        self.ext.set("mcVersion", mcVersion)
-        self.ext.set("libDir", libDir)
-    }
-}
+buildPropsFile = file(File(buildDir, "build.properties"))
+buildProps = Properties()
+if(buildPropsFile.exists()) buildProps.load(buildPropsFile.inputStream())
+buildVersion = buildProps.getProperty("build-version", "0").toInt() + 1
+libDir = buildProps.getProperty("libDir", "$buildDir/libs")
+mcVersion = "1.12.2"
+allVersion = "~build-$buildVersion"
 
 group = pluginGroup as String
 
@@ -80,10 +74,8 @@ tasks.withType<KotlinCompile> {
 }
 
 configurations {
-    val shadow = this.getByName("shadow")
-    this.getByName("compile") {
-        extendsFrom(shadow)
-    }
+    val shadow = create("shadow")
+    this["compile"].extendsFrom(shadow)
 }
 
 dependencies {
