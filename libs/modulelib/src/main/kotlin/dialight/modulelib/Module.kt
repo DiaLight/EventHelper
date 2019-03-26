@@ -1,8 +1,16 @@
 package dialight.modulelib
 
-abstract class Module(val id: String) {
+interface Module {
 
-    protected abstract fun onEnable()
-    protected abstract fun onDisable()
+    val id: String
+    val name: String
+    var enabled: Boolean
+
+    fun enable(): Boolean
+
+    fun disable(): Boolean
+
+    fun toggle() = if(enabled) disable() else enable()
+
 
 }

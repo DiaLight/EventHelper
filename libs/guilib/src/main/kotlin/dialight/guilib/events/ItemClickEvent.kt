@@ -18,6 +18,8 @@ open class ItemClickEvent private constructor(
 
     var updateItem = false
 
+
+
     class DropSingle(event: ClickInventoryEvent, player: Player, gui: Gui, view: View, item: View.Item, index: Int) : ItemClickEvent(event, player, gui, view, item, index, Type.DROP_SINGLE)
     class DropOutsideLeft(event: ClickInventoryEvent, player: Player, gui: Gui, view: View, item: View.Item, index: Int) : ItemClickEvent(event, player, gui, view, item, index, Type.DROP_OUTSIDE_LEFT)
     class DropOutsideRight(event: ClickInventoryEvent, player: Player, gui: Gui, view: View, item: View.Item, index: Int) : ItemClickEvent(event, player, gui, view, item, index, Type.DROP_OUTSIDE_RIGHT)
@@ -54,6 +56,10 @@ open class ItemClickEvent private constructor(
         RIGHT,
         SHIFT_LEFT,
         SHIFT_RIGHT,
+    }
+
+    override fun toString(): String {
+        return "ItemClickEvent(index=$index, type=$type)"
     }
 
 }

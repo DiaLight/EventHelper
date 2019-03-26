@@ -3,12 +3,12 @@ package dialight.eventhelper.gui
 import dialight.eventhelper.EventHelperPlugin
 import dialight.extensions.ItemStackBuilderEx
 import dialight.extensions.closeInventoryLater
-import dialight.guilib.Gui
 import dialight.guilib.View
 import dialight.guilib.events.ItemClickEvent
 import dialight.guilib.simple.SimpleItem
 import dialight.guilib.snapshot.Snapshot
 import dialight.modulelib.Module
+import dialight.modulelib.ModuleMessages
 import dialight.toollib.Tool
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
@@ -43,26 +43,40 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
         }
     }
 
-    fun createDefault(k: String, v: Module): View.Item {
-        return SimpleItem(
-            ItemStackBuilderEx(ItemTypes.ANVIL)
-                .name(Text_colorized("|y|${v.id}"))
-                .lore(
-                    Text_colorizedList(
-                        "|g|ЛКМ|y|: Вкл/Выкл модуль"
+    class ModuleItem(val mod: Module): View.Item {
+
+        override val item get() = ItemStackBuilderEx(ItemTypes.ANVIL)
+            .name(Text_colorized("|y|${mod.name}"))
+            .lore(
+                Text_colorizedList(
+                    "|g|ЛКМ|y|: ${if(mod.enabled) "Вкл" else "Выкл"} модуль"
 //                    "",
 //                    "|g|Версия: |y|v" + plugin.container.version.orElse("null")
-                    )
                 )
-                .build()
-        ) {
-            when(it.type) {
+            )
+            .build()
+
+        override fun onClick(event: ItemClickEvent) {
+            when(event.type) {
                 ItemClickEvent.Type.LEFT -> {
-                    it.player.closeInventoryLater(plugin)
-                    plugin.toollib.giveTool(it.player, v.id)
+                    val newState = !mod.enabled
+                    if(!mod.toggle()) {
+                        if(newState) {
+                            event.player.sendMessage(ModuleMessages.cantEnable(mod))
+                        } else {
+                            event.player.sendMessage(ModuleMessages.cantDisable(mod))
+                        }
+                    } else {
+                        if(newState) {
+                            event.player.sendMessage(ModuleMessages.successEnable(mod))
+                        } else {
+                            event.player.sendMessage(ModuleMessages.successDisable(mod))
+                        }
+                    }
                 }
             }
         }
+
     }
 
     fun updateItems() {
@@ -82,7 +96,7 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
         // modules
         val moduleItems = arrayListOf<View.Item>()
         for((id, module) in plugin.modulelib.moduleregistry) {
-            moduleItems.add(plugin.moduleItemRegistry[id] ?: createDefault(id, module))
+            moduleItems.add(plugin.moduleItemRegistry[id] ?: ModuleItem(module))
         }
         val rawModulePages = EventHelperPageBuilder(maxColumns - 2, maxLines, moduleItems).toList()
 
