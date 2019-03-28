@@ -1,5 +1,6 @@
 package dialight.guilib
 
+import dialight.extensions.getOrNull
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.inventory.Inventory
@@ -38,7 +39,7 @@ class GuiStory(val plugin: GuiPlugin) {
         val last = story.queue.pollLast()
         if(last != null) {
             last.destroyFor(player)
-            val prev = story.queue.peekFirst()
+            val prev = story.queue.peekLast()
             if(prev != null) {
                 plugin.openView(player, prev.getView(player))
                 story.opened = true
@@ -59,7 +60,6 @@ class GuiStory(val plugin: GuiPlugin) {
     }
 
     fun currentGui(player: Player, inv: Inventory, remove: Boolean = false): Gui? {
-//        val oprop = inv.getInventoryProperty(Identifiable::class.java)
 //        if(!oprop.isPresent) return null
         val story = guiStory[player.uniqueId]
         if (story == null) {

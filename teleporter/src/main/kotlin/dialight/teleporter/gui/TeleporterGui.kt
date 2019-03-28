@@ -13,7 +13,7 @@ import org.spongepowered.api.scheduler.Task
 
 class TeleporterGui(val plugin: TeleporterPlugin) : SnapshotGui<TeleporterSnapshot>() {
 
-    override fun createSnapshot(player: Player) = TeleporterSnapshot.Builder(plugin, id, player).build()
+    override fun getSnapshot(player: Player) = TeleporterSnapshot.Builder(plugin, id, player).build()
 
     @Listener
     fun onSelect(e: TeleporterEvent, @First player: Player) {

@@ -14,7 +14,7 @@ class TeamsListener(val plugin: TeamsPlugin) {
 
     @Listener
     fun onTeleporterAction(e: TeleporterEvent, @First player: Player) {
-        val team = plugin.selected.value ?: return
+        val team = plugin.selected[player.uniqueId] ?: return
         for(sel in e.result.selected) {
             team.addMember(Text.of(sel.name))
             player.sendMessage(TeamsMessages.addTeamPlayer(team, sel.name))

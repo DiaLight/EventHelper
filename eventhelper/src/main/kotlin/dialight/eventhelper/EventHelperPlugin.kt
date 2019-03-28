@@ -2,6 +2,7 @@ package dialight.eventhelper
 
 import com.google.inject.Inject
 import dialight.eventhelper.gui.EventHelperGui
+import dialight.eventhelper.gui.EventHelperItem
 import dialight.extensions.getPluginInstance
 import dialight.guilib.GuiPlugin
 import dialight.guilib.View
@@ -44,6 +45,8 @@ class EventHelperPlugin @Inject constructor(
         moduleItemRegistry[id] = item
     }
 
+    val tool = EventHelperTool(this)
+
     @Listener
     fun onConstruction(event: GameConstructionEvent) {
         toollib = pluginManager.getPluginInstance("toollib")!!
@@ -54,7 +57,8 @@ class EventHelperPlugin @Inject constructor(
     @Listener
     fun onServerStart(event: GameStartedServerEvent) {
         this.maingui = EventHelperGui(this)
-        toollib.registerTool(EventHelperTool(this))
+        toollib.registerTool(tool)
+        registerToolItem(tool.id, EventHelperItem(this))
         registerCommands()
         logger.info("EventHelper v${container.version.orElse("null")} has been Enabled")
     }

@@ -36,7 +36,7 @@ Useful tool to help event masters with theirs job
 
 ##### modulelib
 Зависит от: `kotlinrt`
-* [ ] Реализовано
+* [X] Реализовано
 
 ##### guilib
 Зависит от: `kotlinrt`

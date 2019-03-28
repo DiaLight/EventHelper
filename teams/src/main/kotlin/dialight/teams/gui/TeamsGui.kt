@@ -8,46 +8,82 @@ import dialight.teams.event.ScoreboardEvent
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.scheduler.Task
+import java.util.*
 
 class TeamsGui(val plugin: TeamsPlugin) : SnapshotGui<TeamsSnapshot>() {
 
-    private val snap = TeamsSnapshot(plugin, id)
+    override fun getSnapshot(player: Player) = TeamsSnapshot(plugin, player.uniqueId, id)
 
-    override fun createSnapshot(player: Player) = snap
+    init {
+        plugin.selected.apply {
+            onPut{ uuid, v ->
+                Task.builder().execute { task ->
+                    updateItems(uuid)
+                }.submit(plugin)
+            }
+            onRemove { uuid, v ->
+                Task.builder().execute { task ->
+                    updateItems(uuid)
+                }.submit(plugin)
+            }
+            onReplace { key, old, new ->
+
+            }
+        }
+    }
+
+    fun updateItems(uuid: UUID) {
+        val snap = opened[uuid] ?: return
+        snap.updateItems()
+        val inv = plugin.guilib!!.guimap[uuid] ?: return
+        val current = snap.current(uuid)
+        var index = 0
+        for(item in current) {
+            inv[index] = item?.item?.createStack()
+            index++
+        }
+    }
 
     @Listener
     fun onTeamAdd(e: ScoreboardEvent.Team.Add) {
-        snap.updateItems()
-//        Task.builder().execute { task ->
-//            for ((uuid, snap) in opened) {
-//                val player = Server_getPlayer(uuid) ?: continue
-//                val current = this.snap.current(uuid)
-//                plugin.guilib!!.openView(player, current)
-//            }
-//        }.delayTicks(1).submit(plugin)
+        for((uuid, snap) in opened) {
+            snap.updateItems()
+        }
     }
     @Listener
     fun onTeamRemove(e: ScoreboardEvent.Team.Remove) {
-        snap.updateItems()
-//        Task.builder().execute { task ->
-//            for ((uuid, snap) in opened) {
-//                val player = Server_getPlayer(uuid) ?: continue
-//                val current = this.snap.current(uuid)
-//                plugin.guilib!!.openView(player, current)
-//            }
-//        }.delayTicks(1).submit(plugin)
+        Task.builder().execute { task ->
+            for ((uuid, snap) in opened) {
+                val inv = plugin.guilib!!.guimap[uuid] ?: continue
+                val current = snap.current(uuid)
+                var index = 0
+                for(item in current) {
+                    inv[index] = item?.item?.createStack()
+                    index++
+                }
+            }
+        }.submit(plugin)
+        for((uuid, snap) in opened) {
+            snap.updateItems()
+        }
     }
     @Listener
     fun onTeamUpdate(e: ScoreboardEvent.Team.UpdateInfo) {
-
+        for((uuid, snap) in opened) {
+            snap.updateItems()
+        }
     }
     @Listener
     fun onTeamMemberAdd(e: ScoreboardEvent.TeamMember.Add) {
-
+//        for((uuid, snap) in opened) {
+//            snap.updateItems()
+//        }
     }
     @Listener
     fun onTeamMemberRemove(e: ScoreboardEvent.TeamMember.Remove) {
-
+//        for((uuid, snap) in opened) {
+//            snap.updateItems()
+//        }
     }
 
 }

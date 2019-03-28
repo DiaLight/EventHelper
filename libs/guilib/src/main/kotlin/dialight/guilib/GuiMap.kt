@@ -26,18 +26,15 @@ class GuiMap(val plugin: GuiPlugin) {
     operator fun get(player: Player) = guimap[player.uniqueId]
     operator fun get(uuid: UUID) = guimap[uuid]
 
-    fun inventoryClone(from: Inventory, player: Player) {
-        val usrinv = guimap[player.uniqueId] ?: return
-        inventoryClone(from, usrinv)
-    }
-    fun inventoryClone(from: Inventory, to: Inventory) {
-        to.title = from.title
+    fun inventoryClone(from: View, to: Inventory) {
+        val inv = from.inventory
+        to.title = inv.title
         var index = 0
-        for(slot in from.slots<Slot>()) {
-            to[index] = slot.peek().getOrNull()
+        for(item in from) {
+            to[index] = item?.item?.createStack()
             index++
         }
-        val idfrprop = from.getInventoryProperty(Identifiable::class.java).getOrNull()?.value ?: throw Exception("Can't identify from view")
+        val idfrprop = inv.getInventoryProperty(Identifiable::class.java).getOrNull()?.value ?: throw Exception("Can't identify from view")
         val idtoprop = to.getInventoryProperty(Identifiable::class.java).getOrNull() ?: throw Exception("Can't identify to view")
         idtoprop.setValue(idfrprop)
     }
@@ -72,10 +69,10 @@ class GuiMap(val plugin: GuiPlugin) {
             // add delay for update to keep event update order
             Task.builder().execute { task ->
                 openmap[player.uniqueId] = view.inventory.getInventoryProperty(Identifiable::class.java).getOrNull()!!.value!!
-                inventoryClone(view.inventory, usrinv)
+                inventoryClone(view, usrinv)
             }.submit(plugin)
         } else {  // open new inventory
-            inventoryClone(view.inventory, usrinv)  // update now
+            inventoryClone(view, usrinv)  // update now
             // add delay for open to keep event update order
             Task.builder().execute { task ->
                 openmap[player.uniqueId] = view.inventory.getInventoryProperty(Identifiable::class.java).getOrNull()!!.value!!

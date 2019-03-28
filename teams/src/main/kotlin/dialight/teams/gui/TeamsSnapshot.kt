@@ -17,45 +17,27 @@ import dialight.teleporter.TeleporterTool
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
 import org.spongepowered.api.data.key.Keys
+import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.item.ItemTypes
+import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.inventory.property.Identifiable
+import org.spongepowered.api.scoreboard.Team
 import org.spongepowered.api.text.Text
+import java.util.*
 import java.util.stream.Collectors
 
-class TeamsSnapshot(val plugin: TeamsPlugin, id: Identifiable) : Snapshot<TeamsSnapshot.Page>(plugin.guilib!!, id) {
+class TeamsSnapshot(val plugin: TeamsPlugin, val uuid: UUID, id: Identifiable) : Snapshot<TeamsSnapshot.Page>(plugin.guilib!!, id) {
 
     val addTeamItem = SimpleItem(ItemStackBuilderEx(ItemTypes.NETHER_STAR)
         .name(Text_colorized("Добавить команду"))
         .lore(Text_colorizedList(
-            ""
+            "|g|ЛКМ|y|: добавить команду"
         ))
         .build()) {
         when(it.type) {
             ItemClickEvent.Type.LEFT -> {
                 plugin.guilib!!.openGui(it.player, AddTeamGui(plugin))
-            }
-            ItemClickEvent.Type.RIGHT -> {
-                val gui = TextInputGui(plugin.guilib!!, Identifiable(), Text_colorized("TextInput"))
-                gui.first = SimpleItem(ItemStackBuilderEx(ItemTypes.WOOL)
-                    .name(Text_colorized("First"))
-                    .lore(Text_colorizedList(
-                        "hello"
-                    ))
-                    .build())
-                gui.second = SimpleItem(ItemStackBuilderEx(ItemTypes.ACTIVATOR_RAIL)
-                    .name(Text_colorized("sec"))
-                    .lore(Text_colorizedList(
-                        "hello"
-                    ))
-                    .build())
-//                gui.result = SimpleItem(ItemStackBuilderEx(ItemTypes.GLASS)
-//                    .name(Text_colorized("res"))
-//                    .lore(Text_colorizedList(
-//                        "hello"
-//                    ))
-//                    .build())
-                plugin.guilib!!.openGui(it.player, gui)
             }
         }
     }
@@ -68,51 +50,7 @@ class TeamsSnapshot(val plugin: TeamsPlugin, id: Identifiable) : Snapshot<TeamsS
         val items = arrayListOf<View.Item>()
         val scoreboard = Server_getScoreboard()
         for(team in scoreboard.teams) {
-            items += SimpleItem(ItemStackBuilderEx(ItemTypes.WOOL)
-                .name(Text_colorized(team.name))
-                .also {
-                    offer(Keys.DYE_COLOR, team.color.dyeColor)
-                }
-                .lore(Text_colorizedList(
-                    "|g|ЛКМ|y|: выбрать текущую команду",
-                    "|y| и игроков в телепортере",
-                    "|g|ПКМ|y|: выбрать игроков в телепортере",
-                    "|g|СКМ|y|: удалить команду"
-                ))
-                .build()) {
-                val users = team.members.stream()
-                    .map { Server_getUser(it.toPlain()) }
-                    .filter { it != null }
-                    .map { it!! }
-                    .collect(Collectors.toList())
-                when(it.type) {
-                    ItemClickEvent.Type.LEFT -> {
-                        plugin.teleporter?.let { teleporter ->
-                            val selected = plugin.selected.value
-                            plugin.selected.value = null
-                            teleporter.teleporter.invoke(it.player, Teleporter.Action.UNTAG, Teleporter.Group.ALL)
-                            teleporter.teleporter.invoke(it.player, Teleporter.Action.TAG, users)
-                            if(selected == null || selected.name != team.name) {
-                                plugin.selected.value = team
-                                it.player.sendMessage(TeamsMessages.selectedTeam(team))
-                            } else {
-                                it.player.sendMessage(TeamsMessages.unselectedTeam(selected))
-                            }
-                        }
-                    }
-                    ItemClickEvent.Type.RIGHT -> {
-                        plugin.teleporter?.let { teleporter ->
-                            teleporter.teleporter.invoke(it.player, Teleporter.Action.UNTAG, Teleporter.Group.ALL)
-                            teleporter.teleporter.invoke(it.player, Teleporter.Action.TAG, users)
-                        }
-                    }
-                    ItemClickEvent.Type.MIDDLE -> {
-                        if(team.unregister()) {
-                            it.player.sendMessage(TeamsMessages.removeTeam(team))
-                        }
-                    }
-                }
-            }
+            items += Item(team)
         }
         items.add(addTeamItem)
 
@@ -142,6 +80,54 @@ class TeamsSnapshot(val plugin: TeamsPlugin, id: Identifiable) : Snapshot<TeamsS
 
     }
 
+    inner class Item(val team: Team) : View.Item {
+
+        override val item: ItemStackSnapshot
+            get() {
+                val selected = plugin.selected[uuid] == team
+                return ItemStackBuilderEx(if(selected) ItemTypes.LEATHER_HELMET else ItemTypes.LEATHER_CHESTPLATE)
+                    .name(Text_colorized(team.name))
+                    .also {
+                        offer(Keys.COLOR, team.color.color)
+//                            offer(Keys.DYE_COLOR, team.color.dyeColor)
+                    }
+                    .lore(Text_colorizedList(
+                        "|g|ЛКМ|y|: выбрать текущую команду",
+                        "|y| и игроков в телепортере",
+                        "|g|СКМ|y|: удалить команду"
+                    ))
+                    .build()
+            }
+
+        override fun onClick(event: ItemClickEvent) {
+            val users = team.members.stream()
+                .map { Server_getUser(it.toPlain()) }
+                .filter { it != null }
+                .map { it!! }
+                .collect(Collectors.toList())
+            when(event.type) {
+                ItemClickEvent.Type.LEFT -> {
+                    plugin.teleporter?.let { teleporter ->
+                        val selected = plugin.selected.remove(event.player.uniqueId)
+                        teleporter.teleporter.invoke(event.player, Teleporter.Action.UNTAG, Teleporter.Group.ALL)
+                        teleporter.teleporter.invoke(event.player, Teleporter.Action.TAG, users)
+                        if(selected == null || selected.name != team.name) {
+                            plugin.selected[event.player.uniqueId] = team
+                            event.player.sendMessage(TeamsMessages.selectedTeam(team))
+                        } else {
+                            event.player.sendMessage(TeamsMessages.unselectedTeam(selected))
+                        }
+                    }
+                }
+                ItemClickEvent.Type.MIDDLE -> {
+                    if(team.unregister()) {
+                        event.player.sendMessage(TeamsMessages.removeTeam(team))
+                    }
+                }
+            }
+        }
+
+    }
 
 
 }

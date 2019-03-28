@@ -49,9 +49,10 @@ class AddTeamGui(val plugin: TeamsPlugin) : SimpleGui(plugin.guilib!!, Text_colo
         val coloredTeams = scoreboard.teams.map { it.color }
         for(color in COLORS) {
             if(color in coloredTeams) continue
-            items.add(SimpleItem(ItemStackBuilderEx(ItemTypes.WOOL)
+            items.add(SimpleItem(ItemStackBuilderEx(ItemTypes.LEATHER_CHESTPLATE)
                 .also {
-                    offer(Keys.DYE_COLOR, color.dyeColor)
+                    offer(Keys.COLOR, color.color)
+//                    offer(Keys.DYE_COLOR, color.dyeColor)
                 }
                 .name(Text_colorized(color.name))
                 .lore(Text_colorizedList(
@@ -60,10 +61,15 @@ class AddTeamGui(val plugin: TeamsPlugin) : SimpleGui(plugin.guilib!!, Text_colo
                 .build()) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
+                        var team_name = "${color.name}_team"
+                        if(team_name.length > 16) {
+                            team_name = team_name.substring(0, 16)
+                        }
                         val team = Team.builder()
-                            .name("${color.name}_team")
+                            .name(team_name)
                             .color(color)
                             .prefix(Text.of(color))
+                            .suffix(Text.of(TextColors.RESET))
                             .build()
                         scoreboard.registerTeam(team)
                         it.player.sendMessage(TeamsMessages.addTeam(team))

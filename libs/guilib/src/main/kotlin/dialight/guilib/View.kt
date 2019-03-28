@@ -6,7 +6,7 @@ import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 
-interface View {
+interface View : Iterable<View.Item?> {
 
     val capacity: Int
 
@@ -22,6 +22,18 @@ interface View {
         val item: ItemStackSnapshot
 
         fun onClick(event: ItemClickEvent)
+
+    }
+
+    override fun iterator() = VIterator(this)
+
+    class VIterator(val view: View) : Iterator<Item?> {
+        var index = 0
+        override fun hasNext(): Boolean {
+            return index < view.capacity
+        }
+
+        override fun next() = view[index++]
 
     }
 

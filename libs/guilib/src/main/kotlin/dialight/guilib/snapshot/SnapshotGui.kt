@@ -22,10 +22,10 @@ abstract class SnapshotGui<T : Snapshot<*>> : Gui {
         return id.value!! == prop.value!!
     }
 
-    abstract fun createSnapshot(player: Player): T
+    abstract fun getSnapshot(player: Player): T
 
     override fun getView(player: Player): View {
-        val snap = createSnapshot(player)
+        val snap = getSnapshot(player)
         opened[player.uniqueId] = snap
         return snap.current(player)
     }

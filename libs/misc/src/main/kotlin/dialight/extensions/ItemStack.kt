@@ -15,6 +15,7 @@ class ItemStackBuilderEx(val type: ItemType) {
     private val nameData = Sponge.getDataManager().getManipulatorBuilder(DisplayNameData::class.java).get().create()
 
     private val toApply = arrayListOf<ItemStack.() -> Unit>()
+    private val toBuilder = arrayListOf<ItemStack.Builder.() -> Unit>()
 
     fun lore(lines: List<Text>): ItemStackBuilderEx {
         val lore = loreData.lore()
@@ -34,11 +35,19 @@ class ItemStackBuilderEx(val type: ItemType) {
         return this
     }
 
+    fun builder(op: ItemStack.Builder.() -> Unit): ItemStackBuilderEx {
+        toBuilder += op
+        return this
+    }
+
     fun build(): ItemStackSnapshot {
         val itemStack = ItemStack.builder()
             .itemType(type)
             .itemData(nameData)
             .itemData(loreData)
+            .apply {
+                for(op in toBuilder) op()
+            }
             .build()
         toApply.forEach { itemStack.it() }
         return itemStack.createSnapshot()

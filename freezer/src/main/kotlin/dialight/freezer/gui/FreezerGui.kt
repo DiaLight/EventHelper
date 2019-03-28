@@ -1,5 +1,6 @@
 package dialight.freezer.gui
 
+import dialight.extensions.getOrNull
 import dialight.extensions.set
 import dialight.freezer.FreezerPlugin
 import dialight.freezer.events.FreezerEvent
@@ -23,7 +24,7 @@ class FreezerGui(val plugin: FreezerPlugin) : SnapshotGui<FreezerSnapshot>() {
 
     private var snap = FreezerSnapshot.Builder(plugin, id).build()
 
-    override fun createSnapshot(player: Player) = snap
+    override fun getSnapshot(player: Player) = snap
 
     @Listener
     fun onSelect(e: FreezerEvent, @First player: Player) {
@@ -46,10 +47,11 @@ class FreezerGui(val plugin: FreezerPlugin) : SnapshotGui<FreezerSnapshot>() {
 
     @Listener
     fun onJoin(event: ClientConnectionEvent.Join, @First player: Player) {
+        val srv = Sponge.getServer()
         for ((uuid, snap) in opened) {
             val inv = plugin.guilib!!.guimap[uuid] ?: continue
             val current = snap.current(uuid)
-            val (index, item) = current[player.uniqueId] ?: continue
+            val (index, item) = current[uuid] ?: continue
             inv[index] = item.item.createStack()
         }
         if(!snap.update(player.uniqueId)) {  // rebuild snap
@@ -62,7 +64,7 @@ class FreezerGui(val plugin: FreezerPlugin) : SnapshotGui<FreezerSnapshot>() {
             for ((uuid, snap) in opened) {
                 val inv = plugin.guilib!!.guimap[uuid] ?: continue
                 val current = snap.current(uuid)
-                val (index, item) = current[player.uniqueId] ?: continue
+                val (index, item) = current[uuid] ?: continue
                 inv[index] = item.item.createStack()
             }
             snap.update(player.uniqueId)

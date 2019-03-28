@@ -269,12 +269,8 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uui
                     return true
                 }
                 val usr = Server_getUser(uuid) ?: return false
-                val oworldId = usr.worldUniqueId
-                if(!oworldId.isPresent) return false
-                val worldId = oworldId.get()
-                val oToWorld = player.worldUniqueId
-                if(!oToWorld.isPresent) return false
-                val toWorld = oToWorld.get()
+                val worldId = usr.worldUniqueId.getOrNull() ?: return false
+                val toWorld = player.worldUniqueId.getOrNull() ?: return false
                 if(toWorld != worldId) return false
                 Task.builder().execute { task -> player.location = Location(player.world, usr.position) }.submit(snap.plugin)
                 return true

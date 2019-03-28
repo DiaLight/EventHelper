@@ -38,9 +38,8 @@ class TeamsTool(val plugin: TeamsPlugin) : Tool(TeamsTool.ID) {
                     guilib.openGui(e.player, plugin.teamsgui)
                 }
             } else {
-                val team = plugin.selected.value
+                val team = plugin.selected.remove(e.player.uniqueId)
                 if(team != null) {
-                    plugin.selected.value = null
                     e.player.sendMessage(TeamsMessages.unselectedTeam(team))
                 }
             }

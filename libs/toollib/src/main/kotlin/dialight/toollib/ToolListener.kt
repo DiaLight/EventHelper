@@ -83,17 +83,12 @@ class ToolListener(val plugin: ToolPlugin) {
     fun onBlockChangeUsingItem(e: ChangeBlockEvent, oitem: Optional<ItemStack>, player: Player, block: BlockSnapshot, place: Boolean): Boolean {
         val itemStack = oitem.getOrNull() ?: return false
         val tool = identifyTool(itemStack) ?: return false
-//        e.dump()
         if(place) {
             val blockType = tool.type.block.getOrNull()
-            println(blockType)
-            println(block)
             if(blockType == null || block.state.type != blockType) {
-//                println("filtered")
                 return false
             }
         }
-//        println("passed")
         val toolEvent = ToolInteractEvent.Block(player, itemStack.createSnapshot(), block, ToolInteractEvent.Type.LEFT_CLICK)
         tool.onClick(toolEvent)
         if (toolEvent.deny) e.isCancelled = true

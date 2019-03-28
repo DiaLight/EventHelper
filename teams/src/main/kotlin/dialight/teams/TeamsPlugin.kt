@@ -5,6 +5,8 @@ import dialight.observable.ObservableObject
 import dialight.eventhelper.EventHelperPlugin
 import dialight.extensions.getPluginInstance
 import dialight.guilib.GuiPlugin
+import dialight.observable.map.ObservableMap
+import dialight.observable.map.observableMapOf
 import dialight.teams.gui.TeamsGui
 import dialight.teams.gui.TeamsItem
 import dialight.teleporter.TeleporterPlugin
@@ -18,6 +20,7 @@ import org.spongepowered.api.plugin.Plugin
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.plugin.PluginManager
 import org.spongepowered.api.scoreboard.Team
+import java.util.*
 import kotlin.properties.ObservableProperty
 
 @Plugin(id = "teams")
@@ -40,7 +43,7 @@ class TeamsPlugin @Inject constructor(
     lateinit var teamsgui: TeamsGui
         private set
 
-    var selected = ObservableObject<Team?>(null)
+    var selected = observableMapOf<UUID, Team>()
 
     @Listener
     fun onConstruction(event: GameConstructionEvent) {

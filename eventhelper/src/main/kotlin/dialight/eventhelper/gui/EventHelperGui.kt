@@ -21,7 +21,7 @@ class EventHelperGui(val plugin: EventHelperPlugin) : SnapshotGui<EventHelperSna
 
     private var snap = EventHelperSnapshot(plugin, id)
 
-    override fun createSnapshot(player: Player) = snap
+    override fun getSnapshot(player: Player) = snap
 
     val toolsInfo: View.Item
 
@@ -70,6 +70,17 @@ class EventHelperGui(val plugin: EventHelperPlugin) : SnapshotGui<EventHelperSna
             }
         }
         plugin.modulelib.moduleregistry.apply {
+            onPut{ k, v ->
+                snap.updateItems()
+            }
+            onRemove { s, tool ->
+                snap.updateItems()
+            }
+            onReplace { key, old, new ->
+
+            }
+        }
+        plugin.moduleItemRegistry.apply {
             onPut{ k, v ->
                 snap.updateItems()
             }
