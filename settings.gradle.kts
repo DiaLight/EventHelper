@@ -17,5 +17,6 @@ fun Settings.includeProjects(path: String) = file(path).listFiles().asList().str
 includeAll("libs")
 includeProjects(".")
 includeAll("teams_controllers")
+includeAll("modules")
 
 file("local.settings.gradle.kts").let { if(it.exists()) apply(from = it) }

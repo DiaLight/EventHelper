@@ -53,7 +53,10 @@ val ehProjects = listOf(
     ":teleporter",
     ":freezer",
     ":teams",
-    ":random"
+    ":random",
+    ":autorespawn"
+//    ":oldpvp",  // not ready yet
+//    ":captain"  // not ready yet
 )
 
 val join = listOf(":misc")

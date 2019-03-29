@@ -82,3 +82,13 @@ Useful tool to help event masters with theirs job
 Рандомное распределение игроков по командам
 Зависит от: `kotlinrt`, `modulelib`, `teams`, [`guilib`], [`eventhelper`]
 * [X] Реализовано
+
+##### autorespawn
+Автоматический респавн игрока после смерти
+Зависит от: `kotlinrt`, `modulelib`, [`guilib`], [`eventhelper`]
+* [X] Реализовано
+
+##### oldpvp
+Система PvP из версии 1.8 Майнкрафта
+Зависит от: `kotlinrt`, `modulelib`, [`guilib`], [`eventhelper`]
+* [ ] Реализовано

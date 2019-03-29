@@ -11,6 +11,8 @@ import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.block.ChangeBlockEvent
 import org.spongepowered.api.event.cause.EventContextKeys
+import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.event.item.inventory.DropItemEvent
 import org.spongepowered.api.event.item.inventory.InteractItemEvent
@@ -97,6 +99,7 @@ class ToolListener(val plugin: ToolPlugin) {
 
     @Listener
     fun onDropItem(e: DropItemEvent.Pre, @First player: Player) {
+        if(e.cause.containsType(DamageSource::class.java)) return
         val it = e.droppedItems.iterator()
         while(it.hasNext()) {
             val item = it.next()
