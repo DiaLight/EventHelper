@@ -45,7 +45,6 @@ class TeamsTool(val plugin: TeamsPlugin) : Tool(TeamsTool.ID) {
     }
 
     override fun onClick(e: ToolInteractEvent) {
-        Supplier
         when(e.action) {
             ToolInteractEvent.Type.LEFT_CLICK -> if(!e.sneaking) {
 
