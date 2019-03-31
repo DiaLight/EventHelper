@@ -15,7 +15,7 @@ import org.spongepowered.api.data.type.DyeColors
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.item.ItemTypes
-import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.Identifiable
 import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.text.Text
@@ -116,12 +116,10 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : PlayersSnap
             val botleft = (height - 1) * width
             val botmid = botleft + width / 2
             val pageTitle = Text_colorized("Страница ${index + 1}/$total")
-            val descriptionItem = SimpleItem(ItemStackBuilderEx(ItemTypes.STAINED_GLASS_PANE)
-                .also {
-                    offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
-                }
-                .name(Text_colorized("Замораживатель"))
-                .lore(
+            val descriptionItem = SimpleItem(itemStackOf(ItemTypes.STAINED_GLASS_PANE) {
+                dyeColor = DyeColors.LIGHT_BLUE
+                displayName = Text_colorized("Замораживатель")
+                lore.addAll(
                     Text_colorizedList(
                         "|y|Страница ${index + 1}/$total",
                         "|r|Для верного отображения",
@@ -144,8 +142,7 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : PlayersSnap
                         "|g|Версия: |y|v" + snap.guiplugin.container.version.orElse("null")
                     )
                 )
-                .build()) {
-
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         snap.plugin.freezer.invoke(it.player, Freezer.Action.FREEZE, Freezer.Group.ALL)
@@ -161,45 +158,40 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : PlayersSnap
                     }
                 }
             }
-            val returnItem = SimpleItem(
-                ItemStackBuilderEx(ItemTypes.CHEST)
-                    .name(pageTitle)
-                    .lore(
-                        Text_colorizedList(
-                            "|g|ЛКМ|y|: Вернуться назад"
-                        )
+            val returnItem = SimpleItem(itemStackOf(ItemTypes.CHEST) {
+                displayName = pageTitle
+                lore.addAll(
+                    Text_colorizedList(
+                        "|g|ЛКМ|y|: Вернуться назад"
                     )
-                    .build()) {
+                )
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         Task.builder().execute { task -> guiplugin.guistory.openPrev(it.player) }.submit(snap.guiplugin)
                     }
                 }
             }
-            val backwardItem = SimpleItem(
-                ItemStackBuilderEx(ItemTypes.ARROW)
-                    .name(pageTitle)
-                    .lore(
-                        Text_colorizedList(
-                            "|g|ЛКМ|y|: Перейти на Предыдущую страницу"
-                        )
+            val backwardItem = SimpleItem(itemStackOf(ItemTypes.ARROW) {
+                displayName = pageTitle
+                lore.addAll(
+                    Text_colorizedList(
+                        "|g|ЛКМ|y|: Перейти на Предыдущую страницу"
                     )
-                    .build()) {
+                )
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         snap.backward(it.player)
                     }
                 }
             }
-            val forwardItem = SimpleItem(
-                ItemStackBuilderEx(ItemTypes.ARROW)
-                    .name(pageTitle)
-                    .lore(
-                        Text_colorizedList(
-                            "|g|ЛКМ|y|: Перейти на следующую страницу"
-                        )
-                    )
-                    .build()) {
+            val forwardItem = SimpleItem(itemStackOf(ItemTypes.ARROW) {
+                displayName = pageTitle
+                lore.addAll(Text_colorizedList(
+                    "|g|ЛКМ|y|: Перейти на следующую страницу"
+                ))
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         snap.forward(it.player)
@@ -223,7 +215,7 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : PlayersSnap
         fun update(frozen: FrozenPlayers, uuid: UUID): Boolean {
             val (index, item) = this[uuid] ?: return false
             item as Item
-            inventory[index] = item.getItem(frozen).createStack()
+            inventory[index] = item.getItem(frozen)
             return true
         }
 
@@ -236,38 +228,32 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : PlayersSnap
                 get() = Server_getUser(uuid)?.isOnline ?: false
 
 
-            override val item: ItemStackSnapshot
-                get() = getItem(plugin.freezer.frozen)
+            override val item get() = getItem(plugin.freezer.frozen)
 
-            fun getItem(frzs: FrozenPlayers): ItemStackSnapshot {
+            fun getItem(frzs: FrozenPlayers) = itemStackOf {
                 val tagged = frzs.map[uuid] != null
-                return ItemStackBuilderEx(
-                    if (online) {
-                        if (tagged) {
-                            ItemTypes.SNOWBALL
-                        } else {
-                            ItemTypes.COAL
-                        }
+                type = if (online) {
+                    if (tagged) {
+                        ItemTypes.SNOWBALL
                     } else {
-                        if (tagged) {
-                            ItemTypes.PACKED_ICE
-                        } else {
-                            ItemTypes.COAL_ORE
-                        }
+                        ItemTypes.COAL
                     }
-                )
-                    .name(Text_colorized(if (online) name else "$name |r|(Офлайн)"))
-                    .lore(
-                        Text_colorizedList(
-                            if (tagged) {
-                                "|g|ЛКМ|y|: Заморозить игрока"
-                            } else {
-                                "|g|ЛКМ|y|: Разморозить игрока"
-                            },
-                            "|g|shift|y|+|g|ПКМ|y|: Телепортироваться к игроку"
-                        )
-                    )
-                    .build()
+                } else {
+                    if (tagged) {
+                        ItemTypes.PACKED_ICE
+                    } else {
+                        ItemTypes.COAL_ORE
+                    }
+                }
+                displayName = Text_colorized(if(online) this@Item.name else "${this@Item.name} |r|(Офлайн)")
+                lore.addAll(Text_colorizedList(
+                    if (tagged) {
+                        "|g|ЛКМ|y|: Заморозить игрока"
+                    } else {
+                        "|g|ЛКМ|y|: Разморозить игрока"
+                    },
+                    "|g|shift|y|+|g|ПКМ|y|: Телепортироваться к игроку"
+                ))
             }
 
             private fun teleport(player: Player): Boolean {

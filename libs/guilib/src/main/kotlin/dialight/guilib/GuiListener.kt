@@ -42,7 +42,7 @@ class GuiListener(val plugin: GuiPlugin) {
             if(guiEvent.updateItem) {
                 Task.builder().execute { task ->
                     view[index] = item
-                    event.targetInventory[index] = item.item.createStack()
+                    event.targetInventory[index] = item.item
                 }.submit(plugin)
             }
         }

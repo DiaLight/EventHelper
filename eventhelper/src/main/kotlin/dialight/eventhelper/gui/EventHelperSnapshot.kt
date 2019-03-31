@@ -1,8 +1,8 @@
 package dialight.eventhelper.gui
 
 import dialight.eventhelper.EventHelperPlugin
-import dialight.extensions.ItemStackBuilderEx
 import dialight.extensions.closeInventoryLater
+import dialight.extensions.itemStackOf
 import dialight.guilib.View
 import dialight.guilib.events.ItemClickEvent
 import dialight.guilib.simple.SimpleItem
@@ -20,7 +20,6 @@ import org.spongepowered.api.item.inventory.property.Identifiable
 import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.profile.property.ProfileProperty
 import org.spongepowered.api.text.Text
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder
 import kotlin.streams.toList
 import java.util.UUID
 
@@ -31,16 +30,14 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
 
     fun createDefault(k: String, v: Tool): View.Item {
         return SimpleItem(
-            ItemStackBuilderEx(v.type)
-                .name(v.title)
-                .lore(
-                    Text_colorizedList(
-                        "|g|ЛКМ|y|: Получить инструмент"
+            itemStackOf(v.type) {
+                displayName = v.title
+                lore.addAll(Text_colorizedList(
+                    "|g|ЛКМ|y|: Получить инструмент"
 //                    "",
 //                    "|g|Версия: |y|v" + plugin.container.version.orElse("null")
-                    )
-                )
-                .build()
+                ))
+            }
         ) {
             when(it.type) {
                 ItemClickEvent.Type.LEFT -> {
@@ -53,16 +50,14 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
 
     class ModuleItem(val mod: Module): View.Item {
 
-        override val item get() = ItemStackBuilderEx(ItemTypes.ANVIL)
-            .name(Text_colorized("|y|${mod.name}"))
-            .lore(
-                Text_colorizedList(
-                    "|g|ЛКМ|y|: ${if(mod.enabled) "Вкл" else "Выкл"} модуль"
-//                    "",
-//                    "|g|Версия: |y|v" + plugin.container.version.orElse("null")
-                )
-            )
-            .build()
+        override val item get() = itemStackOf(ItemTypes.ANVIL) {
+            displayName = Text_colorized("|y|${mod.name}")
+            lore.addAll(Text_colorizedList(
+                "|g|ЛКМ|y|: ${if(mod.enabled) "Вкл" else "Выкл"} модуль"
+//                "",
+//                "|g|Версия: |y|v" + plugin.container.version.orElse("null")
+            ))
+        }
 
         override fun onClick(event: ItemClickEvent) {
             when(event.type) {
@@ -143,43 +138,41 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
     ) {
 
         init {
-            val description = SimpleItem(ItemStackBuilderEx(ItemTypes.STAINED_GLASS_PANE)
-                .also {
-                    offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
-                }
-                .name(Text_colorized("Инструменты"))
-                .build()) {
+            val description = SimpleItem(itemStackOf(ItemTypes.STAINED_GLASS_PANE) {
+                dyeColor = DyeColors.LIGHT_BLUE
+                displayName = Text_colorized("Инструменты")
+            }) {
             }
-            val backwardItem = SimpleItem(ItemStackBuilderEx(ItemTypes.SKULL)
-                .builder {
+            val backwardItem = SimpleItem(itemStackOf(ItemTypes.SKULL) {
+                builder {
                     add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
                     val profile = GameProfile.of(UUID.randomUUID(), "Head")
                     profile.propertyMap.put("textures", ProfileProperty.of("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODQxZGQxMjc1OTVhMjVjMjQzOWM1ZGIzMWNjYjQ5MTQ1MDdhZTE2NDkyMWFhZmVjMmI5NzlhYWQxY2ZlNyJ9fX0="))
                     add(Keys.REPRESENTED_PLAYER, profile)
                 }
-                .name(Text_colorized("Инструменты"))
-                .lore(Text_colorizedList(
+                displayName = Text_colorized("Инструменты")
+                lore.addAll(Text_colorizedList(
                     "|g|ЛКМ|y|: Перейти на предыдущую страницу"
                 ))
-                .build()) {
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         snap.backward(it.player)
                     }
                 }
             }
-            val forwardItem = SimpleItem(ItemStackBuilderEx(ItemTypes.SKULL)
-                .builder {
+            val forwardItem = SimpleItem(itemStackOf(ItemTypes.SKULL) {
+                builder {
                     add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
                     val profile = GameProfile.of(UUID.randomUUID(), "Head")
                     profile.propertyMap.put("textures", ProfileProperty.of("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDJkMDMxM2I2NjgwMTQxMjg2Mzk2ZTcxYzM2MWU1OTYyYTM5YmFmNTk2ZDdlNTQ3NzE3NzVkNWZhM2QifX19"))
                     add(Keys.REPRESENTED_PLAYER, profile)
                 }
-                .name(Text_colorized("Инструменты"))
-                .lore(Text_colorizedList(
+                displayName = Text_colorized("Инструменты")
+                lore.addAll(Text_colorizedList(
                     "|g|ЛКМ|y|: Перейти на следующую страницу"
                 ))
-                .build()) {
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         snap.forward(it.player)
@@ -215,42 +208,40 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
     ) {
 
         init {
-            val description = SimpleItem(ItemStackBuilderEx(ItemTypes.STAINED_GLASS_PANE)
-                .also {
-                    offer(Keys.DYE_COLOR, DyeColors.GREEN)
-                }
-                .name(Text_colorized("Модули"))
-                .build())
-            val backwardItem = SimpleItem(ItemStackBuilderEx(ItemTypes.SKULL)
-                .builder {
+            val description = SimpleItem(itemStackOf(ItemTypes.STAINED_GLASS_PANE) {
+                dyeColor = DyeColors.GREEN
+                displayName = Text_colorized("Модули")
+            })
+            val backwardItem = SimpleItem(itemStackOf(ItemTypes.SKULL) {
+                builder {
                     add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
                     val profile = GameProfile.of(UUID.randomUUID(), "Head")
                     profile.propertyMap.put("textures", ProfileProperty.of("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODQxZGQxMjc1OTVhMjVjMjQzOWM1ZGIzMWNjYjQ5MTQ1MDdhZTE2NDkyMWFhZmVjMmI5NzlhYWQxY2ZlNyJ9fX0="))
                     add(Keys.REPRESENTED_PLAYER, profile)
                 }
-                .name(Text_colorized("Инструменты"))
-                .lore(Text_colorizedList(
+                displayName = Text_colorized("Инструменты")
+                lore.addAll(Text_colorizedList(
                     "|g|ЛКМ|y|: Перейти на предыдущую страницу"
                 ))
-                .build()) {
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         snap.backward(it.player)
                     }
                 }
             }
-            val forwardItem = SimpleItem(ItemStackBuilderEx(ItemTypes.SKULL)
-                .builder {
+            val forwardItem = SimpleItem(itemStackOf(ItemTypes.SKULL) {
+                builder {
                     add(Keys.SKULL_TYPE, SkullTypes.PLAYER)
                     val profile = GameProfile.of(UUID.randomUUID(), "Head")
                     profile.propertyMap.put("textures", ProfileProperty.of("textures", "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZDJkMDMxM2I2NjgwMTQxMjg2Mzk2ZTcxYzM2MWU1OTYyYTM5YmFmNTk2ZDdlNTQ3NzE3NzVkNWZhM2QifX19"))
                     add(Keys.REPRESENTED_PLAYER, profile)
                 }
-                .name(Text_colorized("Инструменты"))
-                .lore(Text_colorizedList(
+                displayName = Text_colorized("Инструменты")
+                lore.addAll(Text_colorizedList(
                     "|g|ЛКМ|y|: Перейти на следующую страницу"
                 ))
-                .build()) {
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         snap.forward(it.player)

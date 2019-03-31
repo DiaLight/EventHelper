@@ -4,6 +4,7 @@ import dialight.guilib.events.GuiOutsideClickEvent
 import dialight.guilib.events.ItemClickEvent
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.inventory.Inventory
+import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 
 interface View : Iterable<View.Item?> {
@@ -19,7 +20,7 @@ interface View : Iterable<View.Item?> {
 
     interface Item {
 
-        val item: ItemStackSnapshot
+        val item: ItemStack
 
         fun onClick(event: ItemClickEvent)
 

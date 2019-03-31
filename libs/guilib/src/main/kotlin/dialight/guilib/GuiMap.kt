@@ -31,7 +31,7 @@ class GuiMap(val plugin: GuiPlugin) {
         to.title = inv.title
         var index = 0
         for(item in from) {
-            to[index] = item?.item?.createStack()
+            to[index] = item?.item
             index++
         }
         val idfrprop = inv.getInventoryProperty(Identifiable::class.java).getOrNull()?.value ?: throw Exception("Can't identify from view")

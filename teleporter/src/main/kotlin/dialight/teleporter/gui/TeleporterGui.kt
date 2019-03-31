@@ -23,11 +23,11 @@ class TeleporterGui(val plugin: TeleporterPlugin) : SnapshotGui<TeleporterSnapsh
             val current = snap.current(player)
             for(sel in e.result.selected) {
                 val (index, item) = current[sel.uuid] ?: continue
-                inv[index] = item.item.createStack()
+                inv[index] = item.item
             }
             for(sel in e.result.unselected) {
                 val (index, item) = current[sel.uuid] ?: continue
-                inv[index] = item.item.createStack()
+                inv[index] = item.item
             }
         }.submit(plugin)
         snap.update(e.result)
@@ -40,7 +40,7 @@ class TeleporterGui(val plugin: TeleporterPlugin) : SnapshotGui<TeleporterSnapsh
             val inv = plugin.guilib!!.guimap[uuid] ?: continue
             val current = snap.current(uuid)
             val (index, item) = current[player.uniqueId] ?: continue
-            inv[index] = item.item.createStack()
+            inv[index] = item.item
         }
     }
     @Listener
@@ -51,7 +51,7 @@ class TeleporterGui(val plugin: TeleporterPlugin) : SnapshotGui<TeleporterSnapsh
                 val inv = plugin.guilib!!.guimap[uuid] ?: continue
                 val current = snap.current(uuid)
                 val (index, item) = current[player.uniqueId] ?: continue
-                inv[index] = item.item.createStack()
+                inv[index] = item.item
             }
         }.submit(plugin)
     }

@@ -1,5 +1,7 @@
 package dialight.toollib
 
+import dialight.extensions.ItemStackBuilderEx
+import dialight.extensions.itemStackOf
 import dialight.toollib.events.ToolInteractEvent
 import jekarus.colorizer.Colorizer
 import jekarus.colorizer.Text_colorized
@@ -46,14 +48,16 @@ abstract class Tool(val id: String) {
     abstract val title: Text
     abstract val lore: List<Text>
 
-    fun buildItem(): ItemStack {
-        val item = ItemStack.builder()
-            .itemType(type)
-            .itemData(UniqueIdDataImpl(uuid))
-            .add(Keys.DISPLAY_NAME, title)
-            .add(Keys.ITEM_LORE, listOf(*lore.toTypedArray(), Text.of(prefix, id)))
-            .build()
-        return item
+    open val build: ItemStackBuilderEx.() -> Unit = {}
+
+    fun buildItem() = itemStackOf(type) {
+        builder {
+            itemData(UniqueIdDataImpl(uuid))
+        }
+        displayName = title
+        lore.addAll(this@Tool.lore)
+        this@Tool.build(this)
+        lore.add(Text.of(prefix, id))
     }
 
     open fun onClick(e: ToolInteractEvent) {

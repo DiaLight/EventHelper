@@ -1,6 +1,6 @@
 package dialight.observable.collection
 
-class ObservableCollectionWrapper<E>(
+open class ObservableCollectionWrapper<E>(
     val collection: MutableCollection<E> = mutableListOf()
 ) : ObservableCollection<E>(), MutableCollection<E> {
 

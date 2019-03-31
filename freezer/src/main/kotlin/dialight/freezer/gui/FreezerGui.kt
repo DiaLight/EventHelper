@@ -34,11 +34,11 @@ class FreezerGui(val plugin: FreezerPlugin) : SnapshotGui<FreezerSnapshot>() {
                 val current = snap.current(uuid)
                 for(sel in e.result.freezed) {
                     val (index, item) = current[sel.uuid] ?: continue
-                    inv[index] = item.item.createStack()
+                    inv[index] = item.item
                 }
                 for(sel in e.result.unfreezed) {
                     val (index, item) = current[sel.uuid] ?: continue
-                    inv[index] = item.item.createStack()
+                    inv[index] = item.item
                 }
             }
         }.submit(plugin)
@@ -52,7 +52,7 @@ class FreezerGui(val plugin: FreezerPlugin) : SnapshotGui<FreezerSnapshot>() {
             val inv = plugin.guilib!!.guimap[uuid] ?: continue
             val current = snap.current(uuid)
             val (index, item) = current[uuid] ?: continue
-            inv[index] = item.item.createStack()
+            inv[index] = item.item
         }
         if(!snap.update(player.uniqueId)) {  // rebuild snap
             snap = FreezerSnapshot.Builder(plugin, id).build()
@@ -65,7 +65,7 @@ class FreezerGui(val plugin: FreezerPlugin) : SnapshotGui<FreezerSnapshot>() {
                 val inv = plugin.guilib!!.guimap[uuid] ?: continue
                 val current = snap.current(uuid)
                 val (index, item) = current[uuid] ?: continue
-                inv[index] = item.item.createStack()
+                inv[index] = item.item
             }
             snap.update(player.uniqueId)
         }.submit(plugin)

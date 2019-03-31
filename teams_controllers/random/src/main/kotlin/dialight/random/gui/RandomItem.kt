@@ -1,28 +1,24 @@
 package dialight.random.gui
 
-import dialight.extensions.ItemStackBuilderEx
+import dialight.extensions.itemStackOf
 import dialight.guilib.View
 import dialight.guilib.events.ItemClickEvent
-import dialight.guilib.simple.SimpleItem
 import dialight.modulelib.ModuleMessages
 import dialight.random.RandomPlugin
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
 import org.spongepowered.api.item.ItemTypes
-import org.spongepowered.api.item.inventory.ItemStackSnapshot
 
 class RandomItem(val plugin: RandomPlugin) : View.Item {
 
-    override val item get() = ItemStackBuilderEx(ItemTypes.ENDER_EYE)
-        .name(Text_colorized("|y|${plugin.moduule.name}"))
-        .lore(
-            Text_colorizedList(
-                "|g|ЛКМ|y|: ${if(!plugin.moduule.enabled) "Вкл" else "Выкл"} модуль",
-                "",
-                "|g|Версия: |y|v" + plugin.container.version.orElse("null")
-            )
-        )
-        .build()
+    override val item get() = itemStackOf(ItemTypes.ENDER_EYE) {
+        displayName = Text_colorized("|y|${plugin.moduule.name}")
+        lore.addAll(Text_colorizedList(
+            "|g|ЛКМ|y|: ${if(!plugin.moduule.enabled) "Вкл" else "Выкл"} модуль",
+            "",
+            "|g|Версия: |y|v" + plugin.container.version.orElse("null")
+        ))
+    }
 
     override fun onClick(event: ItemClickEvent) {
         when(event.type) {

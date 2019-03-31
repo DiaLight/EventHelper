@@ -39,7 +39,7 @@ class TeamsGui(val plugin: TeamsPlugin) : SnapshotGui<TeamsSnapshot>() {
         val current = snap.current(uuid)
         var index = 0
         for(item in current) {
-            inv[index] = item?.item?.createStack()
+            inv[index] = item?.item
             index++
         }
     }
@@ -58,7 +58,7 @@ class TeamsGui(val plugin: TeamsPlugin) : SnapshotGui<TeamsSnapshot>() {
                 val current = snap.current(uuid)
                 var index = 0
                 for(item in current) {
-                    inv[index] = item?.item?.createStack()
+                    inv[index] = item?.item
                     index++
                 }
             }

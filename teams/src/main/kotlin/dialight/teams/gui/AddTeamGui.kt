@@ -1,8 +1,6 @@
 package dialight.teams.gui
 
-import dialight.extensions.ItemStackBuilderEx
-import dialight.extensions.dyeColor
-import dialight.extensions.textColor
+import dialight.extensions.itemStackOf
 import dialight.guilib.View
 import dialight.guilib.events.ItemClickEvent
 import dialight.guilib.simple.SimpleGui
@@ -14,7 +12,6 @@ import dialight.teams.TeamsPlugin
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
 import org.spongepowered.api.data.key.Keys
-import org.spongepowered.api.data.type.DyeColors
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.scoreboard.Team
 import org.spongepowered.api.text.Text
@@ -49,16 +46,15 @@ class AddTeamGui(val plugin: TeamsPlugin) : SimpleGui(plugin.guilib!!, Text_colo
         val coloredTeams = scoreboard.teams.map { it.color }
         for(color in COLORS) {
             if(color in coloredTeams) continue
-            items.add(SimpleItem(ItemStackBuilderEx(ItemTypes.LEATHER_CHESTPLATE)
-                .also {
-                    offer(Keys.COLOR, color.color)
-//                    offer(Keys.DYE_COLOR, color.dyeColor)
-                }
-                .name(Text_colorized(color.name))
-                .lore(Text_colorizedList(
+            items.add(SimpleItem(itemStackOf(ItemTypes.LEATHER_CHESTPLATE) {
+                this.color = color.color
+                hideAttributes = true
+                hideMiscellaneous = true
+                displayName = Text_colorized(color.name)
+                lore.addAll(Text_colorizedList(
                     "|g|ЛКМ|y|: создать команду"
                 ))
-                .build()) {
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         var team_name = "${color.name}_team"

@@ -2,13 +2,13 @@ package dialight.captain
 
 import com.google.inject.Inject
 import dialight.captain.gui.CaptainItem
+import dialight.captain.system.CaptainSystem
 import dialight.eventhelper.EventHelperPlugin
 import dialight.extensions.getPluginInstance
 import dialight.guilib.GuiPlugin
 import dialight.modulelib.ModulePlugin
 import dialight.teams.TeamsPlugin
 import org.slf4j.Logger
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.game.state.GameConstructionEvent
 import org.spongepowered.api.event.game.state.GameStartedServerEvent
@@ -32,7 +32,8 @@ class CaptainPlugin @Inject constructor(
     var eh: EventHelperPlugin? = null
         private set
 
-    val moduule = CaptainModule(this)
+    val module = CaptainModule(this)
+    val system = CaptainSystem()
 
     @Listener
     fun onConstruction(event: GameConstructionEvent) {
@@ -44,10 +45,10 @@ class CaptainPlugin @Inject constructor(
 
     @Listener
     fun onServerStart(event: GameStartedServerEvent) {
-        modulelib.moduleregistry[moduule.id] = moduule
+        modulelib.moduleregistry[module.id] = module
 
         eh?.also {
-            it.registerModuleItem(moduule.id, CaptainItem(this))
+            it.registerModuleItem(module.id, CaptainItem(this))
         }
 
         logger.info("Captain v${container.version.orElse("null")} has been Enabled")

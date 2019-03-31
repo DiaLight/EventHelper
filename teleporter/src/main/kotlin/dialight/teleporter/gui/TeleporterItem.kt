@@ -1,7 +1,7 @@
 package dialight.teleporter.gui
 
-import dialight.extensions.ItemStackBuilderEx
 import dialight.extensions.closeInventoryLater
+import dialight.extensions.itemStackOf
 import dialight.guilib.View
 import dialight.guilib.events.ItemClickEvent
 import dialight.teleporter.TeleporterPlugin
@@ -14,22 +14,17 @@ import org.spongepowered.api.item.ItemTypes
 
 class TeleporterItem(val plugin: TeleporterPlugin) : View.Item {
 
-    override val item = ItemStackBuilderEx(ItemTypes.STICK)
-        .also {
-            offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
-        }
-        .name(Text_colorized("|a|Телепорт игроков"))
-        .lore(
-            Text_colorizedList(
-                "|g|ЛКМ|y|: Получить инструмент",
-                "|g|ПКМ|y|: Открыть редактор",
-                "|y| выбранных игроков",
-                "",
-                "|g|Плагин: |y|Телепорт",
-                "|g|Версия: |y|v" + plugin.container.version.orElse("null")
-            )
-        )
-        .build()
+    override val item get() = itemStackOf(ItemTypes.STICK) {
+        displayName = Text_colorized("|a|Телепорт игроков")
+        lore.addAll(Text_colorizedList(
+            "|g|ЛКМ|y|: Получить инструмент",
+            "|g|ПКМ|y|: Открыть редактор",
+            "|y| выбранных игроков",
+            "",
+            "|g|Плагин: |y|Телепорт",
+            "|g|Версия: |y|v" + plugin.container.version.orElse("null")
+        ))
+    }
 
     override fun onClick(event: ItemClickEvent) {
         val player = event.player

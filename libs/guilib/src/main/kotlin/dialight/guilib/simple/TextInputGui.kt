@@ -61,7 +61,7 @@ class TextInputGui(
     override operator fun get(index: Int) = items[index]
     override operator fun set(index: Int, item: View.Item?) {
 //        inventory.set(SlotIndex.of(line * width), info)
-        inventory[index] = item?.item?.createStack()
+        inventory[index] = item?.item
         items[index] = item
     }
 

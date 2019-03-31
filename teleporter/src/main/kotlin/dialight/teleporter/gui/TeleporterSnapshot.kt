@@ -15,7 +15,7 @@ import org.spongepowered.api.data.type.DyeColors
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.item.ItemTypes
-import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.Identifiable
 import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.text.Text
@@ -119,12 +119,10 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uui
             val botleft = (height - 1) * width
             val botmid = botleft + width / 2
             val pageTitle = Text_colorized("Страница ${index + 1}/$total")
-            val descriptionItem = SimpleItem(ItemStackBuilderEx(ItemTypes.STAINED_GLASS_PANE)
-                .also {
-                    offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
-                }
-                .name(Text_colorized("Телепорт"))
-                .lore(Text_colorizedList(
+            val descriptionItem = SimpleItem(itemStackOf(ItemTypes.STAINED_GLASS_PANE) {
+                dyeColor = DyeColors.LIGHT_BLUE
+                displayName = Text_colorized("Телепорт")
+                lore.addAll(Text_colorizedList(
                     "|y|Страница ${index + 1}/$total",
                     "|r|Для верного отображения",
                     "|r|заголовков столбцов",
@@ -144,8 +142,8 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uui
                     "",
                     "|g|Плагин: |y|Телепорт",
                     "|g|Версия: |y|v" + snap.guiplugin.container.version.orElse("null")
-            ))
-            .build()) {
+                ))
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         snap.plugin.teleporter.invoke(it.player, Teleporter.Action.TAG, Teleporter.Group.ALL)
@@ -161,36 +159,36 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uui
                     }
                 }
             }
-            val returnItem = SimpleItem(ItemStackBuilderEx(ItemTypes.CHEST)
-                .name(pageTitle)
-                .lore(Text_colorizedList(
+            val returnItem = SimpleItem(itemStackOf(ItemTypes.CHEST) {
+                displayName = pageTitle
+                lore.addAll(Text_colorizedList(
                     "|g|ЛКМ|y|: Вернуться назад"
                 ))
-                .build()) {
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         Task.builder().execute { task -> guiplugin.guistory.openPrev(it.player) }.submit(snap.guiplugin)
                     }
                 }
             }
-            val backwardItem = SimpleItem(ItemStackBuilderEx(ItemTypes.ARROW)
-                .name(pageTitle)
-                .lore(Text_colorizedList(
+            val backwardItem = SimpleItem(itemStackOf(ItemTypes.ARROW) {
+                displayName = pageTitle
+                lore.addAll(Text_colorizedList(
                     "|g|ЛКМ|y|: Перейти на предыдущую страницу"
                 ))
-                .build()) {
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         snap.backward(it.player)
                     }
                 }
             }
-            val forwardItem = SimpleItem(ItemStackBuilderEx(ItemTypes.ARROW)
-                .name(pageTitle)
-                .lore(Text_colorizedList(
+            val forwardItem = SimpleItem(itemStackOf(ItemTypes.ARROW) {
+                displayName = pageTitle
+                lore.addAll(Text_colorizedList(
                     "|g|ЛКМ|y|: Перейти на следующую страницу"
                 ))
-                .build()) {
+            }) {
                 when(it.type) {
                     ItemClickEvent.Type.LEFT -> {
                         snap.forward(it.player)
@@ -214,7 +212,7 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uui
         fun update(sels: SelectedPlayers, uuid: UUID): Boolean {
             val (index, item) = this[uuid] ?: return false
             item as Item
-            inventory[index] = item.getItem(sels).createStack()
+            inventory[index] = item.getItem(sels)
             return true
         }
 
@@ -226,40 +224,34 @@ class TeleporterSnapshot(val plugin: TeleporterPlugin, id: Identifiable, val uui
             val online: Boolean
                 get() = Server_getUser(uuid)?.isOnline ?: false
 
-            override val item: ItemStackSnapshot
-                get() = getItem(snap.selected)
+            override val item get() = getItem(snap.selected)
 
-
-            fun getItem(sels: SelectedPlayers): ItemStackSnapshot{
+            fun getItem(sels: SelectedPlayers) = itemStackOf {
                 val selected = sels[uuid]
-                return ItemStackBuilderEx(
-                    if (online) {
-                        if (selected != null) {
-                            ItemTypes.DIAMOND
-                        } else {
-                            ItemTypes.COAL
-                        }
+                type = if (online) {
+                    if (selected != null) {
+                        ItemTypes.DIAMOND
                     } else {
-                        if (selected != null) {
-                            ItemTypes.DIAMOND_ORE
-                        } else {
-                            ItemTypes.COAL_ORE
-                        }
+                        ItemTypes.COAL
                     }
-                )
-                    .name(Text_colorized(if (online) name else "$name |r|(Офлайн)"))
-                    .lore(
-                        Text_colorizedList(
-                            if (selected != null) {
-                                "|g|ЛКМ|y|: отменить выбор"
-                            } else {
-                                "|g|ЛКМ|y|: выбрать игрока"
-                            },
+                } else {
+                    if (selected != null) {
+                        ItemTypes.DIAMOND_ORE
+                    } else {
+                        ItemTypes.COAL_ORE
+                    }
+                }
+
+                displayName = Text_colorized(if (online) this@Item.name else "${this@Item.name} |r|(Офлайн)")
+                lore.addAll(Text_colorizedList(
+                    if (selected != null) {
+                        "|g|ЛКМ|y|: отменить выбор"
+                    } else {
+                        "|g|ЛКМ|y|: выбрать игрока"
+                    },
 //                        "~|g|ПКМ|y|: Телепортировать игрока к другому игроку",
-                            "|g|Shift|y|+|g|ПКМ|y|: телепортироваться к игроку"
-                        )
-                    )
-                    .build()
+                    "|g|Shift|y|+|g|ПКМ|y|: телепортироваться к игроку"
+                ))
             }
 
             private fun teleport(player: Player): Boolean {

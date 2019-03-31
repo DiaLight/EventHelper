@@ -4,16 +4,13 @@ import dialight.eventhelper.EventHelperPlugin
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.DyeColors
 import org.spongepowered.api.item.ItemTypes
-import dialight.extensions.ItemStackBuilderEx
-import dialight.extensions.closeInventoryLater
+import dialight.extensions.itemStackOf
 import dialight.guilib.View
 import dialight.guilib.events.ItemClickEvent
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
-import dialight.guilib.simple.SimpleGui
 import dialight.guilib.simple.SimpleItem
 import dialight.guilib.snapshot.SnapshotGui
-import dialight.toollib.Tool
 import org.spongepowered.api.entity.living.player.Player
 
 
@@ -28,19 +25,15 @@ class EventHelperGui(val plugin: EventHelperPlugin) : SnapshotGui<EventHelperSna
     init {
         /* Информация */
 
-        toolsInfo = SimpleItem(
-            ItemStackBuilderEx(ItemTypes.STAINED_GLASS_PANE)
-            .also {
-                offer(Keys.DYE_COLOR, DyeColors.LIGHT_BLUE)
-            }
-            .name(Text_colorized("|r|Краткое описание"))
-            .lore(Text_colorizedList(
+        toolsInfo = SimpleItem(itemStackOf(ItemTypes.STAINED_GLASS_PANE) {
+            dyeColor = DyeColors.LIGHT_BLUE
+            displayName = Text_colorized("|r|Краткое описание")
+            lore.addAll(Text_colorizedList(
                 "|a|Тут находятся инструменты",
                 "",
                 "|g|Версия: |y|v" + plugin.container.version.orElse("null")
             ))
-            .build()
-        ) {
+        }) {
             if(it.type == ItemClickEvent.Type.LEFT) {
 
             }

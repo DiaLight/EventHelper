@@ -1,7 +1,7 @@
 package dialight.freezer.gui
 
-import dialight.extensions.ItemStackBuilderEx
 import dialight.extensions.closeInventoryLater
+import dialight.extensions.itemStackOf
 import dialight.freezer.FreezerPlugin
 import dialight.freezer.FreezerTool
 import dialight.guilib.View
@@ -9,14 +9,13 @@ import dialight.guilib.events.ItemClickEvent
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
 import org.spongepowered.api.item.ItemTypes
-import org.spongepowered.api.scheduler.Task
 
 class FreezerItem(val plugin: FreezerPlugin) : View.Item {
 
 
-    override val item = ItemStackBuilderEx(ItemTypes.ICE)
-        .name(Text_colorized("|a|Замораживатель игроков"))
-        .lore(
+    override val item get() = itemStackOf(ItemTypes.ICE) {
+        displayName = Text_colorized("|a|Замораживатель игроков")
+        lore.addAll(
             Text_colorizedList(
                 "|g|ЛКМ|y|: получить инструмент",
                 "|g|ПКМ|y|: открыть замораживатель",
@@ -25,7 +24,7 @@ class FreezerItem(val plugin: FreezerPlugin) : View.Item {
                 "|g|Версия: |y|v" + plugin.container.version.orElse("null")
             )
         )
-        .build()
+    }
 
     override fun onClick(event: ItemClickEvent) {
         val player = event.player

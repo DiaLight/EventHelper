@@ -1,6 +1,6 @@
 package dialight.oldpvp.gui
 
-import dialight.extensions.ItemStackBuilderEx
+import dialight.extensions.itemStackOf
 import dialight.guilib.View
 import dialight.guilib.events.ItemClickEvent
 import dialight.modulelib.ModuleMessages
@@ -11,16 +11,14 @@ import org.spongepowered.api.item.ItemTypes
 
 class OldPvPItem(val plugin: OldPvPPlugin) : View.Item {
 
-    override val item get() = ItemStackBuilderEx(ItemTypes.IRON_SWORD)
-        .name(Text_colorized("|y|${plugin.moduule.name}"))
-        .lore(
-            Text_colorizedList(
-                "|g|ЛКМ|y|: ${if(!plugin.moduule.enabled) "Вкл" else "Выкл"} модуль",
-                "",
-                "|g|Версия: |y|v" + plugin.container.version.orElse("null")
-            )
-        )
-        .build()
+    override val item get() = itemStackOf(ItemTypes.IRON_SWORD) {
+        displayName = Text_colorized("|y|${plugin.moduule.name}")
+        lore.addAll(Text_colorizedList(
+            "|g|ЛКМ|y|: ${if(!plugin.moduule.enabled) "Вкл" else "Выкл"} модуль",
+            "",
+            "|g|Версия: |y|v" + plugin.container.version.orElse("null")
+        ))
+    }
 
     override fun onClick(event: ItemClickEvent) {
         when(event.type) {
