@@ -11,6 +11,8 @@ object TeamsMessages {
     val setScoreboard = Text.of(pluginPrefix, Text_colorized("|g|Вам установлен скорбоард плагина"))
     val setDefaultScoreboard = Text.of(pluginPrefix, Text_colorized("|g|Вам установлен скорбоард по умолчанию"))
     val cantSetDefaultScoreboard = Text.of(pluginPrefix, Text_colorized("|r|Не могу установить скорбоард по умолчанию"))
+    val thisColorAlreadyInUse = Text.of(pluginPrefix, Text_colorized("|r|Команда с таким цветом уже создана"))
+    val thisNameAlreadyInUse = Text.of(pluginPrefix, Text_colorized("|r|Команда с таким названием уже создана"))
 
     fun addTeam(team: Team) = Text.of(pluginPrefix, Text_colorized("|g|Добавлена команда "), team.color, team.name)
     fun removeTeam(team: Team) = Text.of(pluginPrefix, Text_colorized("|g|Удалена команда "), team.color, team.name)

@@ -20,7 +20,7 @@ class TeamsTool(val plugin: TeamsPlugin) : Tool(TeamsTool.ID) {
     }
 
     override val type = ItemTypes.BANNER
-    override val title = Text_colorized("Распределитель команд")
+    override val title = Text_colorized("|a|Распределитель команд")
     override val lore = Text_colorizedList(
         "|a|ПКМ|y|: открыть редактор команд",
         "|a|Shift|y|+|a|ПКМ|y|: убрать выделение команды",

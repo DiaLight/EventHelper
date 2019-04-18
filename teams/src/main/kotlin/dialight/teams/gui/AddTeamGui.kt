@@ -45,38 +45,62 @@ class AddTeamGui(val plugin: TeamsPlugin) : SimpleGui(plugin.guilib!!, Text_colo
         val scoreboard = Server_getScoreboard()
         val coloredTeams = scoreboard.teams.map { it.color }
         for(color in COLORS) {
-            if(color in coloredTeams) continue
-            items.add(SimpleItem(itemStackOf(ItemTypes.LEATHER_CHESTPLATE) {
-                this.color = color.color
-                hideAttributes = true
-                hideMiscellaneous = true
-                displayName = Text_colorized(color.name)
-                lore.addAll(Text_colorizedList(
-                    "|a|ЛКМ|y|: создать команду"
-                ))
-            }) {
-                when(it.type) {
-                    ItemClickEvent.Type.LEFT -> {
-                        var team_name = "${color.name}_team"
-                        if(team_name.length > 16) {
-                            team_name = team_name.substring(0, 16)
+            if(color in coloredTeams) {
+                items.add(SimpleItem(itemStackOf(ItemTypes.LEATHER_BOOTS) {
+                    this.color = color.color
+                    hideAttributes = true
+                    hideMiscellaneous = true
+                    displayName = Text_colorized(color.name)
+                    lore.addAll(Text_colorizedList(
+                        "|y|Команда с таким цветом уже создана"
+                    ))
+                }) {
+                    when(it.type) {
+                        ItemClickEvent.Type.LEFT -> {
+                            it.player.sendMessage(TeamsMessages.thisColorAlreadyInUse)
                         }
-                        val team = Team.builder()
-                            .name(team_name)
-                            .color(color)
-                            .prefix(Text.of(color))
-                            .suffix(Text.of(TextColors.RESET))
-                            .build()
-                        scoreboard.registerTeam(team)
-                        it.player.sendMessage(TeamsMessages.addTeam(team))
+                        ItemClickEvent.Type.RIGHT -> {
 
-                        guiplugin.guistory.openPrev(it.player)
+                        }
                     }
-                    ItemClickEvent.Type.RIGHT -> {
+                })
+            } else {
+                items.add(SimpleItem(itemStackOf(ItemTypes.LEATHER_CHESTPLATE) {
+                    this.color = color.color
+                    hideAttributes = true
+                    hideMiscellaneous = true
+                    displayName = Text_colorized(color.name)
+                    lore.addAll(Text_colorizedList(
+                        "|a|ЛКМ|y|: создать команду"
+                    ))
+                }) {
+                    when(it.type) {
+                        ItemClickEvent.Type.LEFT -> {
+                            var team_name = "${color.name}_team"
+                            if(team_name.length > 16) {
+                                team_name = team_name.substring(0, 16)
+                            }
+                            if(scoreboard.getTeam(team_name).isPresent) {
+                                it.player.sendMessage(TeamsMessages.thisNameAlreadyInUse)
+                            } else {
+                                val team = Team.builder()
+                                    .name(team_name)
+                                    .color(color)
+                                    .prefix(Text.of(color))
+                                    .suffix(Text.of(TextColors.RESET))
+                                    .build()
+                                scoreboard.registerTeam(team)
+                                it.player.sendMessage(TeamsMessages.addTeam(team))
 
+                                guiplugin.guistory.openPrev(it.player)
+                            }
+                        }
+                        ItemClickEvent.Type.RIGHT -> {
+
+                        }
                     }
-                }
-            })
+                })
+            }
         }
         val pages = SequentialPageBuilder(width, height - 1, width, items).toList()
         for((index, item) in pages.first()) {
