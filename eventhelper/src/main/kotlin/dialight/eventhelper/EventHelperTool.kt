@@ -11,20 +11,16 @@ class EventHelperTool(val plugin: EventHelperPlugin) : Tool(ID) {
         val ID = "eventhelper"
     }
 
+    override val type = ItemTypes.EMERALD
     override val title = Colorizer.apply("|a|Вещь всея Майнкрафта")
     override val lore = Colorizer.apply(
         mutableListOf(
             "|a|ПКМ|y|: Открыть «Инвентарь EventHelper»",
-            "|a|Shift|y|+|a|ПКМ|y|: Открыть ранее",
-            "|y| открытый инентарь",
+            "|a|Shift|y|+|a|ПКМ|y|: Открыть ранее открытый",
+            "|y| инентарь",
             "|y|Аналог: |g|/eh"
         )
     )
-    override val type = ItemTypes.EMERALD
-
-    init {
-
-    }
 
     override fun onClick(e: ToolInteractEvent) {
         super.onClick(e)

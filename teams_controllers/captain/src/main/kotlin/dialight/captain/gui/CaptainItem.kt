@@ -2,6 +2,7 @@ package dialight.captain.gui
 
 import dialight.captain.CaptainPlugin
 import dialight.extensions.itemStackOf
+import dialight.extensions.toJson
 import dialight.guilib.View
 import dialight.guilib.events.ItemClickEvent
 import dialight.modulelib.ModuleMessages
@@ -45,14 +46,21 @@ class CaptainItem(val plugin: CaptainPlugin) : View.Item {
         raw {
             itemDamageValue = 11
             nbt = """
-{BlockEntityTag:{Patterns:[{Color:0,Pattern:"tts"},{Color:0,Pattern:"bts"},{Color:0,Pattern:"bl"},{Color:0,Pattern:"tr"},{Color:0,Pattern:"ls"},{Color:0,Pattern:"rs"}]}}
+{BlockEntityTag:{Patterns:[
+  {Color:0,Pattern:"tts"},
+  {Color:0,Pattern:"bts"},
+  {Color:0,Pattern:"bl"},
+  {Color:0,Pattern:"tr"},
+  {Color:0,Pattern:"ls"},
+  {Color:0,Pattern:"rs"}
+]}}
                     """.trimIndent()
         }
         hideMiscellaneous = true
         displayName = Text_colorized("|y|${plugin.module.name}")
         lore.addAll(
             Text_colorizedList(
-                "|g|ЛКМ|y|: ${if(!plugin.module.enabled) "Вкл" else "Выкл"} модуль",
+                "|a|ЛКМ|y|: ${if(!plugin.module.enabled) "Вкл" else "Выкл"} модуль",
                 "",
                 "|g|Версия: |y|v" + plugin.container.version.orElse("null")
             )
@@ -62,21 +70,7 @@ class CaptainItem(val plugin: CaptainPlugin) : View.Item {
     override fun onClick(event: ItemClickEvent) {
         when(event.type) {
             ItemClickEvent.Type.LEFT -> {
-                plugin.system.arena.maybeLoc = event.player.location
-                val newState = !plugin.module.enabled
-                if(!plugin.module.toggle()) {
-                    if(newState) {
-                        event.player.sendMessage(ModuleMessages.cantEnable(plugin.module))
-                    } else {
-                        event.player.sendMessage(ModuleMessages.cantDisable(plugin.module))
-                    }
-                } else {
-                    if(newState) {
-                        event.player.sendMessage(ModuleMessages.successEnable(plugin.module))
-                    } else {
-                        event.player.sendMessage(ModuleMessages.successDisable(plugin.module))
-                    }
-                }
+                plugin.module.toggle(event.player)
                 event.updateItem = true
             }
             ItemClickEvent.Type.RIGHT -> {
@@ -115,16 +109,6 @@ class CaptainItem(val plugin: CaptainPlugin) : View.Item {
 //                }
             }
         }
-    }
-
-    fun String.toContainer(): DataContainer {
-        return DataFormats.HOCON.read(this)
-    }
-
-    fun DataView.toJson(): String {
-        val stringWriter = StringWriter()
-        DataFormats.JSON.writeTo(stringWriter, this)
-        return stringWriter.toString()
     }
 
 }

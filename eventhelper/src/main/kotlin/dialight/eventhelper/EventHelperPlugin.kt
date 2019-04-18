@@ -60,7 +60,7 @@ class EventHelperPlugin @Inject constructor(
         toollib.registerTool(tool)
         registerToolItem(tool.id, EventHelperItem(this))
         registerCommands()
-        logger.info("EventHelper v${container.version.orElse("null")} has been Enabled")
+        logger.info("${container.name} v${container.version.orElse("null")} has been Enabled")
     }
 
     @Listener

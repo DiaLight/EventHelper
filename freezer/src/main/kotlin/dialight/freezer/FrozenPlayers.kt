@@ -174,9 +174,11 @@ class FrozenPlayers {
     ///////////////////////////////Module/invoker/////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
 
-    fun freezeOnline(invoker: PluginContainer, trg: Player, result: Freezer.Result): Boolean {
+
+    fun freezeOnline(invoker: PluginContainer, trg: Player, result: Freezer.Result) = freezeOnline(invoker, trg.location, trg, result)
+    fun freezeOnline(invoker: PluginContainer, loc: Location<World>, trg: Player, result: Freezer.Result): Boolean {
         if (this.map.containsKey(trg.uniqueId)) return false
-        val frozen = Frozen(trg, byPlugin = true)
+        val frozen = Frozen(trg, byPlugin = true, location = loc)
         result.freeze(frozen)
         this.map[trg.uniqueId] = frozen
         FreezerMessages.freeze(invoker, trg)
@@ -190,10 +192,12 @@ class FrozenPlayers {
         return true
     }
 
-    fun toggleOnline(invoker: PluginContainer, trg: Player, result: Freezer.Result): Boolean {
+
+    fun toggleOnline(invoker: PluginContainer, trg: Player, result: Freezer.Result) = toggleOnline(invoker, trg.location, trg, result)
+    fun toggleOnline(invoker: PluginContainer, loc: Location<World>, trg: Player, result: Freezer.Result): Boolean {
         var frozen: Frozen? = this.map.remove(trg.uniqueId)
         if (frozen == null) {
-            frozen = Frozen(trg, byPlugin = true)
+            frozen = Frozen(trg, byPlugin = true, location = loc)
             result.freeze(frozen)
             this.map[trg.uniqueId] = frozen
             FreezerMessages.freeze(invoker, trg)

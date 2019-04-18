@@ -52,7 +52,7 @@ class AddTeamGui(val plugin: TeamsPlugin) : SimpleGui(plugin.guilib!!, Text_colo
                 hideMiscellaneous = true
                 displayName = Text_colorized(color.name)
                 lore.addAll(Text_colorizedList(
-                    "|g|ЛКМ|y|: создать команду"
+                    "|a|ЛКМ|y|: создать команду"
                 ))
             }) {
                 when(it.type) {

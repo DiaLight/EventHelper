@@ -8,6 +8,7 @@ import dialight.toollib.events.ToolInteractEvent
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
 import org.spongepowered.api.Sponge
+import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.ItemTypes
 import java.util.function.Predicate
 import java.util.function.Supplier
@@ -21,14 +22,14 @@ class TeamsTool(val plugin: TeamsPlugin) : Tool(TeamsTool.ID) {
     override val type = ItemTypes.BANNER
     override val title = Text_colorized("Распределитель команд")
     override val lore = Text_colorizedList(
-        "|g|ПКМ|y|: открыть редактор команд",
-        "|g|Shift|y|+|g|ПКМ|y|: убрать выделение команды",
+        "|a|ПКМ|y|: открыть редактор команд",
+        "|a|Shift|y|+|a|ПКМ|y|: убрать выделение команды",
         "",
         "|g|Плагин: |y|Распределитель команд",
         "|g|Версия: |y|v" + plugin.container.version.orElse("null")
     )
 
-    override val build: ItemStackBuilderEx.() -> Unit = {
+    override val build: ItemStackBuilderEx.(player: Player) -> Unit = { player ->
         raw {
             nbt = """
 {BlockEntityTag:{Patterns:[

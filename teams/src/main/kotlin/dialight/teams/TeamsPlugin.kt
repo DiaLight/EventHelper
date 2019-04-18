@@ -73,7 +73,7 @@ class TeamsPlugin @Inject constructor(
         Sponge.getEventManager().registerListeners(this, TeamsListener(this))
 
 
-        logger.info("TeamsTool v${container.version.orElse("null")} has been Enabled")
+        logger.info("${container.name} v${container.version.orElse("null")} has been Enabled")
     }
 
     fun getAll() {

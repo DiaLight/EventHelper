@@ -50,6 +50,6 @@ class RandomPlugin @Inject constructor(
             it.registerModuleItem(moduule.id, RandomItem(this))
         }
 
-        logger.info("Random v${container.version.orElse("null")} has been Enabled")
+        logger.info("${container.name} v${container.version.orElse("null")} has been Enabled")
     }
 }

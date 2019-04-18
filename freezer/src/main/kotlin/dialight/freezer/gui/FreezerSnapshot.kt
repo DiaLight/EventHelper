@@ -126,16 +126,16 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : PlayersSnap
                         "|r|заголовков столбцов",
                         "|r|используйте шрифт Unicode.",
                         "|w|Выделение",
-                        "|g|ЛКМ|y|: Выделить всех",
-                        "|g|ПКМ|y|: Снять со всех выделение",
-                        "|g|Shift|y|+|g|ЛКМ|y|: Выделить всех, кто онлайн",
-                        "|g|Shift|y|+|g|ПКМ|y|: Выделить всех, кто офлайн",
+                        "|a|ЛКМ|y|: Выделить всех",
+                        "|a|ПКМ|y|: Снять со всех выделение",
+                        "|a|Shift|y|+|a|ЛКМ|y|: Выделить всех, кто онлайн",
+                        "|a|Shift|y|+|a|ПКМ|y|: Выделить всех, кто офлайн",
                         "|w|Навигация",
-                        "|g|ЛКМ снаружи инвертаря|y|:",
+                        "|a|ЛКМ снаружи инвертаря|y|:",
                         "|y| Перейти на предыдущую страницу",
-                        "|g|ПКМ снаружи инвертаря|y|:",
+                        "|a|ПКМ снаружи инвертаря|y|:",
                         "|y| Перейти на следующую страницу",
-                        "|g|СКМ снаружи инвертаря|y|:",
+                        "|a|СКМ снаружи инвертаря|y|:",
                         "|y| Вернуться назад",
                         "",
                         "|g|Плагин: |y|Замораживатель",
@@ -162,7 +162,7 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : PlayersSnap
                 displayName = pageTitle
                 lore.addAll(
                     Text_colorizedList(
-                        "|g|ЛКМ|y|: Вернуться назад"
+                        "|a|ЛКМ|y|: Вернуться назад"
                     )
                 )
             }) {
@@ -176,7 +176,7 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : PlayersSnap
                 displayName = pageTitle
                 lore.addAll(
                     Text_colorizedList(
-                        "|g|ЛКМ|y|: Перейти на Предыдущую страницу"
+                        "|a|ЛКМ|y|: Перейти на Предыдущую страницу"
                     )
                 )
             }) {
@@ -189,7 +189,7 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : PlayersSnap
             val forwardItem = SimpleItem(itemStackOf(ItemTypes.ARROW) {
                 displayName = pageTitle
                 lore.addAll(Text_colorizedList(
-                    "|g|ЛКМ|y|: Перейти на следующую страницу"
+                    "|a|ЛКМ|y|: Перейти на следующую страницу"
                 ))
             }) {
                 when(it.type) {
@@ -248,11 +248,11 @@ class FreezerSnapshot(val plugin: FreezerPlugin, id: Identifiable) : PlayersSnap
                 displayName = Text_colorized(if(online) this@Item.name else "${this@Item.name} |r|(Офлайн)")
                 lore.addAll(Text_colorizedList(
                     if (tagged) {
-                        "|g|ЛКМ|y|: Заморозить игрока"
+                        "|a|ЛКМ|y|: Заморозить игрока"
                     } else {
-                        "|g|ЛКМ|y|: Разморозить игрока"
+                        "|a|ЛКМ|y|: Разморозить игрока"
                     },
-                    "|g|shift|y|+|g|ПКМ|y|: Телепортироваться к игроку"
+                    "|a|shift|y|+|a|ПКМ|y|: Телепортироваться к игроку"
                 ))
             }
 

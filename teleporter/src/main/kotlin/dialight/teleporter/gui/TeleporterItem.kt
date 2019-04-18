@@ -17,8 +17,8 @@ class TeleporterItem(val plugin: TeleporterPlugin) : View.Item {
     override val item get() = itemStackOf(ItemTypes.STICK) {
         displayName = Text_colorized("|a|Телепорт игроков")
         lore.addAll(Text_colorizedList(
-            "|g|ЛКМ|y|: Получить инструмент",
-            "|g|ПКМ|y|: Открыть редактор",
+            "|a|ЛКМ|y|: Получить инструмент",
+            "|a|ПКМ|y|: Открыть редактор",
             "|y| выбранных игроков",
             "",
             "|g|Плагин: |y|Телепорт",

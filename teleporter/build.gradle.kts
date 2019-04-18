@@ -26,6 +26,8 @@ val pluginVersion: String by project
 val allVersion: String by rootProject.ext
 val mcVersion: String by rootProject.ext
 
+var spongeDep: DependencyHandler.() -> Unit by rootProject.ext
+
 var sponge_conf: MetadataBaseExtension.() -> Unit by ext
 sponge_conf = {
     this.plugins.apply {
@@ -38,6 +40,7 @@ sponge_conf = {
                 this.dependencies.apply {
                     this.create("kotlinrt")
                     this.create("toollib")
+                    this.create("offlinelib")
                     this.create("guilib") {
                         this.optional = true
                     }
@@ -68,10 +71,10 @@ val join = listOf(":misc")
 
 dependencies {
     val shadow by configurations
-    implementation("org.spongepowered:spongeapi:7.1.0-SNAPSHOT")
-    implementation("org.spongepowered:spongevanilla:1.12.2-7.1.5")
+    spongeDep()
     implementation(kotlin("stdlib-jdk8"))
     implementation(project(":toollib"))
+    implementation(project(":offlinelib"))
     implementation(project(":guilib"))
     implementation(project(":eventhelper"))
     join.forEach { implementation(project(it)) }

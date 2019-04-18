@@ -113,7 +113,7 @@ class Colorizer(texts: MutableList<String>) {
             "w", "white" -> TextColors.WHITE
             "y", "yellow" -> TextColors.YELLOW
             else -> {
-                println("unknown style '$string'")
+                throw Exception("unknown style '$string'")
                 TextColors.NONE
             }
         }

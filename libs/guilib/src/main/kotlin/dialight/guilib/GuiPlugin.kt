@@ -29,7 +29,7 @@ class GuiPlugin @Inject constructor(
     @Listener
     fun onServerStart(event: GameStartedServerEvent) {
         Sponge.getEventManager().registerListeners(this, GuiListener(this))
-        logger.info("GuiLib v${container.version.orElse("null")} has been Enabled")
+        logger.info("${container.name} v${container.version.orElse("null")} has been Enabled")
     }
 
     fun openView(player: Player, view: View) = guimap.openView(player, view)

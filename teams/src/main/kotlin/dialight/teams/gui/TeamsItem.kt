@@ -42,8 +42,8 @@ class TeamsItem(val plugin: TeamsPlugin) : View.Item {
         hideMiscellaneous = true
         displayName = Text_colorized("|a|Распределитель команд")
         lore.addAll(Text_colorizedList(
-            "|g|ЛКМ|y|: получить инструмент",
-            "|g|ПКМ|y|: открыть распределитель",
+            "|a|ЛКМ|y|: получить инструмент",
+            "|a|ПКМ|y|: открыть распределитель",
             "",
             "|g|Плагин: |y|Распределитель команд",
             "|g|Версия: |y|v" + plugin.container.version.orElse("null")

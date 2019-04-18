@@ -5,7 +5,6 @@ import dialight.extensions.*
 import dialight.freezer.events.FreezerEvent
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World
@@ -68,31 +67,19 @@ class Freezer {
 
     @Deprecated("Search for player by name is long time process. ")
     operator fun invoke(invoker: Player, action: Action, trgName: String): Result {
-        val trg = Server_getUser(trgName)
-        if(trg == null) {
-            FreezerMessages.notFound(invoker, trgName)
-            return Result()
-        }
-        return this.___invoke(invoker, action, trg)
-    }
-
-    private fun ___invoke(invoker: Player, action: Action, trg: User): Result {
-        val player = trg.player.getOrNull()
-        if (player != null) {
-            return this.invoke(invoker, action, player)
-        }
-        return this.invoke(invoker, action, trg.uniqueId, trg.name)
+        val player = Server_getPlayer(trgName)
+        if (player != null) return this.invoke(invoker, action, player)
+        val user = Server_getUser(trgName)
+        if(user != null) return this.invoke(invoker, action, user.uniqueId, user.name)
+        FreezerMessages.notFound(invoker, trgName)
+        return Result()
     }
 
     operator fun invoke(invoker: Player, action: Action, trg: UUID): Result {
         val player = Server_getPlayer(trg)
-        if (player != null) {
-            return this.invoke(invoker, action, player)
-        }
+        if (player != null) return this.invoke(invoker, action, player)
         val offline = Server_getUser(trg)
-        if(offline != null) {
-            return this.invoke(invoker, action, trg, offline.name)
-        }
+        if(offline != null) return this.invoke(invoker, action, trg, offline.name)
         invoker.sendMessage(FreezerMessages.notFound(trg))
         return Result()
     }
@@ -167,6 +154,36 @@ class Freezer {
     //////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////plugin/API////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////
+
+    operator fun invoke(invoker: PluginContainer, loc: Location<World>, action: Action, trg: UUID): Result {
+        val player = Server_getPlayer(trg)
+        if (player != null) return this.invoke(invoker, loc, action, player)
+        val offline = Server_getUser(trg)
+        if(offline != null) return this.invoke(invoker, loc, action, trg, offline.name)
+        return Result()
+    }
+
+    private operator fun invoke(invoker: PluginContainer, loc: Location<World>, action: Action, trg: UUID, name: String): Result {
+        val result = Result()
+        when (action) {
+            Action.FREEZE -> frozen.freezeOffline(invoker, loc, trg, name, result)
+            Action.UNFREEZE -> frozen.unfreezeOffline(invoker, trg, name, result)
+            Action.TOGGLE -> frozen.toggleOffline(invoker, loc, trg, name, result)
+        }
+        Sponge.getEventManager().post(FreezerEvent.ByPlugin(invoker, result))
+        return result
+    }
+
+    operator fun invoke(invoker: PluginContainer, loc: Location<World>, action: Action, trg: Player): Result {
+        val result = Result()
+        when (action) {
+            Action.FREEZE -> frozen.freezeOnline(invoker, loc, trg, result)
+            Action.UNFREEZE -> frozen.unfreezeOnline(invoker, trg, result)
+            Action.TOGGLE -> frozen.toggleOnline(invoker, loc, trg, result)
+        }
+        Sponge.getEventManager().post(FreezerEvent.ByPlugin(invoker, result))
+        return result
+    }
 
     operator fun invoke(invoker: PluginContainer, action: Action, trg: Player): Result {
         val result = Result()

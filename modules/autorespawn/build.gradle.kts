@@ -30,6 +30,8 @@ val pluginVersion: String by project
 val allVersion: String by rootProject.ext
 val mcVersion: String by rootProject.ext
 
+var spongeDep: DependencyHandler.() -> Unit by rootProject.ext
+
 version = "$mcVersion"
 
 var sponge_conf: MetadataBaseExtension.() -> Unit by ext
@@ -91,8 +93,7 @@ val join = listOf(":misc")
 
 dependencies {
     val shadow by configurations
-    implementation("org.spongepowered:spongeapi:7.1.0-SNAPSHOT")
-    implementation("org.spongepowered:spongevanilla:1.12.2-7.1.5")
+    spongeDep()
     implementation(kotlin("stdlib-jdk8"))
     implementation(project(":modulelib"))
     implementation(project(":guilib"))
@@ -107,6 +108,10 @@ task("joinJar", Jar::class) {
 }
 task("fatJar", Jar::class) {
     from(sourceSets["main"].output)
+    join.forEach {
+        dependsOn("$it:build")  // we need execution if reobfJar task if it exists
+        dependsOn("$it:joinJar")
+    }
     doFirst {
         join.forEach {
             from(project(it).tasks["joinJar"].outputs.files.map { zipTree(it) })

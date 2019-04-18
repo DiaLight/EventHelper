@@ -6,6 +6,7 @@ import dialight.modulelib.ActionModule
 import dialight.modulelib.Module
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.text.Text
+import org.spongepowered.api.text.channel.MessageReceiver
 import java.util.*
 
 class RandomModule(val plugin: RandomPlugin) : ActionModule(RandomModule.ID, "Random") {
@@ -16,7 +17,7 @@ class RandomModule(val plugin: RandomPlugin) : ActionModule(RandomModule.ID, "Ra
 
     val rnd = Random(Calendar.getInstance().timeInMillis)
 
-    override fun onAction(): Boolean {
+    override fun onAction(invoker: MessageReceiver): Boolean {
         val sb = Sponge.getServer().serverScoreboard.getOrNull() ?: return false
         if(sb.teams.isEmpty()) return false
         val online = LinkedList(Server_getPlayers())

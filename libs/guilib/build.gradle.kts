@@ -41,6 +41,8 @@ val pluginVersion: String by project
 val allVersion: String by rootProject.ext
 val mcVersion: String by rootProject.ext
 
+var spongeDep: DependencyHandler.() -> Unit by rootProject.ext
+
 version = "$mcVersion"
 
 var sponge_conf: MetadataBaseExtension.() -> Unit by ext
@@ -79,25 +81,17 @@ mixin.apply {
 }
 
 repositories {
-    mavenCentral()
-    maven("https://jitpack.io/") { name = "jitpack-repo" }
-    maven("https://hub.spigotmc.org/nexus/content/groups/public/") { name = "spigotmc-repo" }
-//    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") { name = "spigotmc-snapshots-repo" }
-    maven("https://repo.spacehq.org/content/repositories/releases/") { name = "spacehq-repo" }
-//    maven("https://repo.spacehq.org/content/repositories/snapshots/") { name = "spacehq-snapshots-repo" }
-    maven("https://oss.sonatype.org/content/groups/public/") { name = "sonatype-repo" }
-//    maven("https://oss.sonatype.org/content/repositories/snapshots") { name = "sonatype-snapshots-repo" }
-//    maven("https://maven2.ontando.ru/repository/") { name = "angal-repo" }
-    maven("http://repo.dmulloy2.net/content/groups/public/") { name = "dmulloy2-repo" }
+    maven("https://repo.spongepowered.org/maven") { name = "sponge" }
     maven("http://maven.fabricmc.net/") { name = "fabricmc-repo" }
+    maven("https://jitpack.io/") { name = "jitpack-repo" }
+    mavenCentral()
 }
 
 val join = listOf(":misc")
 
 dependencies {
     val shadow by configurations
-    implementation("org.spongepowered:spongeapi:7.1.0-SNAPSHOT")
-    implementation("org.spongepowered:spongevanilla:1.12.2-7.1.5")
+    spongeDep()
     implementation("org.spongepowered:mixin:0.7.5-SNAPSHOT")
     implementation(kotlin("stdlib-jdk8"))
     add("annotationProcessor", "net.fabricmc:sponge-mixin:0.7.11.16")

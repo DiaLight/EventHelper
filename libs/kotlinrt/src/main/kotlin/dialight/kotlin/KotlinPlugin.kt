@@ -17,7 +17,7 @@ class KotlinPlugin @Inject constructor(
 
     @Listener
     fun onServerStart(event: GameStartedServerEvent) {
-        logger.info("KotlinRt v${container.version.orElse("null")} has been Enabled")
+        logger.info("${container.name} v${container.version.orElse("null")} has been Enabled")
     }
 
 }

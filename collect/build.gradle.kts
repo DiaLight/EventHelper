@@ -49,14 +49,15 @@ val ehProjects = listOf(
     ":toollib",
     ":modulelib",
     ":guilib",
+    ":offlinelib",
     ":eventhelper",
     ":teleporter",
     ":freezer",
     ":teams",
     ":random",
-    ":autorespawn"
+    ":autorespawn",
 //    ":oldpvp",  // not ready yet
-//    ":captain"  // not ready yet
+    ":captain"
 )
 
 val join = listOf(":misc")
@@ -75,6 +76,13 @@ fun <T> ExtraPropertiesExtension.getOrNull(key: String): T? {
     return if(has(key)) get(key) as T? else null
 }
 val self = this
+for(proj in gradle.rootProject.allprojects) {
+    val conf = proj.ext.getOrNull<MetadataBaseExtension.() -> Unit>("sponge_conf")
+    if(conf != null) {
+//        println("**** apply conf from ${this.name}")
+        self.sponge.conf()
+    }
+}
 gradle.afterProject {
     if (state.failure == null) {
         val conf = this.ext.getOrNull<MetadataBaseExtension.() -> Unit>("sponge_conf")

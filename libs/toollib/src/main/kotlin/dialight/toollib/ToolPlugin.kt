@@ -48,14 +48,14 @@ class ToolPlugin @Inject constructor(
         // TODO("Clear player inventory from item")
 //                player.inventory.remove(tool.item().get())
 
-        player.setItemInHand(HandTypes.MAIN_HAND, tool.buildItem())
+        player.setItemInHand(HandTypes.MAIN_HAND, tool.buildItem(player))
         return true
     }
 
     @Listener
     fun onServerStart(event: GameStartedServerEvent) {
         Sponge.getEventManager().registerListeners(this, ToolListener(this))
-        logger.info("ToolLib v${container.version.orElse("null")} has been Enabled")
+        logger.info("${container.name} v${container.version.orElse("null")} has been Enabled")
     }
 
     private var UNIQUE_ID_REGISTRATION: DataRegistration<UniqueIdData, UniqueIdData.Immutable>? = null

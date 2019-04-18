@@ -14,7 +14,7 @@ class OldPvPItem(val plugin: OldPvPPlugin) : View.Item {
     override val item get() = itemStackOf(ItemTypes.IRON_SWORD) {
         displayName = Text_colorized("|y|${plugin.moduule.name}")
         lore.addAll(Text_colorizedList(
-            "|g|ЛКМ|y|: ${if(!plugin.moduule.enabled) "Вкл" else "Выкл"} модуль",
+            "|a|ЛКМ|y|: ${if(!plugin.moduule.enabled) "Вкл" else "Выкл"} модуль",
             "",
             "|g|Версия: |y|v" + plugin.container.version.orElse("null")
         ))
@@ -23,20 +23,7 @@ class OldPvPItem(val plugin: OldPvPPlugin) : View.Item {
     override fun onClick(event: ItemClickEvent) {
         when(event.type) {
             ItemClickEvent.Type.LEFT -> {
-                val newState = !plugin.moduule.enabled
-                if(!plugin.moduule.toggle()) {
-                    if(newState) {
-                        event.player.sendMessage(ModuleMessages.cantEnable(plugin.moduule))
-                    } else {
-                        event.player.sendMessage(ModuleMessages.cantDisable(plugin.moduule))
-                    }
-                } else {
-                    if(newState) {
-                        event.player.sendMessage(ModuleMessages.successEnable(plugin.moduule))
-                    } else {
-                        event.player.sendMessage(ModuleMessages.successDisable(plugin.moduule))
-                    }
-                }
+                plugin.moduule.toggle(event.player)
                 event.updateItem = true
             }
         }

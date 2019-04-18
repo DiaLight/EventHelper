@@ -25,6 +25,8 @@ val pluginVersion: String by project
 val allVersion: String by rootProject.ext
 val mcVersion: String by rootProject.ext
 
+var spongeDep: DependencyHandler.() -> Unit by rootProject.ext
+
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -40,8 +42,7 @@ configurations {
 
 dependencies {
     val shadow by configurations
-    implementation("org.spongepowered:spongeapi:7.1.0-SNAPSHOT")
-    implementation("org.spongepowered:spongevanilla:1.12.2-7.1.5")
+    spongeDep()
     implementation(kotlin("stdlib-jdk8"))
 }
 

@@ -78,7 +78,8 @@ class Teleporter {
     operator fun invoke(invoker: Player, action: Action, trg: Player) =
         invoke(invoker, action, trg.uniqueId, trg.name)
 
-    operator fun invoke(invoker: Player, action: Action, trg: UUID, name: String): Result {
+    operator fun invoke(invoker: Player, action: Action, trg: UUID, name: String?): Result {
+        if(name == null) return invoke(invoker, action, trg)
         val result = Result()
         val selections = get(invoker)
         val sel = Selected(trg, name)

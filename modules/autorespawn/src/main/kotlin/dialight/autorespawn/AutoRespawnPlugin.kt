@@ -47,6 +47,6 @@ class AutoRespawnPlugin @Inject constructor(
             it.registerModuleItem(moduule.id, AutoRespawnItem(this))
         }
 
-        logger.info("AutoRespawn v${container.version.orElse("null")} has been Enabled")
+        logger.info("${container.name} v${container.version.orElse("null")} has been Enabled")
     }
 }

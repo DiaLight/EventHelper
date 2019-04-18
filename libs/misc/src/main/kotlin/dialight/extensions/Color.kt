@@ -46,10 +46,31 @@ private val chatToDye = ImmutableMap.builder<TextColor, DyeColor>()
     .put(TextColors.DARK_PURPLE, DyeColors.PURPLE)
     .build()
 
+
+private val dyeToBanner = ImmutableMap.builder<DyeColor, Int>()
+    .put(DyeColors.BLACK, 0)
+    .put(DyeColors.RED, 1)
+    .put(DyeColors.GREEN, 2)
+    .put(DyeColors.BROWN, 3)
+    .put(DyeColors.BLUE, 4)
+    .put(DyeColors.PURPLE, 5)
+    .put(DyeColors.CYAN, 6)
+    .put(DyeColors.SILVER, 7)  // light gray
+    .put(DyeColors.GRAY, 8)
+    .put(DyeColors.PINK, 9)
+    .put(DyeColors.LIME, 10)
+    .put(DyeColors.YELLOW, 11)
+    .put(DyeColors.LIGHT_BLUE, 12)
+    .put(DyeColors.MAGENTA, 13)
+    .put(DyeColors.ORANGE, 14)
+    .put(DyeColors.WHITE, 15)
+    .build()
+
 val DyeColor.textColor: TextColor
     get() = dyeToChat[this] ?: TextColors.WHITE
 
 val TextColor.dyeColor: DyeColor
     get() = chatToDye[this] ?: DyeColors.WHITE
 
-
+val DyeColor.bannerDurability: Int
+    get() = dyeToBanner[this] ?: 15

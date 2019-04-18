@@ -33,7 +33,7 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
             itemStackOf(v.type) {
                 displayName = v.title
                 lore.addAll(Text_colorizedList(
-                    "|g|ЛКМ|y|: Получить инструмент"
+                    "|a|ЛКМ|y|: Получить инструмент"
 //                    "",
 //                    "|g|Версия: |y|v" + plugin.container.version.orElse("null")
                 ))
@@ -53,7 +53,7 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
         override val item get() = itemStackOf(ItemTypes.ANVIL) {
             displayName = Text_colorized("|y|${mod.name}")
             lore.addAll(Text_colorizedList(
-                "|g|ЛКМ|y|: ${if(mod.enabled) "Вкл" else "Выкл"} модуль"
+                "|a|ЛКМ|y|: ${if(mod.enabled) "Вкл" else "Выкл"} модуль"
 //                "",
 //                "|g|Версия: |y|v" + plugin.container.version.orElse("null")
             ))
@@ -62,20 +62,7 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
         override fun onClick(event: ItemClickEvent) {
             when(event.type) {
                 ItemClickEvent.Type.LEFT -> {
-                    val newState = !mod.enabled
-                    if(!mod.toggle()) {
-                        if(newState) {
-                            event.player.sendMessage(ModuleMessages.cantEnable(mod))
-                        } else {
-                            event.player.sendMessage(ModuleMessages.cantDisable(mod))
-                        }
-                    } else {
-                        if(newState) {
-                            event.player.sendMessage(ModuleMessages.successEnable(mod))
-                        } else {
-                            event.player.sendMessage(ModuleMessages.successDisable(mod))
-                        }
-                    }
+                    mod.toggle(event.player)
                 }
             }
         }
@@ -90,6 +77,7 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
 
         // tools
         val toolItems = plugin.toollib.toolregistry.entries.stream()
+            .filter { (id, tool) -> !tool.hidden }
             .sorted { o1, o2 -> o1.key.compareTo(o2.key) }
             .map { (id, tool) -> plugin.toolItemRegistry[id] ?: createDefault(id, tool) }
             .toList()
@@ -152,7 +140,7 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
                 }
                 displayName = Text_colorized("Инструменты")
                 lore.addAll(Text_colorizedList(
-                    "|g|ЛКМ|y|: Перейти на предыдущую страницу"
+                    "|a|ЛКМ|y|: Перейти на предыдущую страницу"
                 ))
             }) {
                 when(it.type) {
@@ -170,7 +158,7 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
                 }
                 displayName = Text_colorized("Инструменты")
                 lore.addAll(Text_colorizedList(
-                    "|g|ЛКМ|y|: Перейти на следующую страницу"
+                    "|a|ЛКМ|y|: Перейти на следующую страницу"
                 ))
             }) {
                 when(it.type) {
@@ -221,7 +209,7 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
                 }
                 displayName = Text_colorized("Инструменты")
                 lore.addAll(Text_colorizedList(
-                    "|g|ЛКМ|y|: Перейти на предыдущую страницу"
+                    "|a|ЛКМ|y|: Перейти на предыдущую страницу"
                 ))
             }) {
                 when(it.type) {
@@ -239,7 +227,7 @@ class EventHelperSnapshot(val plugin: EventHelperPlugin, id: Identifiable) : Sna
                 }
                 displayName = Text_colorized("Инструменты")
                 lore.addAll(Text_colorizedList(
-                    "|g|ЛКМ|y|: Перейти на следующую страницу"
+                    "|a|ЛКМ|y|: Перейти на следующую страницу"
                 ))
             }) {
                 when(it.type) {

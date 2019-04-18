@@ -1,5 +1,6 @@
 package dialight.teams.gui
 
+import dialight.extensions.Server_getPlayers
 import dialight.extensions.Server_getUser
 import dialight.extensions.itemStackOf
 import dialight.guilib.View
@@ -10,6 +11,7 @@ import dialight.guilib.snapshot.Snapshot
 import dialight.teams.Server_getScoreboard
 import dialight.teams.TeamsMessages
 import dialight.teams.TeamsPlugin
+import dialight.teams.mixin.removeMemberFromTeams
 import dialight.teleporter.Teleporter
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
@@ -27,12 +29,28 @@ class TeamsSnapshot(val plugin: TeamsPlugin, val uuid: UUID, id: Identifiable) :
     val addTeamItem = SimpleItem(itemStackOf(ItemTypes.NETHER_STAR) {
         displayName = Text_colorized("Добавить команду")
         lore.addAll(Text_colorizedList(
-            "|g|ЛКМ|y|: добавить команду"
+            "|a|ЛКМ|y|: добавить команду",
+            "|a|Shift|y|+|a|ЛКМ|y|: удалить все команды",
+            "|a|Shift|y|+|a|ПКМ|y|: очистить все команды"
         ))
     }) {
         when(it.type) {
             ItemClickEvent.Type.LEFT -> {
                 plugin.guilib!!.openGui(it.player, AddTeamGui(plugin))
+            }
+            ItemClickEvent.Type.SHIFT_LEFT -> {
+                val sb = Server_getScoreboard()
+                for(team in sb.teams) {
+                    team.unregister()
+                }
+            }
+            ItemClickEvent.Type.SHIFT_RIGHT -> {
+                val sb = Server_getScoreboard()
+                for(team in sb.teams) {
+                    for(member in team.members) {
+                        sb.removeMemberFromTeams(member)
+                    }
+                }
             }
         }
     }
@@ -86,17 +104,19 @@ class TeamsSnapshot(val plugin: TeamsPlugin, val uuid: UUID, id: Identifiable) :
             hideMiscellaneous = true
             if(selected) {
                 lore.addAll(Text_colorizedList(
-                    "|g|ЛКМ|y|: убрать выделение"
+                    "|a|ЛКМ|y|: убрать выделение"
                 ))
             } else {
                 lore.addAll(Text_colorizedList(
-                    "|g|ЛКМ|y|: выбрать команду, ",
+                    "|a|ЛКМ|y|: выбрать команду, ",
                     "|y| чтобы затем управлять её",
                     "|y| участниками через телепортер"
                 ))
             }
             lore.addAll(Text_colorizedList(
-                "|g|СКМ|y|: удалить команду"
+                "|a|Shift|y|+|a|ЛКМ|y|: добавить всех в команду",
+                "|a|Shift|y|+|a|ПКМ|y|: очистить команду",
+                "|a|СКМ|y|: удалить команду"
             ))
         }
 
@@ -120,6 +140,11 @@ class TeamsSnapshot(val plugin: TeamsPlugin, val uuid: UUID, id: Identifiable) :
                         }
                     }
                 }
+                ItemClickEvent.Type.SHIFT_LEFT -> {
+                    for(player in Server_getPlayers()) {
+                        team.addMember(player.teamRepresentation)
+                    }
+                }
                 ItemClickEvent.Type.MIDDLE -> {
                     if(team.unregister()) {
                         plugin.teleporter?.let { teleporter ->
@@ -131,6 +156,11 @@ class TeamsSnapshot(val plugin: TeamsPlugin, val uuid: UUID, id: Identifiable) :
                             }
                         }
                         event.player.sendMessage(TeamsMessages.removeTeam(team))
+                    }
+                }
+                ItemClickEvent.Type.SHIFT_RIGHT -> {
+                    for(member in team.members) {
+                        team.removeMember(member)
                     }
                 }
             }

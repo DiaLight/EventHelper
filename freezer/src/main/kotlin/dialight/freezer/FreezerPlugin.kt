@@ -60,7 +60,7 @@ class FreezerPlugin @Inject constructor(
             Sponge.getEventManager().registerListeners(this, freezergui)
         }
 
-        logger.info("Freezer v${container.version.orElse("null")} has been Enabled")
+        logger.info("${container.name} v${container.version.orElse("null")} has been Enabled")
         Sponge.getEventManager().registerListeners(this, FreezerListener(this))
     }
 

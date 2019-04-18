@@ -17,8 +17,8 @@ class FreezerItem(val plugin: FreezerPlugin) : View.Item {
         displayName = Text_colorized("|a|Замораживатель игроков")
         lore.addAll(
             Text_colorizedList(
-                "|g|ЛКМ|y|: получить инструмент",
-                "|g|ПКМ|y|: открыть замораживатель",
+                "|a|ЛКМ|y|: получить инструмент",
+                "|a|ПКМ|y|: открыть замораживатель",
                 "",
                 "|g|Плагин: |y|Замораживатель",
                 "|g|Версия: |y|v" + plugin.container.version.orElse("null")

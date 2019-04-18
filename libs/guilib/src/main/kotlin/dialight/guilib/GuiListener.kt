@@ -29,11 +29,7 @@ class GuiListener(val plugin: GuiPlugin) {
         val slots = event.transactions.stream().map{ it.slot }.toList()
         if (slots.isEmpty()) return false
         for(slot in slots) {
-            val osi = slot.getInventoryProperty(SlotIndex::class.java)
-            if (!osi.isPresent) continue
-//            println("osi.get().value: ${view.capacity}")
-            val index = osi.get().value ?: continue
-//            println("view.capacity: ${view.capacity}")
+            val index = slot.getInventoryProperty(SlotIndex::class.java).getOrNull()?.value ?: continue
             if (index >= view.capacity) continue
             event.isCancelled = true
             val item = view[index] ?: continue

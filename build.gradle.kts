@@ -1,3 +1,4 @@
+import org.gradle.api.internal.artifacts.configurations.Configurations
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.*
 
@@ -29,6 +30,12 @@ var buildVersion: Int by ext
 var libDir: String by ext
 var mcVersion: String by ext
 var allVersion: String by ext
+var spongeDep: DependencyHandler.() -> Unit by ext
+
+spongeDep = {
+    implementation("org.spongepowered:spongeapi:7.1.0-SNAPSHOT")
+    implementation("org.spongepowered:spongevanilla:1.12.2-7.1.5")
+}
 
 buildPropsFile = file(File(buildDir, "build.properties"))
 buildProps = Properties()

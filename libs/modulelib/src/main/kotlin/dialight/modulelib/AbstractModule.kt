@@ -1,34 +1,33 @@
 package dialight.modulelib
 
+import org.spongepowered.api.text.channel.MessageReceiver
+
 abstract class AbstractModule(
     override val id: String,
-    override val name: String,
-    enable: Boolean = false
+    override val name: String
     ) : Module {
 
-    override var enabled: Boolean = enable
-        set(value) {
-            if(field == value) return
-            if(value) {
-                if(onEnable()) field = true
-            } else {
-                if(onDisable()) field = false
-            }
-        }
-
-    override fun enable(): Boolean {
+    override fun enable(invoker: MessageReceiver): Boolean {
         if(enabled) return false
-        enabled = true
-        return enabled
+        if(!doEnable(invoker)) {
+            invoker.sendMessage(ModuleMessages.cantEnable(this))
+            return false
+        }
+        invoker.sendMessage(ModuleMessages.successEnable(this))
+        return true
     }
 
-    override fun disable(): Boolean {
+    override fun disable(invoker: MessageReceiver): Boolean {
         if(!enabled) return false
-        enabled = false
-        return !enabled
+        if(!doDisable(invoker)) {
+            invoker.sendMessage(ModuleMessages.cantDisable(this))
+            return false
+        }
+        invoker.sendMessage(ModuleMessages.successDisable(this))
+        return true
     }
 
-    abstract fun onEnable(): Boolean
-    abstract fun onDisable(): Boolean
+    abstract fun doEnable(invoker: MessageReceiver): Boolean
+    abstract fun doDisable(invoker: MessageReceiver): Boolean
 
 }

@@ -16,8 +16,8 @@ class EventHelperItem(val plugin: EventHelperPlugin) : View.Item {
     override val item get() = itemStackOf(ItemTypes.EMERALD) {
         displayName = Text_colorized("|a|EventHelper")
         lore.addAll(Text_colorizedList(
-            "|g|ЛКМ|y|: получить инструмент",
-            "|g|ПКМ|y|: добавить инструмент в инвентарь",
+            "|a|ЛКМ|y|: получить инструмент",
+            "|a|ПКМ|y|: добавить инструмент в инвентарь",
             "",
             "|g|Плагин: |y|EventHelper",
             "|g|Версия: |y|v" + plugin.container.version.orElse("null")
@@ -32,7 +32,7 @@ class EventHelperItem(val plugin: EventHelperPlugin) : View.Item {
                 plugin.toollib.giveTool(player, EventHelperTool.ID)
             }
             ItemClickEvent.Type.RIGHT -> {
-                player.inventory.offer(plugin.tool.buildItem())
+                plugin.toollib.giveTool(event.player, plugin.tool.id)
             }
         }
     }

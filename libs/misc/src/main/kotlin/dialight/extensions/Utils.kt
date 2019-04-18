@@ -90,7 +90,7 @@ object Utils {
         val v = player.direction
         val l = player.eyeLocation.position.add(v).add(v)
         val half = distance / 2
-        val center = l.add(v.clone().mul(half)) //Центр отрезка
+        val center = l.add(v.clone().mul(half))  // Центр отрезка
         val entities: Collection<Entity> = if(types.isEmpty()) {
             player.world.getNearbyEntities(center, half)
         } else {
@@ -100,11 +100,25 @@ object Utils {
                 it.location.position.distance(center) <= half
             }
         }
+        return getEnByDirection_impl(l, v, delta, entities)
+    }
+    fun getEnByDirection(player: Player, distance: Double, delta: Double, entities: Collection<Entity>): Entity? {
+        val v = player.direction
+        val l = player.eyeLocation.position.add(v).add(v)
+        return getEnByDirection(l, v, distance, delta, entities)
+    }
+    fun getEnByDirection(location: Vector3d, direction: Vector3d, distance: Double, delta: Double, entities: Collection<Entity>): Entity? {
+        val half = distance / 2
+        val center = location.add(direction.clone().mul(half))  // Центр отрезка
+        val filtered = entities.filter { it.location.position.distance(center) <= half }
+        return getEnByDirection_impl(location, direction, delta, filtered)
+    }
+    private fun getEnByDirection_impl(location: Vector3d, direction: Vector3d, delta: Double, entities: Collection<Entity>): Entity? {
         var closestEntity: Entity? = null
         var closestProj = delta
         for (en in entities) {
             val t = en.location.position.add(0.0, 1.0, 0.0)
-            val curProj = projectionToRay(l, v, t)
+            val curProj = projectionToRay(location, direction, t)
             if (curProj <= closestProj) {
                 closestProj = curProj
                 closestEntity = en

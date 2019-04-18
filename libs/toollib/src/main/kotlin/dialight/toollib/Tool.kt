@@ -10,6 +10,7 @@ import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData
 import org.spongepowered.api.data.value.ValueContainer
+import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
@@ -18,7 +19,7 @@ import org.spongepowered.api.text.Text
 import java.util.*
 import java.util.regex.Pattern
 
-abstract class Tool(val id: String) {
+abstract class Tool(val id: String, val hidden: Boolean = false) {
 
     companion object {
 
@@ -48,15 +49,15 @@ abstract class Tool(val id: String) {
     abstract val title: Text
     abstract val lore: List<Text>
 
-    open val build: ItemStackBuilderEx.() -> Unit = {}
+    open val build: ItemStackBuilderEx.(player: Player) -> Unit = {}
 
-    fun buildItem() = itemStackOf(type) {
+    fun buildItem(player: Player) = itemStackOf(type) {
         builder {
             itemData(UniqueIdDataImpl(uuid))
         }
         displayName = title
         lore.addAll(this@Tool.lore)
-        this@Tool.build(this)
+        this@Tool.build(this, player)
         lore.add(Text.of(prefix, id))
     }
 

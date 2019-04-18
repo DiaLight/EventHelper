@@ -40,7 +40,13 @@ Useful tool to help event masters with theirs job
 
 ##### guilib
 Зависит от: `kotlinrt`
-* [X] Реализовано
+* [X] Реализовано (сложный интерфейс)
+
+##### offlinelib
+Позволяет телепортировать оффлайн игроков и оставлять вместо игроков жителей.
+
+Зависит от: `kotlinrt`
+* [X] Реализовано (плохо, но работает)
 
 #### Инструменты
 ##### eventhelper
@@ -75,8 +81,8 @@ Useful tool to help event masters with theirs job
 #### Модули
 ##### captain
 Распределение игроков по камандам при помощи выбранных капитанов
-Зависит от: `kotlinrt`, `modulelib`, `teams`, [`guilib`], [`eventhelper`]
-* [ ] Реализовано
+Зависит от: `kotlinrt`, `modulelib`, `toollib`, `teams`, `teleporter`, `freezer`, [`guilib`], [`eventhelper`]
+* [x] Реализовано (экспериментально. могут быть баги)
 
 ##### random
 Рандомное распределение игроков по командам
@@ -87,8 +93,3 @@ Useful tool to help event masters with theirs job
 Автоматический респавн игрока после смерти
 Зависит от: `kotlinrt`, `modulelib`, [`guilib`], [`eventhelper`]
 * [X] Реализовано
-
-##### oldpvp
-Система PvP из версии 1.8 Майнкрафта
-Зависит от: `kotlinrt`, `modulelib`, [`guilib`], [`eventhelper`]
-* [ ] Реализовано

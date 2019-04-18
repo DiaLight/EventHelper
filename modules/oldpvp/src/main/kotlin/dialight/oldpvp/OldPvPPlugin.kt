@@ -47,6 +47,6 @@ class OldPvPPlugin @Inject constructor(
             it.registerModuleItem(moduule.id, OldPvPItem(this))
         }
 
-        logger.info("OldPvP v${container.version.orElse("null")} has been Enabled")
+        logger.info("${container.name} v${container.version.orElse("null")} has been Enabled")
     }
 }

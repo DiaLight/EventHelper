@@ -28,19 +28,25 @@ val allVersion: String by rootProject.ext
 val mcVersion: String by rootProject.ext
 val libDir: String by rootProject.ext
 
+var spongeDep: DependencyHandler.() -> Unit by rootProject.ext
+
 var sponge_conf: MetadataBaseExtension.() -> Unit by ext
 sponge_conf = {
     this.plugins.apply {
         this.create("captain") {
             this.meta.apply {
-                this.setName("Random")
+                this.setName("Captain")
                 setVersion(allVersion)
                 this.authors.add("DiaLight")
                 this.setDescription("Useful tool to help event masters with theirs job")
                 this.dependencies.apply {
                     this.create("kotlinrt")
                     this.create("modulelib")
+                    this.create("toollib")
+                    this.create("teleporter")
+                    this.create("freezer")
                     this.create("teams")
+                    this.create("offlinelib")
                     this.create("guilib") {
                         this.optional = true
                     }
@@ -71,12 +77,15 @@ val join = listOf(":misc")
 
 dependencies {
     val shadow by configurations
-    implementation("org.spongepowered:spongeapi:7.1.0-SNAPSHOT")
-    implementation("org.spongepowered:spongevanilla:1.12.2-7.1.5")
+    spongeDep()
     implementation(kotlin("stdlib-jdk8"))
     implementation(project(":modulelib"))
+    implementation(project(":toollib"))
     implementation(project(":guilib"))
+    implementation(project(":teleporter"))
+    implementation(project(":freezer"))
     implementation(project(":teams"))
+    implementation(project(":offlinelib"))
     implementation(project(":eventhelper"))
     join.forEach { implementation(project(it)) }
 }
