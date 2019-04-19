@@ -1,0 +1,149 @@
+import com.google.code.regexp.Pattern
+import org.apache.commons.io.FilenameUtils
+import org.apache.tools.ant.filters.ReplaceTokens
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.spongepowered.asm.gradle.plugins.MixinExtension
+import org.spongepowered.asm.gradle.plugins.MixinGradlePlugin
+import org.spongepowered.gradle.meta.MetadataBaseExtension
+import java.util.Properties
+
+buildscript {
+    repositories {
+        maven("http://files.minecraftforge.net/maven") { name = "forge" }
+        maven("https://repo.spongepowered.org/maven") { name = "sponge" }
+    }
+
+    dependencies {
+        classpath("net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT")
+        classpath("org.spongepowered:mixingradle:0.6-SNAPSHOT")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.21")
+    }
+}
+
+plugins {
+    id("org.spongepowered.plugin")
+    id("net.minecrell.vanillagradle.server") version "2.2-6"
+    kotlin("jvm")
+    java
+    base
+}
+
+apply {
+    this.plugin<MixinGradlePlugin>()
+}
+val mixin = the<MixinExtension>()
+
+val pluginGroup: String by project
+val pluginVersion: String by project
+
+val allVersion: String by rootProject.ext
+val mcVersion: String by rootProject.ext
+
+var spongeDep: DependencyHandler.() -> Unit by project(":sponge").ext
+
+version = "$mcVersion"
+
+var sponge_conf: MetadataBaseExtension.() -> Unit by ext
+sponge_conf = {
+    this.plugins.apply {
+        this.create("teams") {
+            this.meta.apply {
+                this.setName("Teams")
+                setVersion(allVersion)
+                this.authors.add("DiaLight")
+                this.setDescription("Useful tool to help event masters with theirs job")
+                this.dependencies.apply {
+                    this.create("kotlinrt")
+                    this.create("toollib")
+                    this.create("guilib") {
+                        this.optional = true
+                    }
+                    this.create("eventhelper") {
+                        this.optional = true
+                    }
+                    this.create("teleporter") {
+                        this.optional = true
+                    }
+                }
+            }
+        }
+    }
+}
+sponge.sponge_conf()
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+configurations {
+    val shadow = create("shadow")
+    this["compile"].extendsFrom(shadow)
+}
+
+mixin.apply {
+    this.add(sourceSets["main"], "mixins.teams.refmap.json")
+}
+
+val join = listOf(":sponge:misc")
+
+dependencies {
+    val shadow by configurations
+    spongeDep()
+    implementation("org.spongepowered:mixin:0.7.5-SNAPSHOT")
+    implementation(kotlin("stdlib-jdk8"))
+    implementation(project(":sponge:toollib"))
+    implementation(project(":sponge:guilib"))
+    implementation(project(":sponge:teleporter"))
+    implementation(project(":sponge:eventhelper"))
+    add("annotationProcessor", "net.fabricmc:sponge-mixin:0.7.11.16")
+    add("annotationProcessor", "net.fabricmc:fabric-loom:0.3.0-SNAPSHOT")
+    join.forEach { implementation(project(it)) }
+}
+
+task("joinJar", Jar::class) {
+    dependsOn(tasks["reobfJar"])
+    from(tasks["jar"].outputs.files.map { zipTree(it) })  // we need reobfuscated content
+    exclude("mcmod.info")
+    baseName = "${project.name}-join"
+}
+task("fatJar", Jar::class) {
+    manifest {
+        attributes(mapOf(
+            "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker",
+            "Main-Class" to "org.spongepowered.asm.launch.MixinTweaker",
+            "MixinConfigs" to "mixins.teams.json",
+            "FMLCorePluginContainsFMLMod" to "true"
+        ))
+    }
+    dependsOn(tasks["reobfJar"])
+    from(tasks["jar"].outputs.files.map { zipTree(it) })
+    doFirst {
+        join.forEach {
+            from(project(it).tasks["joinJar"].outputs.files.map { zipTree(it) })
+        }
+    }
+    baseName = "${project.name}-fat"
+}
+
+minecraft {
+    version = mcVersion
+    mappings = "snapshot_20180814"
+    makeObfSourceJar = false
+}
+
+tasks["build"].apply {
+    dependsOn(":incrementVersion")
+}
+
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "1.8"
+}

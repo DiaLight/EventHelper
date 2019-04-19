@@ -16,6 +16,8 @@ Useful tool to help event masters with theirs job
 Собрка "все в одном" соответственно имеет следующее название:
 `EventHelper-all-<MC Server platform>-<MC Server version>-<EventHelper version>.jar`
 
+<details>
+  <summary>Sponge</summary>
 
 ### Структура проекта
 
@@ -93,3 +95,11 @@ Useful tool to help event masters with theirs job
 Автоматический респавн игрока после смерти
 Зависит от: `kotlinrt`, `modulelib`, [`guilib`], [`eventhelper`]
 * [X] Реализовано
+
+</details>
+
+
+<details>
+  <summary>Bukkit</summary>
+  
+</details>

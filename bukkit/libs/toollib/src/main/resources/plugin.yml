@@ -1,0 +1,12 @@
+name: ToolLib
+version: @version@
+main: dialight.toollib.ToolPlugin
+api-version: 1.13
+authors: [DiaLight]
+description: Useful tool to help event masters with theirs job
+
+commands:
+  tool:
+    description: Command to control all registered tools
+    permission: toollib.tool
+    usage: /<command>

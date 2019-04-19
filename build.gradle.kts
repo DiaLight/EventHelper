@@ -1,4 +1,3 @@
-import org.gradle.api.internal.artifacts.configurations.Configurations
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.*
 
@@ -15,7 +14,6 @@ buildscript {
 }
 
 plugins {
-    id("org.spongepowered.plugin") version "0.8.1"
     kotlin("jvm") version "1.3.21"
     java
     base
@@ -27,25 +25,28 @@ val pluginVersion: String by project
 var buildPropsFile: File by ext
 var buildProps: Properties by ext
 var buildVersion: Int by ext
-var libDir: String by ext
 var mcVersion: String by ext
 var allVersion: String by ext
-var spongeDep: DependencyHandler.() -> Unit by ext
-
-spongeDep = {
-    implementation("org.spongepowered:spongeapi:7.1.0-SNAPSHOT")
-    implementation("org.spongepowered:spongevanilla:1.12.2-7.1.5")
-}
 
 buildPropsFile = file(File(buildDir, "build.properties"))
 buildProps = Properties()
 if(buildPropsFile.exists()) buildProps.load(buildPropsFile.inputStream())
 buildVersion = buildProps.getProperty("build-version", "0").toInt() + 1
-libDir = buildProps.getProperty("libDir", "$buildDir/libs")
 mcVersion = "1.12.2"
 allVersion = "~build-$buildVersion"
 
 group = pluginGroup as String
+
+repositories {
+    mavenCentral()
+    maven("https://jitpack.io/") { name = "jitpack-repo" }
+//    maven("https://repo.spacehq.org/content/repositories/snapshots/") { name = "spacehq-snapshots-repo" }
+//    maven("https://oss.sonatype.org/content/groups/public/") { name = "sonatype-repo" }
+//    maven("https://oss.sonatype.org/content/repositories/snapshots") { name = "sonatype-snapshots-repo" }
+//    maven("https://maven2.ontando.ru/repository/") { name = "angal-repo" }
+//    maven("http://repo.dmulloy2.net/content/groups/public/") { name = "dmulloy2-repo" }
+//    maven("http://maven.fabricmc.net/") { name = "fabricmc-repo" }
+}
 
 task("incrementVersion") { this as DefaultTask
     doFirst {
@@ -57,20 +58,6 @@ task("incrementVersion") { this as DefaultTask
     }
 }
 
-
-repositories {
-    mavenCentral()
-    maven("https://jitpack.io/") { name = "jitpack-repo" }
-    maven("https://hub.spigotmc.org/nexus/content/groups/public/") { name = "spigotmc-repo" }
-//    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") { name = "spigotmc-snapshots-repo" }
-    maven("https://repo.spacehq.org/content/repositories/releases/") { name = "spacehq-repo" }
-//    maven("https://repo.spacehq.org/content/repositories/snapshots/") { name = "spacehq-snapshots-repo" }
-    maven("https://oss.sonatype.org/content/groups/public/") { name = "sonatype-repo" }
-//    maven("https://oss.sonatype.org/content/repositories/snapshots") { name = "sonatype-snapshots-repo" }
-//    maven("https://maven2.ontando.ru/repository/") { name = "angal-repo" }
-    maven("http://repo.dmulloy2.net/content/groups/public/") { name = "dmulloy2-repo" }
-    maven("http://maven.fabricmc.net/") { name = "fabricmc-repo" }
-}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
