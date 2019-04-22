@@ -1,6 +1,6 @@
 package dialight.freezer
 
-import dialight.eventhelper.EventHelperTool
+import dialight.ehgui.EHGuiTool
 import dialight.extensions.Utils
 import dialight.teleporter.Teleporter
 import dialight.toollib.Tool
@@ -33,8 +33,8 @@ class FreezerTool(val plugin: FreezerPlugin) : Tool(FreezerTool.ID) {
 
     override fun onClick(e: ToolInteractEvent) {
         when (e.action) {
-            ToolInteractEvent.Type.LEFT_CLICK -> if (!e.sneaking) {
-                if (e.type == ToolInteractEvent.Target.ENTITY) {
+            ToolInteractEvent.Action.LEFT_CLICK -> if (!e.sneaking) {
+                if (e.type == ToolInteractEvent.Type.ENTITY) {
                     e as ToolInteractEvent.Entity
                     if (e.entity.type == EntityTypes.PLAYER) {
                         plugin.freezer.invoke(e.player, Freezer.Action.TOGGLE, e.entity as Player)
@@ -48,7 +48,7 @@ class FreezerTool(val plugin: FreezerPlugin) : Tool(FreezerTool.ID) {
             } else {
 
             }
-            ToolInteractEvent.Type.RIGHT_CLICK -> if (!e.sneaking) {
+            ToolInteractEvent.Action.RIGHT_CLICK -> if (!e.sneaking) {
                 plugin.guilib?.also { guilib ->
                     guilib.openGui(e.player, plugin.freezergui)
                 }
@@ -61,9 +61,9 @@ class FreezerTool(val plugin: FreezerPlugin) : Tool(FreezerTool.ID) {
                 }
                 result.sendReport(e.player)
             }
-            ToolInteractEvent.Type.DROP -> {
+            ToolInteractEvent.Action.DROP -> {
                 plugin.eh?.also { eh ->
-                    plugin.toollib.giveTool(e.player, EventHelperTool.ID)
+                    plugin.toollib.giveTool(e.player, EHGuiTool.ID)
                 }
                 plugin.guilib?.clearStory(e.player)
             }

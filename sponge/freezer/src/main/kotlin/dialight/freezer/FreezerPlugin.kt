@@ -1,7 +1,7 @@
 package dialight.freezer
 
 import com.google.inject.Inject
-import dialight.eventhelper.EventHelperPlugin
+import dialight.ehgui.EHGuiPlugin
 import dialight.extensions.getPluginInstance
 import dialight.freezer.gui.FreezerGui
 import dialight.freezer.gui.FreezerItem
@@ -31,7 +31,7 @@ class FreezerPlugin @Inject constructor(
         private set
     var guilib: GuiPlugin? = null
         private set
-    var eh: EventHelperPlugin? = null
+    var eh: EHGuiPlugin? = null
         private set
 
     val freezer = Freezer()
@@ -45,7 +45,7 @@ class FreezerPlugin @Inject constructor(
         toollib = pluginManager.getPluginInstance("toollib")!!
         teleporter = pluginManager.getPluginInstance("teleporter")!!
         guilib = pluginManager.getPluginInstance("guilib")
-        eh = pluginManager.getPluginInstance("eventhelper")
+        eh = pluginManager.getPluginInstance("ehgui")
     }
 
     @Listener

@@ -1,18 +1,6 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
-buildscript {
-    repositories {
-        maven("http://files.minecraftforge.net/maven") { name = "forge" }
-    }
-
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.21")
-    }
-}
+import org.apache.commons.io.FilenameUtils
 
 plugins {
-    kotlin("jvm")
     java
     base
 }
@@ -20,62 +8,59 @@ plugins {
 val pluginGroup: String by project
 val pluginVersion: String by project
 
+val buildVersion: Int by rootProject.ext
 val allVersion: String by rootProject.ext
 val mcVersion: String by rootProject.ext
 
-var bukkitDep: DependencyHandler.() -> Unit by project(":bukkit").ext
+val libDir: String by project(":bukkit").ext
+var configureProject: Project.(List<String>, List<String>) -> Unit by project(":bukkit").ext
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
+val parts = arrayOf(
+    ":bukkit:toollib",
+    ":bukkit:modulelib",
+    ":bukkit:guilib",
+    ":bukkit:offlinelib",
+    ":bukkit:ehgui",
+    ":bukkit:teleporter",
+    ":bukkit:freezer"
+//    ":bukkit:teams",
+//    ":bukkit:random",
+//    ":bukkit:autorespawn",
+//    ":bukkit:oldpvp",  // not ready yet
+//    ":bukkit:captain"
+)
 
-configurations {
-    val shadow = this.create("shadow")
-    this["compile"].extendsFrom(shadow)
-}
+val deps = listOf()
+val join = listOf(
+    ":bukkit:misc",
+    *parts
+)
 
-val join = listOf()
+configureProject(join, deps)
 
-dependencies {
-    val shadow by configurations
-    bukkitDep()
-    implementation(kotlin("stdlib-jdk8"))
-    join.forEach { implementation(project(it)) }
-}
-tasks["processResources"].apply { this as ProcessResources
-    val tokens = mapOf("version" to "2.3.1")
-    from(sourceSets["main"].resources.srcDirs) {
-        filter<ReplaceTokens>("tokens" to tokens)
-    }
-}
-
-task("joinJar", Jar::class) {
-    from(sourceSets["main"].output)
-    exclude("mcmod.info")
-    baseName = "${project.name}-join"
-}
-task("fatJar", Jar::class) {
-    from(sourceSets["main"].output)
+task("copyToServer_splitted", Copy::class) {
     doFirst {
-        join.forEach {
-            from(project(it).tasks["joinJar"].outputs.files.map { zipTree(it) })
+        val libDirFile = File(libDir)
+        libDirFile.deleteRecursively()
+        libDirFile.mkdirs()
+    }
+    parts.forEach {
+        dependsOn("$it:fatJar")
+        doFirst {
+            val jar_task = project(it).tasks["fatJar"] as Jar
+            from(jar_task.outputs.files)
         }
     }
-    baseName = "${project.name}-fat"
-}
-
-tasks["build"].apply {
-    dependsOn(":incrementVersion")
-}
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+    val jar = tasks["jar"] as Jar
+    from(jar)
+    doFirst {
+        exclude(jar.outputs.files.singleFile.name)
+    }
+    this.rename {
+        val dir = FilenameUtils.getFullPathNoEndSeparator(it)
+        val name = FilenameUtils.getBaseName(it).split("-")[0]
+        return@rename "$dir/$name.jar"
+    }
+    into(libDir)
+    outputs.upToDateWhen { false }  // update every time
 }

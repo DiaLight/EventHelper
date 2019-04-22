@@ -1,11 +1,9 @@
 package dialight.teams
 
 import com.google.inject.Inject
-import dialight.observable.ObservableObject
-import dialight.eventhelper.EventHelperPlugin
+import dialight.ehgui.EHGuiPlugin
 import dialight.extensions.getPluginInstance
 import dialight.guilib.GuiPlugin
-import dialight.observable.map.ObservableMap
 import dialight.observable.map.observableMapOf
 import dialight.teams.gui.TeamsGui
 import dialight.teams.gui.TeamsItem
@@ -21,7 +19,6 @@ import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.plugin.PluginManager
 import org.spongepowered.api.scoreboard.Team
 import java.util.*
-import kotlin.properties.ObservableProperty
 
 @Plugin(id = "teams")
 class TeamsPlugin @Inject constructor(
@@ -34,7 +31,7 @@ class TeamsPlugin @Inject constructor(
         private set
     var guilib: GuiPlugin? = null
         private set
-    var eh: EventHelperPlugin? = null
+    var eh: EHGuiPlugin? = null
         private set
     var teleporter: TeleporterPlugin? = null
         private set
@@ -49,7 +46,7 @@ class TeamsPlugin @Inject constructor(
     fun onConstruction(event: GameConstructionEvent) {
         toollib = pluginManager.getPluginInstance("toollib")!!
         guilib = pluginManager.getPluginInstance("guilib")
-        eh = pluginManager.getPluginInstance("eventhelper")
+        eh = pluginManager.getPluginInstance("ehgui")
         teleporter = pluginManager.getPluginInstance("teleporter")
     }
 

@@ -4,14 +4,12 @@ import dialight.extensions.*
 import dialight.toollib.events.ToolInteractEvent
 import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.block.BlockTypes
-import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.HandTypes
 import org.spongepowered.api.data.value.ValueContainer
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.block.ChangeBlockEvent
 import org.spongepowered.api.event.cause.EventContextKeys
-import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.event.item.inventory.DropItemEvent
@@ -30,7 +28,7 @@ class ToolListener(val plugin: ToolPlugin) {
     @Listener
     fun onLeftClick(e: InteractItemEvent.Primary, @First player: Player) {
         val tool = identifyTool(e.itemStack) ?: return
-        val toolEvent = ToolInteractEvent.Air(player, e.itemStack, ToolInteractEvent.Type.LEFT_CLICK)
+        val toolEvent = ToolInteractEvent.Air(player, e.itemStack, ToolInteractEvent.Action.LEFT_CLICK)
         tool.onClick(toolEvent)
         if (toolEvent.deny) e.isCancelled = true
     }
@@ -47,7 +45,7 @@ class ToolListener(val plugin: ToolPlugin) {
         if(oentity.isPresent) {
             val entity = oentity.get()
             entityHit = true
-            val toolEvent = ToolInteractEvent.Entity(player, e.itemStack, entity, ToolInteractEvent.Type.RIGHT_CLICK)
+            val toolEvent = ToolInteractEvent.Entity(player, e.itemStack, entity, ToolInteractEvent.Action.RIGHT_CLICK)
             tool.onClick(toolEvent)
             if (toolEvent.deny) e.isCancelled = true
             return
@@ -59,9 +57,9 @@ class ToolListener(val plugin: ToolPlugin) {
                 return
             }
             val toolEvent = if(block.state.type != BlockTypes.AIR) {
-                ToolInteractEvent.Block(player, e.itemStack, block, ToolInteractEvent.Type.RIGHT_CLICK)
+                ToolInteractEvent.Block(player, e.itemStack, block, ToolInteractEvent.Action.RIGHT_CLICK)
             } else {
-                ToolInteractEvent.Air(player, e.itemStack, ToolInteractEvent.Type.RIGHT_CLICK)
+                ToolInteractEvent.Air(player, e.itemStack, ToolInteractEvent.Action.RIGHT_CLICK)
             }
             tool.onClick(toolEvent)
             if (toolEvent.deny) e.isCancelled = true
@@ -91,7 +89,7 @@ class ToolListener(val plugin: ToolPlugin) {
                 return false
             }
         }
-        val toolEvent = ToolInteractEvent.Block(player, itemStack.createSnapshot(), block, ToolInteractEvent.Type.LEFT_CLICK)
+        val toolEvent = ToolInteractEvent.Block(player, itemStack.createSnapshot(), block, ToolInteractEvent.Action.LEFT_CLICK)
         tool.onClick(toolEvent)
         if (toolEvent.deny) e.isCancelled = true
         return true
@@ -104,7 +102,7 @@ class ToolListener(val plugin: ToolPlugin) {
         while(it.hasNext()) {
             val item = it.next()
             val tool = identifyTool(item) ?: continue
-            val toolEvent = ToolInteractEvent.Air(player, item, ToolInteractEvent.Type.DROP)
+            val toolEvent = ToolInteractEvent.Air(player, item, ToolInteractEvent.Action.DROP)
             tool.onClick(toolEvent)
             if (toolEvent.deny) it.remove()
         }

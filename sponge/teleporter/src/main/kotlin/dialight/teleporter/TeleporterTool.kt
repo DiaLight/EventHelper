@@ -1,6 +1,6 @@
 package dialight.teleporter
 
-import dialight.eventhelper.EventHelperTool
+import dialight.ehgui.EHGuiTool
 import dialight.extensions.*
 import dialight.teleporter.event.PlayerTeleportEvent
 import dialight.toollib.Tool
@@ -56,7 +56,7 @@ class TeleporterTool(val plugin: TeleporterPlugin) : Tool(TeleporterTool.ID) {
 
     override fun onClick(e: ToolInteractEvent) {
         when (e.action) {
-            ToolInteractEvent.Type.LEFT_CLICK -> if(!e.sneaking) {
+            ToolInteractEvent.Action.LEFT_CLICK -> if(!e.sneaking) {
                 teleport(e,
                     plugin.teleporter[e.player].online,
                     plugin.teleporter[e.player].offline
@@ -64,8 +64,8 @@ class TeleporterTool(val plugin: TeleporterPlugin) : Tool(TeleporterTool.ID) {
             } else {
 
             }
-            ToolInteractEvent.Type.RIGHT_CLICK -> if(!e.sneaking) {
-                if (e.type == ToolInteractEvent.Target.ENTITY) {
+            ToolInteractEvent.Action.RIGHT_CLICK -> if(!e.sneaking) {
+                if (e.type == ToolInteractEvent.Type.ENTITY) {
                     e as ToolInteractEvent.Entity
                     if (e.entity.type == EntityTypes.PLAYER) {
                         toggleSelect(e.player, (e.entity as Player).uniqueId, null)
@@ -92,9 +92,9 @@ class TeleporterTool(val plugin: TeleporterPlugin) : Tool(TeleporterTool.ID) {
                 plugin.teleporter.invoke(e.player, Teleporter.Action.UNTAG, Teleporter.Group.ALL)
                 e.player.sendMessage(TeleporterMessages.AllPlayersRemoved)
             }
-            ToolInteractEvent.Type.DROP -> {
+            ToolInteractEvent.Action.DROP -> {
                 if(plugin.eh != null) {
-                    plugin.toollib.giveTool(e.player, EventHelperTool.ID)
+                    plugin.toollib.giveTool(e.player, EHGuiTool.ID)
                 }
                 plugin.guilib?.clearStory(e.player)
             }

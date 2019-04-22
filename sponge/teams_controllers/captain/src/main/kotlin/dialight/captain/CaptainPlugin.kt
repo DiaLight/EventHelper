@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import dialight.captain.gui.CaptainGui
 import dialight.captain.gui.CaptainItem
 import dialight.captain.system.CaptainSystem
-import dialight.eventhelper.EventHelperPlugin
+import dialight.ehgui.EHGuiPlugin
 import dialight.extensions.getPluginInstance
 import dialight.freezer.FreezerPlugin
 import dialight.guilib.GuiPlugin
@@ -42,7 +42,7 @@ class CaptainPlugin @Inject constructor(
         private set
     var guilib: GuiPlugin? = null
         private set
-    var eh: EventHelperPlugin? = null
+    var eh: EHGuiPlugin? = null
         private set
 
     val module = CaptainModule(this)
@@ -61,7 +61,7 @@ class CaptainPlugin @Inject constructor(
         offlinelib = pluginManager.getPluginInstance("offlinelib")!!
         teleporter = pluginManager.getPluginInstance("teleporter")!!
         freezer = pluginManager.getPluginInstance("freezer")!!
-        eh = pluginManager.getPluginInstance("eventhelper")
+        eh = pluginManager.getPluginInstance("ehgui")
     }
 
     @Listener

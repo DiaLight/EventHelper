@@ -67,11 +67,3 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-configurations {
-    val shadow = create("shadow")
-    this["compile"].extendsFrom(shadow)
-}
-
-dependencies {
-    val shadow by configurations
-}

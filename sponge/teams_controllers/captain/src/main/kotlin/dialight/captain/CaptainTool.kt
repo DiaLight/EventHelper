@@ -5,13 +5,11 @@ import dialight.toollib.Tool
 import dialight.toollib.events.ToolInteractEvent
 import jekarus.colorizer.Colorizer
 import jekarus.colorizer.Text_colorized
-import org.spongepowered.api.data.type.HandTypes
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.scheduler.Task
-import org.spongepowered.api.text.Text
 import java.util.*
 
 class CaptainTool(val plugin: CaptainPlugin) : Tool(CaptainTool.ID, true) {
@@ -53,8 +51,8 @@ class CaptainTool(val plugin: CaptainPlugin) : Tool(CaptainTool.ID, true) {
             return
         }
         when(e.action) {
-            ToolInteractEvent.Type.LEFT_CLICK -> if(!e.sneaking) {
-                if (e.type == ToolInteractEvent.Target.ENTITY) {
+            ToolInteractEvent.Action.LEFT_CLICK -> if(!e.sneaking) {
+                if (e.type == ToolInteractEvent.Type.ENTITY) {
                     e as ToolInteractEvent.Entity
                     trySelect(e.player, e.entity)
                 } else {
@@ -66,12 +64,12 @@ class CaptainTool(val plugin: CaptainPlugin) : Tool(CaptainTool.ID, true) {
             } else {
 
             }
-            ToolInteractEvent.Type.RIGHT_CLICK -> if(!e.sneaking) {
+            ToolInteractEvent.Action.RIGHT_CLICK -> if(!e.sneaking) {
                 e.player.sendMessage(Text_colorized("|r|Not implemented yet"))
             } else {
 
             }
-            ToolInteractEvent.Type.DROP -> if(!e.sneaking) {
+            ToolInteractEvent.Action.DROP -> if(!e.sneaking) {
 
             } else {
 

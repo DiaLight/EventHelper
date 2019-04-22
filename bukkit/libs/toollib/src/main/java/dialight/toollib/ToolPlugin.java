@@ -8,13 +8,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class ToolPlugin extends JavaPlugin {
 
-    private final ToolListener toolListener = new ToolListener();
+    private final ToolCore core = new ToolCore(this);
 
     @Override
     public void onEnable() {
-        val pm = getServer().getPluginManager();
-        pm.registerEvents(toolListener, this);
-
+        core.enable();
         getCommand("tool").setExecutor(new ToolCommand());
 
         val desc = getDescription();
@@ -23,6 +21,7 @@ public final class ToolPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        HandlerList.unregisterAll(toolListener);
+        core.disable();
     }
+
 }

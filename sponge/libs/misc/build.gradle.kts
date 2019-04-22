@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 buildscript {
     repositories {
         maven("http://files.minecraftforge.net/maven") { name = "forge" }
@@ -26,36 +24,9 @@ val allVersion: String by rootProject.ext
 val mcVersion: String by rootProject.ext
 
 var spongeDep: DependencyHandler.() -> Unit by project(":sponge").ext
+var configureProject: Project.(List<String>, List<String>) -> Unit by project(":sponge").ext
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
+val deps = listOf()
+val join = listOf()
 
-configurations {
-    val shadow = create("shadow")
-    this["compile"].extendsFrom(shadow)
-}
-
-dependencies {
-    val shadow by configurations
-    spongeDep()
-    implementation(kotlin("stdlib-jdk8"))
-}
-
-task("joinJar", Jar::class) {
-    from(sourceSets["main"].output)
-    exclude("mcmod.info")
-    baseName = "${project.name}-join"
-}
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}
+configureProject(join, deps)

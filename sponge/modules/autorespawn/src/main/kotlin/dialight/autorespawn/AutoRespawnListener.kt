@@ -11,7 +11,7 @@ class AutoRespawnListener(val plugin: AutoRespawnPlugin) {
 
     @Listener
     fun onDeath(e: DestructEntityEvent.Death, @First player: Player) {
-        if(!plugin.moduule.enabled) return
+        if(!plugin.module.enabled) return
         Task.builder().execute { task ->
             player.respawnPlayer()
         }.submit(plugin)

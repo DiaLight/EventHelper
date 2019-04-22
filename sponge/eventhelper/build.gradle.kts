@@ -1,5 +1,8 @@
+import org.apache.commons.io.FilenameUtils
+import org.apache.tools.ant.filters.ReplaceTokens
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.spongepowered.gradle.meta.MetadataBaseExtension
+import java.util.*
 
 buildscript {
     repositories {
@@ -23,10 +26,38 @@ plugins {
 val pluginGroup: String by project
 val pluginVersion: String by project
 
+val buildVersion: Int by rootProject.ext
 val allVersion: String by rootProject.ext
 val mcVersion: String by rootProject.ext
 
-var spongeDep: DependencyHandler.() -> Unit by project(":sponge").ext
+val libDir: String by project(":sponge").ext
+var configureProject: Project.(List<String>, List<String>) -> Unit by project(":sponge").ext
+
+
+val parts = arrayOf(
+    ":sponge:kotlinrt",
+    ":sponge:toollib",
+    ":sponge:modulelib",
+    ":sponge:guilib",
+    ":sponge:offlinelib",
+    ":sponge:ehgui",
+    ":sponge:teleporter",
+    ":sponge:freezer",
+    ":sponge:teams",
+    ":sponge:random",
+    ":sponge:autorespawn",
+//    ":sponge:oldpvp",  // not ready yet
+    ":sponge:captain"
+)
+
+val deps = listOf()
+val join = listOf(
+    ":sponge:misc",
+    *parts
+)
+
+configureProject(join, deps)
+
 
 var sponge_conf: MetadataBaseExtension.() -> Unit by ext
 sponge_conf = {
@@ -37,66 +68,117 @@ sponge_conf = {
                 setVersion(allVersion)
                 this.authors.add("DiaLight")
                 this.setDescription("Useful tool to help event masters with theirs job")
-                this.dependencies.apply {
-                    this.create("kotlinrt")
-                    this.create("toollib")
-                    this.create("modulelib")
-                    this.create("guilib")
-                }
             }
         }
     }
 }
 sponge.sponge_conf()
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+
+sponge {
+    plugins.apply {
+        this.clear()
+    }
 }
 
-configurations {
-    val fat = this.create("fat")
-    this["compile"].extendsFrom(fat)
+fun <T> ExtraPropertiesExtension.getOrNull(key: String): T? {
+    return if(has(key)) get(key) as T? else null
+}
+val self = this
+for(proj in gradle.rootProject.allprojects) {
+    val conf = proj.ext.getOrNull<MetadataBaseExtension.() -> Unit>("sponge_conf")
+    if(conf != null) {
+//        println("**** apply conf from ${this.name}")
+        self.sponge.conf()
+    }
+}
+gradle.afterProject {
+    if (state.failure == null) {
+        val conf = this.ext.getOrNull<MetadataBaseExtension.() -> Unit>("sponge_conf")
+        if(conf != null && this.name != self.name) {
+//            println("**** apply conf from ${this.name}")
+            self.sponge.conf()
+        } else {
+//            println("**** skip conf from ${this.name}")
+        }
+    }
 }
 
-val join = listOf(":sponge:misc")
-
-dependencies {
-    val fat by configurations
-    spongeDep()
-    implementation(kotlin("stdlib-jdk8"))
-    implementation(project(":sponge:guilib"))
-    implementation(project(":sponge:toollib"))
-    implementation(project(":sponge:modulelib"))
-    join.forEach { implementation(project(it)) }
-}
-
-task("joinJar", Jar::class) {
-    from(sourceSets["main"].output)
-    exclude("mcmod.info")
-    baseName = "${project.name}-join"
-}
-task("fatJar", Jar::class) {
-    from(sourceSets["main"].output)
+task("fatJar-AllInOne", Jar::class) {
+    manifest {
+        attributes(mapOf(
+            "TweakClass" to "org.spongepowered.asm.launch.MixinTweaker",
+            "Main-Class" to "org.spongepowered.asm.launch.MixinTweaker",
+            "MixinConfigs" to "mixins.guilib.json,mixins.teams.json",
+            "FMLCorePluginContainsFMLMod" to "true"
+        ))
+    }
+    join.forEach {
+        dependsOn("$it:build")  // we need execution if reobfJar task if it exists
+        dependsOn("$it:joinJar")
+    }
     doFirst {
         join.forEach {
             from(project(it).tasks["joinJar"].outputs.files.map { zipTree(it) })
         }
     }
-    baseName = "${project.name}-fat"
+    from(
+        tasks["jar"].outputs.files.map { zipTree(it) }
+    )
+    outputs.upToDateWhen { false }  // update every time
 }
 
-tasks["build"].apply {
-    dependsOn(":incrementVersion")
+task("collectReleaseJars", Copy::class) {
+    val binDir = file("bin")
+    doFirst {
+        binDir.deleteRecursively()
+    }
+
+    didWork = false  // update every time
+
+    parts.forEach {
+        dependsOn("$it:fatJar")
+        doFirst {
+            val jar_task = project(it).tasks["fatJar"] as Jar
+            from(jar_task.outputs.files)
+        }
+    }
+    val fatJar = tasks["fatJar"] as Jar
+    dependsOn(fatJar)
+    from(fatJar.outputs.files.singleFile)
+    into(binDir)
+    this.rename {
+        val dir = FilenameUtils.getFullPathNoEndSeparator(it)
+        val name = FilenameUtils.getBaseName(it).split("-")[0]
+        return@rename "$dir/EventHelper-$name-sponge-$mcVersion-build-$buildVersion.jar"
+    }
+    outputs.upToDateWhen { false }  // update every time
 }
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+
+task("copyToServer_splitted", Copy::class) {
+    doFirst {
+        val libDirFile = File(libDir)
+        libDirFile.deleteRecursively()
+        libDirFile.mkdirs()
+    }
+    dependsOn(tasks["fatJar"])
+    parts.forEach {
+        dependsOn("$it:fatJar")
+        doFirst {
+            val jar_task = project(it).tasks["fatJar"] as Jar
+            from(jar_task.outputs.files)
+        }
+    }
+    val jar = tasks["jar"] as Jar
+    from(jar)
+    doFirst {
+        exclude(jar.outputs.files.singleFile.name)
+    }
+    this.rename {
+        val dir = FilenameUtils.getFullPathNoEndSeparator(it)
+        val name = FilenameUtils.getBaseName(it).split("-")[0]
+        return@rename "$dir/$name.jar"
+    }
+    into(libDir)
+    outputs.upToDateWhen { false }  // update every time
 }

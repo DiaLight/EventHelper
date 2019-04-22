@@ -1,0 +1,13 @@
+name: Freezer
+version: @version@
+main: dialight.freezer.FreezerPlugin
+api-version: 1.13
+authors: [DiaLight]
+description: Useful tool to help event masters with theirs job
+depend: [ToolLib]
+
+commands:
+  freezer:
+    description: Command to control all registered tools
+    permission: freezer.tool
+    usage: /<command>

@@ -17,8 +17,9 @@ class ObservableObject<V>(value: V) {
 
     var value: V = value
         set(value) {
+            val oldValue = field
             field = value
-            fireChange(field, value)
+            fireChange(oldValue, value)
         }
 
 }

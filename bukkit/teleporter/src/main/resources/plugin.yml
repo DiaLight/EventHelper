@@ -1,0 +1,13 @@
+name: Teleporter
+version: @version@
+main: dialight.teleporter.TeleporterPlugin
+api-version: 1.13
+authors: [DiaLight]
+description: Useful tool to help event masters with theirs job
+depend: [ToolLib]
+
+commands:
+  teleporter:
+    description: Command to control all registered tools
+    permission: teleporter.tool
+    usage: /<command>

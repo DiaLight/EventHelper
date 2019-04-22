@@ -1,0 +1,6 @@
+name: GuiLib
+version: @version@
+main: dialight.guilib.GuiPlugin
+api-version: 1.13
+authors: [DiaLight]
+description: Useful tool to help event masters with theirs job

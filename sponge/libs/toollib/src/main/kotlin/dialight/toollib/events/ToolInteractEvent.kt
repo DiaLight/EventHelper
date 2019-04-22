@@ -5,19 +5,15 @@ import dialight.extensions.direction
 import dialight.extensions.eyeLocation
 import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.data.key.Keys
-import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
-import org.spongepowered.api.world.Location
-import org.spongepowered.api.world.World
 
 
-abstract class ToolInteractEvent(val player: Player, val item: ItemStackSnapshot, val action: ToolInteractEvent.Type) {
+abstract class ToolInteractEvent(val player: Player, val item: ItemStackSnapshot, val action: ToolInteractEvent.Action) {
 
     var deny = true
 
-    abstract val type: ToolInteractEvent.Target
+    abstract val type: ToolInteractEvent.Type
     val sneaking = player.get(Keys.IS_SNEAKING).orElse(false)
 
     override fun toString() = String.format("%s, %s, %s", player.name, item.type, action)
@@ -29,17 +25,17 @@ abstract class ToolInteractEvent(val player: Player, val item: ItemStackSnapshot
             50
         ).add(.5, 1.0, .5)
 
-    class Air(player: Player, item: ItemStackSnapshot, type: ToolInteractEvent.Type) : ToolInteractEvent(player, item, type) {
+    class Air(player: Player, item: ItemStackSnapshot, type: ToolInteractEvent.Action) : ToolInteractEvent(player, item, type) {
 
-        override val type: Target = Target.AIR
+        override val type: Type = Type.AIR
 
         override fun toString() = String.format("ToolInteractEvent.Air{%s}", super.toString())
 
     }
 
-    class Block(player: Player, item: ItemStackSnapshot, val block: BlockSnapshot, type: ToolInteractEvent.Type) : ToolInteractEvent(player, item, type) {
+    class Block(player: Player, item: ItemStackSnapshot, val block: BlockSnapshot, type: ToolInteractEvent.Action) : ToolInteractEvent(player, item, type) {
 
-        override val type: Target = Target.BLOCK
+        override val type: Type = Type.BLOCK
 
         override fun toString() = String.format("ToolInteractEvent.Block{%s, %s}", super.toString(), block)
 
@@ -47,21 +43,21 @@ abstract class ToolInteractEvent(val player: Player, val item: ItemStackSnapshot
 
     }
 
-    class Entity(player: Player, item: ItemStackSnapshot, val entity: org.spongepowered.api.entity.Entity, type: ToolInteractEvent.Type) : ToolInteractEvent(player, item, type) {
+    class Entity(player: Player, item: ItemStackSnapshot, val entity: org.spongepowered.api.entity.Entity, type: ToolInteractEvent.Action) : ToolInteractEvent(player, item, type) {
 
-        override val type: Target = Target.ENTITY
+        override val type: Type = Type.ENTITY
 
         override fun toString() = String.format("ToolInteractEvent.Entity{%s, %s}", super.toString(), entity)
 
     }
 
-    enum class Target {
+    enum class Type {
         AIR,
         BLOCK,
         ENTITY
     }
 
-    enum class Type {
+    enum class Action {
         LEFT_CLICK,
         RIGHT_CLICK,
         DROP

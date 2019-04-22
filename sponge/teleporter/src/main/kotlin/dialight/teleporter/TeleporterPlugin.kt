@@ -1,7 +1,7 @@
 package dialight.teleporter
 
 import com.google.inject.Inject
-import dialight.eventhelper.EventHelperPlugin
+import dialight.ehgui.EHGuiPlugin
 import dialight.extensions.Server_getPlayer
 import dialight.extensions.getPluginInstance
 import dialight.extensions.teleportSafe
@@ -36,7 +36,7 @@ class TeleporterPlugin @Inject constructor(
         private set
     var guilib: GuiPlugin? = null
         private set
-    var eh: EventHelperPlugin? = null
+    var eh: EHGuiPlugin? = null
         private set
 
     val tool = TeleporterTool(this)
@@ -50,7 +50,7 @@ class TeleporterPlugin @Inject constructor(
         toollib = pluginManager.getPluginInstance("toollib")!!
         offlinelib = pluginManager.getPluginInstance("offlinelib")!!
         guilib = pluginManager.getPluginInstance("guilib")
-        eh = pluginManager.getPluginInstance("eventhelper")
+        eh = pluginManager.getPluginInstance("ehgui")
     }
 
     @Listener

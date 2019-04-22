@@ -1,17 +1,13 @@
 package dialight.teams
 
-import dialight.eventhelper.EventHelperTool
+import dialight.ehgui.EHGuiTool
 import dialight.extensions.ItemStackBuilderEx
-import dialight.extensions.getOrNull
 import dialight.toollib.Tool
 import dialight.toollib.events.ToolInteractEvent
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.item.ItemTypes
-import java.util.function.Predicate
-import java.util.function.Supplier
 
 class TeamsTool(val plugin: TeamsPlugin) : Tool(TeamsTool.ID) {
 
@@ -47,12 +43,12 @@ class TeamsTool(val plugin: TeamsPlugin) : Tool(TeamsTool.ID) {
 
     override fun onClick(e: ToolInteractEvent) {
         when(e.action) {
-            ToolInteractEvent.Type.LEFT_CLICK -> if(!e.sneaking) {
+            ToolInteractEvent.Action.LEFT_CLICK -> if(!e.sneaking) {
 
             } else {
 
             }
-            ToolInteractEvent.Type.RIGHT_CLICK -> if(!e.sneaking) {
+            ToolInteractEvent.Action.RIGHT_CLICK -> if(!e.sneaking) {
                 plugin.guilib?.also { guilib ->
                     guilib.openGui(e.player, plugin.teamsgui)
                 }
@@ -62,9 +58,9 @@ class TeamsTool(val plugin: TeamsPlugin) : Tool(TeamsTool.ID) {
                     e.player.sendMessage(TeamsMessages.unselectedTeam(team))
                 }
             }
-            ToolInteractEvent.Type.DROP -> {
+            ToolInteractEvent.Action.DROP -> {
                 if(plugin.eh != null) {
-                    plugin.toollib.giveTool(e.player, EventHelperTool.ID)
+                    plugin.toollib.giveTool(e.player, EHGuiTool.ID)
                 }
                 plugin.guilib?.clearStory(e.player)
             }
