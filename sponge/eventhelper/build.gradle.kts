@@ -40,7 +40,7 @@ val parts = arrayOf(
     ":sponge:modulelib",
     ":sponge:guilib",
     ":sponge:offlinelib",
-    ":sponge:ehgui",
+    ":sponge:maingui",
     ":sponge:teleporter",
     ":sponge:freezer",
     ":sponge:teams",

@@ -2,6 +2,7 @@
 plugins {
     java
     base
+    idea
 }
 
 val pluginGroup: String by project
@@ -13,10 +14,11 @@ val mcVersion: String by rootProject.ext
 var configureProject: Project.(List<String>, List<String>) -> Unit by project(":bukkit").ext
 
 val deps = listOf(
-    ":bukkit:toollib"
+    ":bukkit:eventhelper",
+    ":bukkit:toollib",
+    ":bukkit:misc"
 )
 val join = listOf(
-    ":bukkit:misc"
 )
 
 configureProject(join, deps)

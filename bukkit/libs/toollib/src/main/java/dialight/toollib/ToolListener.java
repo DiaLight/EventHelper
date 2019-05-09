@@ -1,5 +1,7 @@
 package dialight.toollib;
 
+import dialight.compatibility.PlayerInteractAtEntityEventBc;
+import dialight.compatibility.PlayerInventoryBc;
 import dialight.toollib.events.ToolInteractEvent;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -13,16 +15,15 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class ToolListener implements Listener {
 
-    private final ToolCore core;
+    private final ToolLib proj;
 
-    public ToolListener(ToolCore core) {
-        this.core = core;
+    public ToolListener(ToolLib proj) {
+        this.proj = proj;
     }
 
 
@@ -30,21 +31,27 @@ public class ToolListener implements Listener {
     private Tool identifyTool(ItemStack itemStack) {
         String id = Tool.parseId(itemStack);
         if(id == null) return null;
-        return core.getTool(id);
+        return proj.getTool(id);
     }
 
     private boolean interactEntity = false;
+    private boolean breakBlock = false;
     @EventHandler(priority = EventPriority.LOW)
     public void onInteract(PlayerInteractEvent e) {
+//        System.out.println("interact " + e.getAction() + " " + interactEntity + " " + breakBlock);
         if(interactEntity) {
             interactEntity = false;
+            return;
+        }
+        if(breakBlock) {
+            breakBlock = false;
             return;
         }
         ItemStack item = e.getItem();
         if(item == null) return;
         Tool tool = identifyTool(item);
         if (tool == null) return;
-        if (!core.hasAccess(e.getPlayer())) return;
+        if (!proj.hasAccess(e.getPlayer())) return;
         if (item.getType().isBlock()) return;
         ToolInteractEvent toolEvent = null;
         switch(e.getAction()) {
@@ -64,24 +71,14 @@ public class ToolListener implements Listener {
                 return;
         }
         tool.onClick(toolEvent);
-        if (toolEvent.isCancelled()) e.setCancelled(true);
+//        if (toolEvent.isCancelled()) e.setCancelled(true);
     }
 
     @EventHandler
     public void onInteractEntity(PlayerInteractAtEntityEvent e) {
         Player player = e.getPlayer();
-        if (!core.hasAccess(player)) return;
-        ItemStack item = null;
-        EntityEquipment equipment = player.getEquipment();
-        if(equipment == null) return;
-        switch (e.getHand()) {
-            case HAND:
-                item = equipment.getItemInMainHand();
-                break;
-            case OFF_HAND:
-                item = equipment.getItemInOffHand();
-                break;
-        }
+        if (!proj.hasAccess(player)) return;
+        ItemStack item = PlayerInteractAtEntityEventBc.of(e).getUsedItem();
         if(item == null) return;
         Tool tool = identifyTool(item);
         if (tool == null) return;
@@ -96,8 +93,8 @@ public class ToolListener implements Listener {
         if(e.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
         if (e.getDamager().getType() != EntityType.PLAYER) return;
         Player player = (Player) e.getDamager();
-        if (!core.hasAccess(player)) return;
-        ItemStack item = player.getInventory().getItemInMainHand();
+        if (!proj.hasAccess(player)) return;
+        ItemStack item = PlayerInventoryBc.of(player.getInventory()).getItemInMainHand();
         Tool tool = identifyTool(item);
         if (tool == null) return;
         ToolInteractEvent toolEvent = new ToolInteractEvent.Entity(player, item, e.getEntity(), ToolInteractEvent.Action.LEFT_CLICK);
@@ -108,40 +105,44 @@ public class ToolListener implements Listener {
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
         Player player = e.getPlayer();
-        if (!core.hasAccess(player)) return;
+        if (!proj.hasAccess(player)) return;
         ItemStack item = e.getItemInHand();
         Tool tool = identifyTool(item);
         if (tool == null) return;
         if (!item.getType().isBlock()) return;
-//        tool.blockPlace(player, e.getBlockPlaced());
+//        ToolInteractEvent toolEvent = new ToolInteractEvent.Block(player, item, e.getBlock(), ToolInteractEvent.Action.RIGHT_CLICK);
+//        tool.onClick(toolEvent);
+//        if (toolEvent.isCancelled()) e.setCancelled(true);
         e.setCancelled(true);
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
         Player player = e.getPlayer();
-        if (!core.hasAccess(player)) return;
-        ItemStack item = player.getInventory().getItemInMainHand();
+        if (!proj.hasAccess(player)) return;
+        ItemStack item = PlayerInventoryBc.of(player.getInventory()).getItemInMainHand();
         Tool tool = identifyTool(item);
         if (tool == null) return;
-        if (!item.getType().isBlock()) return;
-//        tool.blockBreak(player, e.getBlock());
+        breakBlock = true;
+        proj.runTask(() -> {
+            breakBlock = false;
+        });
+//        ToolInteractEvent toolEvent = new ToolInteractEvent.Block(player, item, e.getBlock(), ToolInteractEvent.Action.LEFT_CLICK);
+//        tool.onClick(toolEvent);
+//        if (toolEvent.isCancelled()) e.setCancelled(true);
         e.setCancelled(true);
     }
 
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent e) {
         Player player = e.getPlayer();
-        if (!core.hasAccess(player)) return;
+        if (!proj.hasAccess(player)) return;
         ItemStack item = e.getItemDrop().getItemStack();
         Tool tool = identifyTool(item);
         if (tool == null) return;
         ToolInteractEvent toolEvent = new ToolInteractEvent.Entity(player, item, e.getItemDrop(), ToolInteractEvent.Action.DROP);
         tool.onClick(toolEvent);
-        if (toolEvent.isCancelled()) {
-            e.setCancelled(true);
-            e.getItemDrop().remove();
-        }
+        if (toolEvent.isCancelled()) e.getItemDrop().remove();
     }
 
 

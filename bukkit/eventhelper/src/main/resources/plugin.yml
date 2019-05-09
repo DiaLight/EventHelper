@@ -1,6 +1,6 @@
 name: EventHelper
 version: @version@
-main: dialight.eventhelper.EventHelper
+main: @main_class@
 api-version: 1.13
 authors: [DiaLight]
 description: Useful tool to help event masters with theirs job

@@ -1,7 +1,7 @@
 package dialight.random
 
 import com.google.inject.Inject
-import dialight.ehgui.EHGuiPlugin
+import dialight.maingui.MainGuiPlugin
 import dialight.extensions.getPluginInstance
 import dialight.guilib.GuiPlugin
 import dialight.modulelib.ModulePlugin
@@ -28,7 +28,7 @@ class RandomPlugin @Inject constructor(
         private set
     var guilib: GuiPlugin? = null
         private set
-    var eh: EHGuiPlugin? = null
+    var eh: MainGuiPlugin? = null
         private set
 
     val module = RandomModule(this)
@@ -38,7 +38,7 @@ class RandomPlugin @Inject constructor(
         modulelib = pluginManager.getPluginInstance("modulelib")!!
         guilib = pluginManager.getPluginInstance("guilib")
         teams = pluginManager.getPluginInstance("teams")!!
-        eh = pluginManager.getPluginInstance("ehgui")
+        eh = pluginManager.getPluginInstance("maingui")
     }
 
     @Listener

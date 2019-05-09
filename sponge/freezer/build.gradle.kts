@@ -32,7 +32,7 @@ val deps = listOf(
     ":sponge:guilib",
     ":sponge:toollib",
     ":sponge:teleporter",
-    ":sponge:ehgui"
+    ":sponge:maingui"
 )
 val join = listOf(
     ":sponge:misc"
@@ -56,7 +56,7 @@ sponge_conf = {
                     this.create("guilib") {
                         this.optional = true
                     }
-                    this.create("ehgui") {
+                    this.create("maingui") {
                         this.optional = true
                     }
                 }

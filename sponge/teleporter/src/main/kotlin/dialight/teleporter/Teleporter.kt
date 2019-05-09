@@ -25,16 +25,16 @@ class Teleporter {
         ALL
     }
 
-    class Result : Iterable<Teleporter.Selected> {
+    class Result : Iterable<Selected> {
 
-        val selected = ArrayList<Teleporter.Selected>()
-        val unselected = ArrayList<Teleporter.Selected>()
+        val selected = ArrayList<Selected>()
+        val unselected = ArrayList<Selected>()
 
-        fun select(sel: Teleporter.Selected) {
+        fun select(sel: Selected) {
             selected.add(sel)
         }
 
-        fun unselect(sel: Teleporter.Selected) {
+        fun unselect(sel: Selected) {
             unselected.add(sel)
         }
 

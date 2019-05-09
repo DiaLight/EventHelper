@@ -1,9 +1,10 @@
 name: ToolLib
 version: @version@
-main: dialight.toollib.ToolPlugin
+main: dialight.toollib.ToolLibPlugin
 api-version: 1.13
 authors: [DiaLight]
 description: Useful tool to help event masters with theirs job
+depend: [EventHelper]
 
 commands:
   tool:

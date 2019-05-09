@@ -1,0 +1,14 @@
+name: MainGui
+version: @version@
+main: dialight.maingui.MainGuiPlugin
+api-version: 1.13
+authors: [DiaLight]
+description: Useful tool to help event masters with theirs job
+depend: [EventHelper]
+
+commands:
+  eventhelper:
+    description: Command to open eh gui
+    aliases: [eh]
+    permission: eventhelper.tool
+    usage: /<command>

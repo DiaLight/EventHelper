@@ -31,78 +31,76 @@ Useful tool to help event masters with theirs job
 * [X] Sponge
 
 ##### toollib
-Зависит от: `kotlinrt`
 * [X] Sponge
-* [ ] Bukkit
+  * Зависит от: `kotlinrt`
+* [X] Bukkit
 
 ##### modulelib
-Зависит от: `kotlinrt`
 * [X] Sponge
+  * Зависит от: `kotlinrt`
 * [ ] Bukkit
 
 ##### guilib
-Зависит от: `kotlinrt`
 * [X] Sponge (сложный интерфейс)
-* [ ] Bukkit
+  * Зависит от: `kotlinrt`
+* [X] Bukkit
 
 ##### offlinelib
 Позволяет телепортировать оффлайн игроков и оставлять вместо игроков жителей.
 
-Зависит от: `kotlinrt`
 * [X] Sponge (плохо, но работает)
-* [ ] Bukkit
+  * Зависит от: `kotlinrt`
+* [X] Bukkit
 
 #### Инструменты
-##### ehgui
+##### maingui
 Используя `guilib`, реализует гуи, содержимое которого отражает список инструмнтов, зарегистрировнных в `toollib` и модулей, зарегистрированных в `modulelib`.
 
-Зависит от: `kotlinrt`, `toollib`, `modulelib`, `guilib`
+Зависит от: `toollib`, `modulelib`, `guilib`
 * [X] Sponge
-  * [X] гуи для отображения и получения интрументов (View)
-  * [X] гуи для отображения и управления модулями (View)
-* [ ] Bukkit
+  * Зависит от: `kotlinrt`
+* [X] Bukkit
 
 ##### teleporter
-Зависит от: `kotlinrt`, `toollib`, [`guilib`], [`eventhelper`]
+Зависит от: `toollib`, [`guilib`], [`maingui`]
 * [X] Sponge
-  * [X] структура данных выделенных игроков (Model)
-  * [X] функцинал выделения/телепортирования и события телепортирования и вобора игроков (Control)
-  * [X] гуи для выделенных игроков (View)
-* [ ] Bukkit
+  * Зависит от: `kotlinrt`
+* [X] Bukkit
 
 ##### freezer
-Зависит от: `kotlinrt`, `toollib`, [`guilib`], [`eventhelper`], [`teleporter`]
+Зависит от: `toollib`, [`guilib`], [`maingui`], [`teleporter`]
 * [X] Sponge
-  * [X] структура данных замороженных игроков (Model)
-  * [X] функцинал и события замораживания игроков (Control)
-  * [X] гуи для заморженных игроков (View)
+  * Зависит от: `kotlinrt`
 * [ ] Bukkit
 
 ##### teams
-Зависит от: `kotlinrt`, `toollib`, [`guilib`], [`eventhelper`], [`teleporter`]
+Зависит от: `toollib`, [`guilib`], [`maingui`], [`teleporter`]
 * [X] Sponge
-  * [X] структура данных команд (Model)
-  * [X] функцинал и события добавления/удаления из команды (Control)
-  * [X] гуи для игроков в командах (View)
+  * Зависит от: `kotlinrt`
 * [ ] Bukkit
 
 #### Модули
 ##### captain
 Распределение игроков по камандам при помощи выбранных капитанов
-Зависит от: `kotlinrt`, `modulelib`, `toollib`, `teams`, `teleporter`, `freezer`, [`guilib`], [`eventhelper`]
+
+Зависит от: `modulelib`, `toollib`, `teams`, `maingui`, `freezer`, [`guilib`], [`eventhelper`]
 * [x] Sponge (экспериментально. могут быть баги)
+  * Зависит от: `kotlinrt`
 * [ ] Bukkit
 
 ##### random
 Рандомное распределение игроков по командам
-Зависит от: `kotlinrt`, `modulelib`, `teams`, [`guilib`], [`eventhelper`]
+
+Зависит от: `modulelib`, `teams`, [`guilib`], [`maingui`]
 * [X] Sponge
+  * Зависит от: `kotlinrt`
 * [ ] Bukkit
 
 ##### autorespawn
 Автоматический респавн игрока после смерти
-Зависит от: `kotlinrt`, `modulelib`, [`guilib`], [`eventhelper`]
+Зависит от: `modulelib`, [`guilib`], [`maingui`]
 * [X] Sponge
+  * Зависит от: `kotlinrt`
 * [ ] Bukkit
 
 </details>

@@ -43,6 +43,5 @@ class OfflineShadow(
     var entity: Entity? = null
 
     constructor(user: User) : this(user.uniqueId, user.name)
-
-
+    
 }

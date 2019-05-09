@@ -23,5 +23,7 @@ includeAll("sponge", "sponge/modules")
 
 includeAll("bukkit", "bukkit/libs")
 includeProjects("bukkit", "bukkit")
+includeAll("bukkit", "bukkit/modules")
+
 
 file("local.settings.gradle.kts").let { if(it.exists()) apply(from = it) }

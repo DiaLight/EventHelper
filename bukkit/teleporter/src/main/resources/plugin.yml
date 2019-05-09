@@ -4,10 +4,10 @@ main: dialight.teleporter.TeleporterPlugin
 api-version: 1.13
 authors: [DiaLight]
 description: Useful tool to help event masters with theirs job
-depend: [ToolLib]
+depend: [EventHelper]
 
 commands:
   teleporter:
-    description: Command to control all registered tools
+    description: Teleporter command
     permission: teleporter.tool
     usage: /<command>

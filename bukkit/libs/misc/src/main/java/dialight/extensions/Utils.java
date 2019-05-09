@@ -1,8 +1,7 @@
 package dialight.extensions;
 
-import dialight.exceptions.Todo;
+import dialight.compatibility.WorldBc;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -12,9 +11,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class Utils {
 
@@ -53,7 +53,7 @@ public class Utils {
         for (int j = 0; j < i; j++) {
             r.add(v);
             Block b = r.getBlock();
-            if (b.getType() != Material.AIR) break;
+            if (b.getType().isSolid()) break;
         }
         return r;
     }
@@ -76,7 +76,7 @@ public class Utils {
             entities = player.getWorld().getNearbyEntities(center, half, half, half);
         } else {
             List<EntityType> etypes = Arrays.asList(types);
-            entities = player.getWorld().getNearbyEntities(center, half, half, half, en -> {
+            entities = WorldBc.of(player.getWorld()).getNearbyEntities(center, half, half, half, en -> {
                 if(!etypes.contains(en.getType())) return false;
                 return en.getLocation().distance(center) <= half;
             });

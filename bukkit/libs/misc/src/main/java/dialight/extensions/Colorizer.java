@@ -22,11 +22,11 @@ public class Colorizer {
         format = format.replaceAll("\\|dgr\\|", ChatColor.DARK_GRAY.toString());
         format = format.replaceAll("\\|w\\|", ChatColor.WHITE.toString());
         format = format.replaceAll("\\|_\\|", ChatColor.UNDERLINE.toString());
+        format = format.replaceAll("\\|~\\|", ChatColor.STRIKETHROUGH.toString());
+        format = format.replaceAll("\\|`\\|", ChatColor.RESET.toString());
         if (format.indexOf('|') != -1) {
             throw new IllegalStateException("Bad format: " + format);
         }
-        format = format.replaceAll("~", ChatColor.STRIKETHROUGH.toString());
-        format = format.replaceAll("`", ChatColor.RESET.toString());
         return format;
     }
 

@@ -1,0 +1,13 @@
+name: AutoRespawn
+version: @version@
+main: dialight.autorespawn.AutoRespawnPlugin
+api-version: 1.13
+authors: [DiaLight]
+description: Useful tool to help event masters with theirs job
+depend: [EventHelper]
+
+commands:
+  autorespawn:
+    description: AutoRespawn command
+    permission: autorespawn.tool
+    usage: /<command>

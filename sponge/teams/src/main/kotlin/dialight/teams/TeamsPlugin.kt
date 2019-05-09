@@ -1,7 +1,7 @@
 package dialight.teams
 
 import com.google.inject.Inject
-import dialight.ehgui.EHGuiPlugin
+import dialight.maingui.MainGuiPlugin
 import dialight.extensions.getPluginInstance
 import dialight.guilib.GuiPlugin
 import dialight.observable.map.observableMapOf
@@ -31,7 +31,7 @@ class TeamsPlugin @Inject constructor(
         private set
     var guilib: GuiPlugin? = null
         private set
-    var eh: EHGuiPlugin? = null
+    var eh: MainGuiPlugin? = null
         private set
     var teleporter: TeleporterPlugin? = null
         private set
@@ -46,7 +46,7 @@ class TeamsPlugin @Inject constructor(
     fun onConstruction(event: GameConstructionEvent) {
         toollib = pluginManager.getPluginInstance("toollib")!!
         guilib = pluginManager.getPluginInstance("guilib")
-        eh = pluginManager.getPluginInstance("ehgui")
+        eh = pluginManager.getPluginInstance("maingui")
         teleporter = pluginManager.getPluginInstance("teleporter")
     }
 

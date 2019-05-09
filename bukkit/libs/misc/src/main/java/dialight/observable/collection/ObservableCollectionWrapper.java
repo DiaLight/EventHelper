@@ -32,19 +32,20 @@ public class ObservableCollectionWrapper<E> extends ObservableCollection<E> impl
     }
 
     @Override public boolean addAll(Collection<? extends E> elements) {
-        int index = collection.size();
+        boolean anyAdded = false;
         for (E e : elements) {
-            collection.add(e);
-            fireAdd(e);
-            index++;
+            if(add(e)) {
+                anyAdded = true;
+            }
         }
-        return true;
+        return anyAdded;
     }
 
     @Override public void clear() {
         for (E e : collection) {
             fireRemove(e);
         }
+        collection.clear();
     }
 
 

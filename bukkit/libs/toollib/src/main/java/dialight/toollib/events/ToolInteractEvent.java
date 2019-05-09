@@ -1,21 +1,19 @@
 package dialight.toollib.events;
 
+import dialight.compatibility.LocationBc;
 import dialight.extensions.Utils;
-import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public abstract class ToolInteractEvent {
 
-    @Getter private final Player player;
-    @Getter private final ItemStack item;
-    @Getter private final Action action;
-    @Getter private final boolean sneaking;
-    @Getter protected Target target;
-    @Getter @Setter private boolean cancelled = true;
+    private final Player player;
+    private final ItemStack item;
+    private final Action action;
+    private final boolean sneaking;
+    protected Target target;
+    private boolean cancelled = true;
 
     public ToolInteractEvent(Player player, ItemStack item, Action action) {
         this.player = player;
@@ -25,11 +23,40 @@ public abstract class ToolInteractEvent {
     }
 
     public Location lookingAtLoc() {
-        return Utils.getTargetBlock(
+        Location block = Utils.getTargetBlock(
                 player.getEyeLocation(),
                 player.getLocation().getDirection().normalize(),
                 50
-        ).toBlockLocation().add(.5, 1, .5);
+        );
+        return LocationBc.of(block).toBlockLocation().add(.5, 1, .5);
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public ItemStack getItem() {
+        return item;
+    }
+
+    public Action getAction() {
+        return action;
+    }
+
+    public boolean isSneaking() {
+        return sneaking;
+    }
+
+    public Target getTarget() {
+        return target;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
     @Override public String toString() {
@@ -64,7 +91,8 @@ public abstract class ToolInteractEvent {
         }
 
         @Override public Location lookingAtLoc() {
-            return block.getLocation().add(.5, 1.0, .5);
+            if(block.getType().isSolid()) return block.getLocation().add(.5, 1.0, .5);
+            return super.lookingAtLoc();
         }
 
     }
@@ -77,6 +105,10 @@ public abstract class ToolInteractEvent {
             super(player, item, action);
             this.entity = entity;
             target = Target.ENTITY;
+        }
+
+        public org.bukkit.entity.Entity getEntity() {
+            return entity;
         }
 
         @Override public String toString() {

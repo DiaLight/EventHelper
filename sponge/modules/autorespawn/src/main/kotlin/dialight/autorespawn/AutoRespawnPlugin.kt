@@ -2,7 +2,7 @@ package dialight.autorespawn
 
 import com.google.inject.Inject
 import dialight.autorespawn.gui.AutoRespawnItem
-import dialight.ehgui.EHGuiPlugin
+import dialight.maingui.MainGuiPlugin
 import dialight.extensions.getPluginInstance
 import dialight.guilib.GuiPlugin
 import dialight.modulelib.ModulePlugin
@@ -25,7 +25,7 @@ class AutoRespawnPlugin @Inject constructor(
         private set
     var guilib: GuiPlugin? = null
         private set
-    var eh: EHGuiPlugin? = null
+    var eh: MainGuiPlugin? = null
         private set
 
     val module = AutoRespawnModule(this)
@@ -35,7 +35,7 @@ class AutoRespawnPlugin @Inject constructor(
     fun onConstruction(event: GameConstructionEvent) {
         modulelib = pluginManager.getPluginInstance("modulelib")!!
         guilib = pluginManager.getPluginInstance("guilib")
-        eh = pluginManager.getPluginInstance("ehgui")
+        eh = pluginManager.getPluginInstance("maingui")
     }
 
     @Listener

@@ -1,6 +1,6 @@
 package dialight.teleporter
 
-import dialight.ehgui.EHGuiTool
+import dialight.maingui.MainGuiTool
 import dialight.extensions.*
 import dialight.teleporter.event.PlayerTeleportEvent
 import dialight.toollib.Tool
@@ -94,7 +94,7 @@ class TeleporterTool(val plugin: TeleporterPlugin) : Tool(TeleporterTool.ID) {
             }
             ToolInteractEvent.Action.DROP -> {
                 if(plugin.eh != null) {
-                    plugin.toollib.giveTool(e.player, EHGuiTool.ID)
+                    plugin.toollib.giveTool(e.player, MainGuiTool.ID)
                 }
                 plugin.guilib?.clearStory(e.player)
             }

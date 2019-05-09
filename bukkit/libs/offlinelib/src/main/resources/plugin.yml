@@ -1,6 +1,7 @@
 name: OfflineLib
 version: @version@
-main: dialight.offlinelib.OfflinePlugin
+main: dialight.offlinelib.OfflineLibPlugin
 api-version: 1.13
 authors: [DiaLight]
 description: Useful tool to help event masters with theirs job
+depend: [EventHelper]

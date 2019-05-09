@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
-public abstract class ObservableCollection<E> {
+public abstract class ObservableCollection<E> implements Collection<E> {
 
     private final Collection<Consumer<E>> onAdd = new LinkedList<>();
     private final Collection<Consumer<E>> onRemove = new LinkedList<>();
@@ -28,7 +28,7 @@ public abstract class ObservableCollection<E> {
     }
 
 
-    abstract boolean add(E element);
-    abstract boolean remove(E element);
+//    public abstract boolean add(E element);
+//    public abstract boolean remove(E element);
 
 }

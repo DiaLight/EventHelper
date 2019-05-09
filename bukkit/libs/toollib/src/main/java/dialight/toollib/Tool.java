@@ -1,15 +1,13 @@
 package dialight.toollib;
 
-import dialight.exceptions.Todo;
 import dialight.extensions.Colorizer;
+import dialight.extensions.ItemStackBuilder;
 import dialight.toollib.events.ToolInteractEvent;
-import lombok.Getter;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,12 +15,6 @@ public abstract class Tool {
 
     private static final String prefix = Colorizer.apply("|dgr|Tool ID: |gr|");
     private static final Pattern pattern = Pattern.compile("^" + prefix + "(.*)$");
-
-    @Getter private final String id;
-
-    public Tool(String id) {
-        this.id = id;
-    }
 
     @Nullable public static String parseId(ItemStack item) {
         if(item == null) return null;
@@ -44,6 +36,24 @@ public abstract class Tool {
         return matcher.group(1);
     }
 
+    private final String id;
+
+    public Tool(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public ItemStack applyId(ItemStack item) {
+        return new ItemStackBuilder(item)
+                .addLore(prefix + id)
+                .build();
+    }
+
     public abstract void onClick(ToolInteractEvent event);
+
+    public abstract ItemStack createItem();
 
 }

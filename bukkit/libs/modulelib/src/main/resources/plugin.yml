@@ -1,6 +1,7 @@
 name: ModuleLib
 version: @version@
-main: dialight.modulelib.ModulePlugin
+main: dialight.modulelib.ModuleLibPlugin
 api-version: 1.13
 authors: [DiaLight]
 description: Useful tool to help event masters with theirs job
+depend: [EventHelper]

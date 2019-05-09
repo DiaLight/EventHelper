@@ -1,7 +1,7 @@
 package dialight.oldpvp
 
 import com.google.inject.Inject
-import dialight.ehgui.EHGuiPlugin
+import dialight.maingui.MainGuiPlugin
 import dialight.extensions.getPluginInstance
 import dialight.guilib.GuiPlugin
 import dialight.modulelib.ModulePlugin
@@ -25,7 +25,7 @@ class OldPvPPlugin @Inject constructor(
         private set
     var guilib: GuiPlugin? = null
         private set
-    var eh: EHGuiPlugin? = null
+    var eh: MainGuiPlugin? = null
         private set
 
     val module = OldPvPModule(this)
@@ -35,7 +35,7 @@ class OldPvPPlugin @Inject constructor(
     fun onConstruction(event: GameConstructionEvent) {
         modulelib = pluginManager.getPluginInstance("modulelib")!!
         guilib = pluginManager.getPluginInstance("guilib")
-        eh = pluginManager.getPluginInstance("ehgui")
+        eh = pluginManager.getPluginInstance("maingui")
     }
 
     @Listener

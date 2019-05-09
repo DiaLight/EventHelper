@@ -1,6 +1,6 @@
 package dialight.teams
 
-import dialight.ehgui.EHGuiTool
+import dialight.maingui.MainGuiTool
 import dialight.extensions.ItemStackBuilderEx
 import dialight.toollib.Tool
 import dialight.toollib.events.ToolInteractEvent
@@ -60,7 +60,7 @@ class TeamsTool(val plugin: TeamsPlugin) : Tool(TeamsTool.ID) {
             }
             ToolInteractEvent.Action.DROP -> {
                 if(plugin.eh != null) {
-                    plugin.toollib.giveTool(e.player, EHGuiTool.ID)
+                    plugin.toollib.giveTool(e.player, MainGuiTool.ID)
                 }
                 plugin.guilib?.clearStory(e.player)
             }

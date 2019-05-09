@@ -1,6 +1,6 @@
 package dialight.freezer
 
-import dialight.ehgui.EHGuiTool
+import dialight.maingui.MainGuiTool
 import dialight.extensions.Utils
 import dialight.teleporter.Teleporter
 import dialight.toollib.Tool
@@ -63,7 +63,7 @@ class FreezerTool(val plugin: FreezerPlugin) : Tool(FreezerTool.ID) {
             }
             ToolInteractEvent.Action.DROP -> {
                 plugin.eh?.also { eh ->
-                    plugin.toollib.giveTool(e.player, EHGuiTool.ID)
+                    plugin.toollib.giveTool(e.player, MainGuiTool.ID)
                 }
                 plugin.guilib?.clearStory(e.player)
             }

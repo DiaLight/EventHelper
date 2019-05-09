@@ -1,23 +1,29 @@
 package dialight.teleporter;
 
-import org.bukkit.plugin.PluginDescriptionFile;
+import dialight.eventhelper.EventHelper;
+import dialight.eventhelper.project.Project;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class TeleporterPlugin extends JavaPlugin {
+public final class TeleporterPlugin extends JavaPlugin {
 
-    private final TeleporterCore core = new TeleporterCore(this);
+    private Teleporter proj = new Teleporter(this);
+    private EventHelper eh;
+
+    @Override
+    public void onLoad() {
+        eh = (EventHelper) getServer().getPluginManager().getPlugin("EventHelper");
+        if(eh == null) throw new RuntimeException("Eventhelper required");
+        eh.register(getName(), proj.getApi());
+    }
 
     @Override
     public void onEnable() {
-        core.enable();
-
-        PluginDescriptionFile desc = getDescription();
-        getLogger().info( desc.getName() + " version " + desc.getVersion() + " is enabled!" );
+        this.proj.enable(eh);
     }
 
     @Override
     public void onDisable() {
-        core.disable();
+        this.proj.disable();
     }
 
 }
