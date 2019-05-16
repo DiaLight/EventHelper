@@ -36,6 +36,7 @@ class Colorizer(texts: MutableList<String>) {
             currentChar = string[index++]
             if (skipNext) {
                 state.text.append(currentChar)
+                skipNext = false
                 continue
             }
             when (currentChar) {
