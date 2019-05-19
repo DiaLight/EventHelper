@@ -13,17 +13,17 @@ import java.util.UUID;
 public class TeleporterGui implements Gui {
 
     private final Teleporter proj;
-    private final Map<UUID, SelectedViewState> layoutMap = new HashMap<>();
+    private final Map<UUID, TeleporterViewState> layoutMap = new HashMap<>();
 
     public TeleporterGui(Teleporter proj) {
         this.proj = proj;
     }
 
-    public SelectedViewState getOrCreateLayout(Player player) {
-        SelectedViewState state = layoutMap.get(player.getUniqueId());
+    public TeleporterViewState getOrCreateLayout(Player player) {
+        TeleporterViewState state = layoutMap.get(player.getUniqueId());
         if(state != null) return state;
         SelectedPlayers selected = proj.getSelectedPlayers(player.getUniqueId());
-        state = new SelectedViewState(proj, selected);
+        state = new TeleporterViewState(proj, selected);
         layoutMap.put(player.getUniqueId(), state);
         return state;
     }

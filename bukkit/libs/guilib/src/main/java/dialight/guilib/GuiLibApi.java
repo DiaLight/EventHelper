@@ -27,5 +27,8 @@ public class GuiLibApi implements ProjectApi {
     public List<Player> getViewers(Gui gui) {
         return proj.getViewers(gui);
     }
+    public void openPrev(Player player) {
+        proj.openPrev(player);
+    }
 
 }

@@ -37,6 +37,7 @@ val allVersion: String by rootProject.ext
 val mcVersion: String by rootProject.ext
 
 var libDir: String by ext
+var libDirs: List<String> by ext
 var configureProject: Project.(List<String>, List<String>) -> Unit by ext
 
 configureProject = { join, deps ->
@@ -110,3 +111,5 @@ configureProject = { join, deps ->
 }
 
 libDir = buildProps.getProperty("bukkitLibDir", "$buildDir/libs")
+libDirs = buildProps.getProperty("bukkitLibDirs", "").split(";").filter { it.isNotEmpty() }
+libDirs = libDirs + libDir

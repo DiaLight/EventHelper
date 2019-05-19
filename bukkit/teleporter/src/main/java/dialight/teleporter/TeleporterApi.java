@@ -1,6 +1,11 @@
 package dialight.teleporter;
 
 import dialight.eventhelper.project.ProjectApi;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class TeleporterApi implements ProjectApi {
 
@@ -10,4 +15,11 @@ public class TeleporterApi implements ProjectApi {
         this.proj = proj;
     }
 
+    @NotNull public SelectedPlayers getSelectedPlayers(UUID uuid) {
+        return proj.getSelectedPlayers(uuid);
+    }
+
+    public void teleport(OfflinePlayer op, Location loc) {
+        proj.teleport(op, loc);
+    }
 }

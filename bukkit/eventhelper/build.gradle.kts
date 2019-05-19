@@ -15,6 +15,7 @@ val allVersion: String by rootProject.ext
 val mcVersion: String by rootProject.ext
 
 val libDir: String by project(":bukkit").ext
+val libDirs: List<String> by project(":bukkit").ext
 var configureProject: Project.(List<String>, List<String>) -> Unit by project(":bukkit").ext
 
 val parts = arrayOf(
@@ -26,7 +27,7 @@ val parts = arrayOf(
     ":bukkit:maingui",
     ":bukkit:teleporter",
     ":bukkit:freezer",
-//    ":bukkit:teams",
+    ":bukkit:teams",
 //    ":bukkit:random",
     ":bukkit:autorespawn"
 //    ":bukkit:oldpvp",  // not ready yet
@@ -116,17 +117,26 @@ task("copyToServer_allInOne", Copy::class) {
     into(libDir)
     outputs.upToDateWhen { false }  // update every time
 }
-task("copyToServer_allInOne_update", Copy::class) {
+task("copyToServer_allInOne_update") {
     dependsOn(tasks["fatJar_allInOne"])
     val jar = tasks["fatJar_allInOne"] as Jar
-    from(jar)
-    this.rename {
-        val dir = FilenameUtils.getFullPathNoEndSeparator(it)
-        val name = FilenameUtils.getBaseName(it).split("-")[0]
-        return@rename "$dir/$name.jar"
-    }
-    into(libDir)
     outputs.upToDateWhen { false }  // update every time
+//    into("")
+    libDirs.forEach {
+//        from(jar) {
+//            into(it)
+//        }
+        copy {
+            this.rename {
+                val dir = FilenameUtils.getFullPathNoEndSeparator(it)
+                val name = FilenameUtils.getBaseName(it).split("-")[0]
+                return@rename "$dir/$name.jar"
+            }
+            from(jar)
+            into(it)
+            outputs.upToDateWhen { false }  // update every time
+        }
+    }
 }
 task("copyToServer_splitted", Copy::class) {
     doFirst {

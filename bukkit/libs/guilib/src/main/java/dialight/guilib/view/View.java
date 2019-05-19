@@ -1,8 +1,8 @@
 package dialight.guilib.view;
 
-import dialight.guilib.layout.SlotLayout;
-import dialight.guilib.layout.LayoutListener;
 import dialight.guilib.gui.Gui;
+import dialight.guilib.layout.LayoutListener;
+import dialight.guilib.layout.SlotLayout;
 import dialight.guilib.slot.LocSlot;
 import dialight.nms.InventoryNms;
 import org.bukkit.Bukkit;
@@ -13,6 +13,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 /**
  * Created by DiaLight on 09.06.2016.
@@ -51,7 +54,9 @@ public abstract class View<G extends Gui, L extends SlotLayout> implements Inven
 
     @Nullable public abstract LocSlot getSlot(Player player, int index);
 
-    public void onOutsideClick(Player player, ClickType click) {}
+    public void onOutsideClick(Player player, ClickType click) {
+
+    }
 
     public void onOpen(Player player) {
     }
@@ -71,6 +76,13 @@ public abstract class View<G extends Gui, L extends SlotLayout> implements Inven
 
     @NotNull public String getTitle() {
         return title;
+    }
+
+    public Collection<Player> getViewers() {
+        return inventory.getViewers().stream()
+                .filter(he -> he instanceof Player)
+                .map(he -> (Player) he)
+                .collect(Collectors.toList());
     }
 
 }

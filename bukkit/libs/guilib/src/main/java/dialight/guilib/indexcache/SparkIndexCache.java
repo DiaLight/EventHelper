@@ -49,12 +49,12 @@ public class SparkIndexCache extends IndexCache {
                 flush();
             }
             while(left <= rhalfw || up <= rhalfh) {
-                renderVertical();
-                renderUp();
-                up++;
                 renderHorizontal();
                 renderLeft();
                 left++;
+                renderVertical();
+                renderUp();
+                up++;
             }
         }
         void renderLeft() {

@@ -8,6 +8,7 @@ import dialight.guilib.GuiLibApi;
 import dialight.maingui.MainGuiApi;
 import dialight.offlinelib.OfflineLibApi;
 import dialight.teleporter.gui.TeleporterGui;
+import dialight.teleporter.gui.TeleporterSlot;
 import dialight.toollib.ToolLibApi;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -44,7 +45,7 @@ public class Teleporter extends Project {
         gui = new TeleporterGui(this);
 
         maingui.registerToolItem(TeleporterTool.ID, new TeleporterSlot(this));
-        toollib.getTools().add(tool);
+        toollib.register(tool);
     }
 
     @Override public void disable() {

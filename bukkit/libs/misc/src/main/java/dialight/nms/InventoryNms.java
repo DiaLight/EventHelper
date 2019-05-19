@@ -1,12 +1,16 @@
 package dialight.nms;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.EnumMap;
+import java.util.Map;
 
 public class InventoryNms {
 
@@ -19,6 +23,7 @@ public class InventoryNms {
     private static Field f_EntityPlayer_activeContainer;
     private static Field f_Container_windowId;
     private static Constructor<?> c_PacketOpenWindow;
+    private static Class<?> Containers_class;
 
     public static void sendInventoryTitle(@NotNull Player player, Inventory inventory, String title) {
         try {
@@ -42,8 +47,10 @@ public class InventoryNms {
                 sendPacket5a6a7(nms_PlayerConnection, nms_EntityPlayer, nms_Container, windowId, inventory, title, false);
             } else if (ReflectionUtils.MINOR_VERSION <= 7) {  // 1.7.X
                 sendPacket5a6a7(nms_PlayerConnection, nms_EntityPlayer, nms_Container, windowId, inventory, title, true);
-            } else {  // 1.8.X - ...
+            } else if (ReflectionUtils.MINOR_VERSION <= 13) {  // 1.8.X - 1.13.X
                 sendPacket8(nms_PlayerConnection, nms_EntityPlayer, nms_Container, windowId, inventory, title);
+            } else {  // 1.14 - ...
+                sendPacket14(nms_PlayerConnection, nms_EntityPlayer, nms_Container, windowId, inventory, title);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -203,6 +210,82 @@ public class InventoryNms {
 
         Object nms_title = ((Object[]) m_CraftChatMessage_fromString.invoke(null, title))[0];
         Object nms_packet = c_PacketOpenWindow.newInstance(windowId, id, nms_title, size);
+        sendPacket(nms_playerConnection, nms_packet);
+
+        m_EntityPlayer_updateInventory.invoke(nms_EntityPlayer, nms_Container);
+    }
+
+    private static final Map<InventoryType, Object> containerCache = new EnumMap<>(InventoryType.class);
+    @Nullable private static Object getContainer14(InventoryType type) {
+        Object container = containerCache.get(type);
+        if(container != null) return container;
+        switch (type) {
+            case ANVIL:
+                container = ReflectionUtils.getFieldValue(Containers_class, null, "ANVIL");
+                break;
+            case BEACON:
+                container = ReflectionUtils.getFieldValue(Containers_class, null, "BEACON");
+                break;
+            case BREWING:
+                container = ReflectionUtils.getFieldValue(Containers_class, null, "BREWING_STAND");
+                break;
+            case CRAFTING:
+                return null;
+            case CREATIVE:
+                return null;
+            case DISPENSER:
+            case DROPPER:
+                container = ReflectionUtils.getFieldValue(Containers_class, null, "GENERIC_3X3");
+                break;
+            case ENCHANTING:
+                container = ReflectionUtils.getFieldValue(Containers_class, null, "ENCHANTMENT");
+                break;
+            case ENDER_CHEST:
+            case CHEST:
+                container = ReflectionUtils.getFieldValue(Containers_class, null, "GENERIC_9X6");
+                break;
+            case FURNACE:
+                container = ReflectionUtils.getFieldValue(Containers_class, null, "FURNACE");
+                break;
+            case HOPPER:
+                container = ReflectionUtils.getFieldValue(Containers_class, null, "HOPPER");
+                break;
+            case MERCHANT:
+                container = ReflectionUtils.getFieldValue(Containers_class, null, "MERCHANT");
+                break;
+            case PLAYER:
+                return null;
+            case WORKBENCH:
+                container = ReflectionUtils.getFieldValue(Containers_class, null, "CRAFTING");
+                break;
+            default:
+                return null;
+        }
+        containerCache.put(type, container);
+        return container;
+    }
+    private static void sendPacket14(Object nms_playerConnection, Object nms_EntityPlayer, Object nms_Container, int windowId, Inventory inventory, String title) throws Exception {
+        if(Containers_class == null) Containers_class = ReflectionUtils.getNMSClass("Containers");
+        if (c_PacketOpenWindow == null) {
+            Class<?> IChatBaseComponent_class = ReflectionUtils.getNMSClass("IChatBaseComponent");
+            Class<?> PacketPlayOutOpenWindow_class = ReflectionUtils.getNMSClass("PacketPlayOutOpenWindow");
+            c_PacketOpenWindow = PacketPlayOutOpenWindow_class.getConstructor(int.class, Containers_class, IChatBaseComponent_class);
+        }
+
+        Object container = getContainer14(inventory.getType());
+        if(container == null) return;
+
+        if (m_CraftChatMessage_fromString == null) {
+            Class<?> craftChatMessage_class = ReflectionUtils.getCraftbukkitClass("util.CraftChatMessage");
+            m_CraftChatMessage_fromString = craftChatMessage_class.getMethod("fromString", String.class);
+        }
+        if (m_EntityPlayer_updateInventory == null) {
+            Class<?> Container_class = ReflectionUtils.getNMSClass("Container");
+            m_EntityPlayer_updateInventory = nms_EntityPlayer.getClass().getMethod("updateInventory", Container_class);
+        }
+
+        Object nms_title = ((Object[]) m_CraftChatMessage_fromString.invoke(null, title))[0];
+        Object nms_packet = c_PacketOpenWindow.newInstance(windowId, container, nms_title);
         sendPacket(nms_playerConnection, nms_packet);
 
         m_EntityPlayer_updateInventory.invoke(nms_EntityPlayer, nms_Container);

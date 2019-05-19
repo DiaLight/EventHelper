@@ -2,19 +2,16 @@ package dialight.teleporter.gui;
 
 import dialight.compatibility.ItemStackBuilderBc;
 import dialight.extensions.Colorizer;
-import dialight.extensions.GuiUtils;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.layout.NamedLayout;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
-import dialight.guilib.view.Scroll9x5View;
+import dialight.guilib.view.extensions.NamedLayoutScroll9x5View;
 import dialight.teleporter.Teleporter;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
@@ -22,42 +19,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TeleporterView extends Scroll9x5View<TeleporterGui, SelectedViewState> {
+public class TeleporterView extends NamedLayoutScroll9x5View<TeleporterGui, TeleporterViewState> {
 
-    private final Slot selectView;
-    private final Slot groupselect;
     private final Slot background;
-    private final Slot backward;
-    private final Slot forward;
+    private final Slot selectView;
+    private final Slot groupSelect;
 
-    public TeleporterView(TeleporterGui gui, SelectedViewState layout) {
-        super(gui, layout, "");
+    public TeleporterView(TeleporterGui gui, TeleporterViewState layout) {
+        super(gui, layout);
         Teleporter proj = getGui().getTeleporter();
         PluginDescriptionFile desc = proj.getPlugin().getDescription();
-        selectView = new StaticSlot(new ItemStackBuilder(Material.BOOK)
-                .displayName("Выбор представления данных")
-                .lore(Colorizer.asList(
-                        "|a|ЛКМ|y|: Все игроки",
-                        "|a|ПКМ|y|: Выделенные",
-                        //                    "|a|Shift|y|+|a|ЛКМ|y|: ",
-                        "|a|Shift|y|+|a|ПКМ|y|: Не выделенные"
-                ))
-                .build()) {
-            @Override
-            public void onClick(SlotClickEvent e) {
-                switch (e.getEvent().getClick()) {
-                    case LEFT: {
-                        getLayout().setCurrent(getLayout().getAllLayout());
-                    } break;
-                    case RIGHT: {
-                        getLayout().setCurrent(getLayout().getSelectedLayout());
-                    } break;
-                    case SHIFT_RIGHT: {
-                        getLayout().setCurrent(getLayout().getUnselectedLayout());
-                    } break;
-                }
-            }
-        };
         background = new Slot() {
             @Override
             public void onClick(SlotClickEvent e) {
@@ -78,17 +49,8 @@ public class TeleporterView extends Scroll9x5View<TeleporterGui, SelectedViewSta
                             ItemStackBuilderBc.of(builder).stainedGlassPane(colorf);
                         })
                         .displayName("Телепорт")
-                        .lore(Colorizer.asList(
-                                "|r|Для верного отображения",
-                                "|r|заголовков столбцов",
-                                "|r|используйте шрифт Unicode.",
-                                "|w|Навигация",
-                                "|a|ЛКМ снаружи инвертаря|y|:",
-                                "|y| Скролл влево",
-                                "|a|ПКМ снаружи инвертаря|y|:",
-                                "|y| Скролл вправо",
-                                "|a|СКМ снаружи инвертаря|y|:",
-                                "|y| Вернуться назад",
+                        .lore(DEFAULT_BACKGROUND_LORE)
+                        .addLore(Colorizer.asList(
                                 "",
                                 "|g|Плагин: |y|Телепорт",
                                 "|g|Версия: |y|v" + desc.getVersion()
@@ -96,7 +58,31 @@ public class TeleporterView extends Scroll9x5View<TeleporterGui, SelectedViewSta
                         .build();
             }
         };
-        groupselect = new StaticSlot(new ItemStackBuilder(Material.STICK)
+        selectView = new StaticSlot(new ItemStackBuilder(Material.BOOK)
+                .displayName("Выбор представления данных")
+                .lore(Colorizer.asList(
+                        "|a|ЛКМ|y|: Все игроки",
+                        "|a|ПКМ|y|: Выделенные",
+//                        "|a|Shift|y|+|a|ЛКМ|y|: ",
+                        "|a|Shift|y|+|a|ПКМ|y|: Не выделенные"
+                ))
+                .build()) {
+            @Override
+            public void onClick(SlotClickEvent e) {
+                switch (e.getEvent().getClick()) {
+                    case LEFT: {
+                        getLayout().setCurrent(getLayout().getAllLayout());
+                    } break;
+                    case RIGHT: {
+                        getLayout().setCurrent(getLayout().getSelectedLayout());
+                    } break;
+                    case SHIFT_RIGHT: {
+                        getLayout().setCurrent(getLayout().getUnselectedLayout());
+                    } break;
+                }
+            }
+        };
+        groupSelect = new StaticSlot(new ItemStackBuilder(Material.STICK)
                 .displayName("Групповое выделение")
                 .lore(Colorizer.asList(
                         "|a|ЛКМ|y|: Выделить всех",
@@ -126,76 +112,6 @@ public class TeleporterView extends Scroll9x5View<TeleporterGui, SelectedViewSta
                 }
             }
         };
-        backward = new StaticSlot(new ItemStackBuilder()
-                .let(builder -> {
-                    ItemStackBuilderBc.of(builder).playerHead();
-                })
-                .displayName("Влево")
-                .lore(Colorizer.asList(
-                        "|a|ЛКМ|y|: Скролл влево",
-                        "|a|Shift|y|+|a|ЛКМ|y|: Перейти на предыдущую страницу"
-                ))
-                .nbt(GuiUtils.BACKWARD_NBT)
-                .build()) {
-            @Override
-            public void onClick(SlotClickEvent e) {
-                switch (e.getEvent().getClick()) {
-                    case LEFT: {
-                        moveBackward(1);
-                    } break;
-                    case SHIFT_LEFT: {
-                        moveBackward(width);
-                    } break;
-                }
-            }
-        };
-        forward = new StaticSlot(new ItemStackBuilder()
-                .let(builder -> {
-                    ItemStackBuilderBc.of(builder).playerHead();
-                })
-                .displayName("Вправо")
-                .lore(Colorizer.asList(
-                        "|a|ЛКМ|y|: Скролл вправо",
-                        "|a|Shift|y|+|a|ЛКМ|y|: Перейти на следующую страницу"
-                ))
-                .nbt(GuiUtils.FORWARD_NBT)
-                .build()) {
-            @Override
-            public void onClick(SlotClickEvent e) {
-                switch (e.getEvent().getClick()) {
-                    case LEFT: {
-                        moveForward(1);
-                    } break;
-                    case SHIFT_LEFT: {
-                        moveForward(width);
-                    }
-                }
-            }
-        };
-    }
-
-    @Override
-    public void onOutsideClick(Player player, ClickType click) {
-        switch (click) {
-            case LEFT: {
-                moveBackward(1);
-            } break;
-            case SHIFT_LEFT: {
-                moveBackward(width);
-            }
-            case RIGHT: {
-                moveForward(1);
-            } break;
-            case SHIFT_RIGHT: {
-                moveForward(width);
-            } break;
-        }
-    }
-
-    @Override protected int calcLimit() {
-        int limit = getLayout().getWidth() - width;
-        if(limit < 0) limit = 0;
-        return limit;
     }
 
     @Override protected void updateView() {
@@ -204,27 +120,21 @@ public class TeleporterView extends Scroll9x5View<TeleporterGui, SelectedViewSta
             if(x == 0) {
                 setBotPaneSlot(x, selectView);
             } else if(x == 1) {
-                setBotPaneSlot(x, groupselect);
+                setBotPaneSlot(x, groupSelect);
             } else if(x == 3 && offset != 0) {
-                setBotPaneSlot(x, backward);
+                setBotPaneSlot(x, defaultBackward);
             } else if(x == 5 && offset != limit) {
-                setBotPaneSlot(x, forward);
+                setBotPaneSlot(x, defaultForward);
             } else {
                 setBotPaneSlot(x, background);
             }
         }
     }
 
-    @Override protected void updateTitle() {
-        SelectedViewState state = getLayout();
-        NamedLayout<OfflinePlayer> layout = state.getCurrent();
-        String header = layout.buildColumnsHeader(offset, width);
-        StringBuilder titleBuilder = new StringBuilder();
-        for (int i = 0; i < header.length(); i++) {
-            char c = header.charAt(i);
-            titleBuilder.append("  ").append(c);
-            titleBuilder.append((i % 2 == 0) ? " " : "  ");
-        }
-        setTitle(titleBuilder.toString());
+
+    @Override
+    public NamedLayout getNamedLayout() {
+        return getLayout().getCurrent();
     }
+
 }

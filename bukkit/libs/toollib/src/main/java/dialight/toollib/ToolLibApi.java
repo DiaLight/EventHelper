@@ -2,8 +2,6 @@ package dialight.toollib;
 
 import dialight.eventhelper.project.ProjectApi;
 import dialight.observable.collection.ObservableCollection;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 public class ToolLibApi implements ProjectApi {
@@ -15,14 +13,15 @@ public class ToolLibApi implements ProjectApi {
     }
 
     public ObservableCollection<Tool> getTools() {
-        return proj.getTools();
+        return proj.getImmutableObservable();
     }
 
-    public void giveTool(Player player, String id) {
-        this.proj.giveTool(player, id);
+    public void register(Tool tool) {
+        this.proj.register(tool);
     }
 
-    @Nullable public ItemStack buildItem(String id) {
-        return proj.buildItem(id);
+    @Nullable public <T extends Tool> T get(Class<T> clazz) {
+        return this.proj.getTool(clazz);
     }
+
 }

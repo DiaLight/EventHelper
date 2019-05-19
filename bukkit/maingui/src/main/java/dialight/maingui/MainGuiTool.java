@@ -12,37 +12,12 @@ public class MainGuiTool extends Tool {
 
     public static final String ID = "maingui";
     private final MainGuiProject proj;
+    private final ItemStack item;
 
     public MainGuiTool(MainGuiProject proj) {
         super(ID);
         this.proj = proj;
-    }
-
-    @Override
-    public void onClick(ToolInteractEvent event) {
-        switch (event.getAction()) {
-            case LEFT_CLICK: if(!event.isSneaking()) {
-
-            } else {
-                ItemStack is = event.getPlayer().getInventory().getItem(8);
-                if(is != null && is.getType() != Material.AIR) {
-                    ItemStackNms.dump(is);
-                }
-            } break;
-            case RIGHT_CLICK: if(!event.isSneaking()) {
-                proj.getGuilib().clearStory(event.getPlayer());
-                proj.getGuilib().openGui(event.getPlayer(), proj.getGui());
-            } else {
-                if(proj.getGuilib().openLast(event.getPlayer()) != null) {
-                    proj.getGuilib().openGui(event.getPlayer(), proj.getGui());
-                }
-            } break;
-        }
-    }
-
-    @Override
-    public ItemStack createItem() {
-        return new ItemStackBuilder(Material.EMERALD)
+        item = new ItemStackBuilder(Material.EMERALD)
                 .displayName(Colorizer.apply("|a|Вещь всея Майнкрафта"))
                 .lore(Colorizer.asList(
                         "|a|ПКМ|y|: Открыть «Инвентарь EventHelper»",
@@ -50,7 +25,33 @@ public class MainGuiTool extends Tool {
                         "|y| инентарь",
                         "|y|Аналог: |g|/eh"
                 ))
+                .let(this::applyId)
                 .build();
+    }
+
+    @Override public void onClick(ToolInteractEvent e) {
+        switch (e.getAction()) {
+            case LEFT_CLICK: if(!e.isSneaking()) {
+
+            } else {
+                ItemStack is = e.getPlayer().getInventory().getItem(8);
+                if(is != null && is.getType() != Material.AIR) {
+                    ItemStackNms.dump(is);
+                }
+            } break;
+            case RIGHT_CLICK: if(!e.isSneaking()) {
+                proj.getGuilib().clearStory(e.getPlayer());
+                proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
+            } else {
+                if(proj.getGuilib().openLast(e.getPlayer()) != null) {
+                    proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
+                }
+            } break;
+        }
+    }
+
+    @Override public ItemStack createItem() {
+        return item;
     }
 
 }

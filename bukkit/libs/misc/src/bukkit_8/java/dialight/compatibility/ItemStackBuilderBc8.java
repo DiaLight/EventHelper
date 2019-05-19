@@ -10,14 +10,20 @@ public class ItemStackBuilderBc8 extends ItemStackBuilderBc {
         super(builder);
     }
 
-    public ItemStackBuilderBc stainedGlassPane(DyeColor color) {
+    @Override public ItemStackBuilderBc stainedGlassPane(DyeColor color) {
         builder.reset(Material.STAINED_GLASS_PANE);
         builder.durability(color.getWoolData());
         return this;
     }
 
-    public ItemStackBuilderBc bed(DyeColor color) {
+    @Override public ItemStackBuilderBc bed(DyeColor color) {
         builder.reset(Material.BED);
+        builder.durability(color.getWoolData());
+        return this;
+    }
+
+    @Override public ItemStackBuilderBc banner(DyeColor color) {
+        builder.reset(Material.BANNER);
         builder.durability(color.getWoolData());
         return this;
     }

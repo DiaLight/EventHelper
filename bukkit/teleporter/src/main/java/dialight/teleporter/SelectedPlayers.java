@@ -39,7 +39,7 @@ public class SelectedPlayers extends ObservableCollectionWrapper<UUID> {
 
     public void removeAllPlayers(Collection<? extends OfflinePlayer> offline) {
         for (OfflinePlayer player : offline) {
-            remove(player);
+            remove(player.getUniqueId());
         }
     }
 }

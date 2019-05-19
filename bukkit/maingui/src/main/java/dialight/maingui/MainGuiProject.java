@@ -41,7 +41,7 @@ public class MainGuiProject extends Project {
         tool = new MainGuiTool(this);
 
         registerToolSlot(MainGuiTool.ID, new MainGuiSlot(this));
-        toollib.getTools().add(tool);
+        toollib.register(tool);
 
         PluginCommand eventhelper = getPlugin().getCommand("eventhelper");
         eventhelper.setExecutor(new MainGuiCommand(this));
@@ -72,6 +72,10 @@ public class MainGuiProject extends Project {
 
     public MainGui getGui() {
         return gui;
+    }
+
+    public MainGuiTool getTool() {
+        return tool;
     }
 
     public void registerToolSlot(String id, Slot slot) {

@@ -1,16 +1,20 @@
 package dialight.guilib.view;
 
 import dialight.compatibility.ItemStackBuilderBc;
+import dialight.extensions.Colorizer;
+import dialight.extensions.GuiUtils;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.gui.Gui;
 import dialight.guilib.layout.SlotLayout;
 import dialight.guilib.slot.*;
 import org.bukkit.DyeColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  *
@@ -39,14 +43,35 @@ public class Scroll9x5View<G extends Gui, L extends SlotLayout> extends View<G, 
     protected String prefix;
     protected int offset = 0;
 
-    private final Slot defaultBackground = new StaticSlot(new ItemStackBuilder()
+    protected static final List<String> DEFAULT_BACKGROUND_LORE = Colorizer.asList(
+            "|r|Для верного отображения",
+            "|r|заголовков столбцов",
+            "|r|используйте шрифт Unicode.",
+            "|w|Навигация",
+            "|a|ЛКМ снаружи инвертаря|y|:",
+            "|y| Скролл влево",
+            "|a|ПКМ снаружи инвертаря|y|:",
+            "|y| Скролл вправо",
+            "|a|СКМ снаружи инвертаря|y|:",
+            "|y| Вернуться назад"
+    );
+    protected final Slot defaultBackground = new StaticSlot(new ItemStackBuilder()
             .let(builder -> {
                 ItemStackBuilderBc.of(builder).stainedGlassPane(DyeColor.LIGHT_BLUE);
             })
-            .displayName("")
+            .displayName(" ")
+            .lore(DEFAULT_BACKGROUND_LORE)
             .build());
-    private final Slot defaultBackward = new StaticSlot(new ItemStackBuilder(Material.ARROW)
-            .displayName("Backward")
+    protected final Slot defaultBackward = new StaticSlot(new ItemStackBuilder()
+            .let(builder -> {
+                ItemStackBuilderBc.of(builder).playerHead();
+            })
+            .displayName("Влево")
+            .lore(Colorizer.asList(
+                    "|a|ЛКМ|y|: Скролл влево",
+                    "|a|Shift|y|+|a|ЛКМ|y|: Перейти на предыдущую страницу"
+            ))
+            .nbt(GuiUtils.BACKWARD_NBT)
             .build()) {
         @Override
         public void onClick(SlotClickEvent e) {
@@ -60,8 +85,16 @@ public class Scroll9x5View<G extends Gui, L extends SlotLayout> extends View<G, 
             }
         }
     };
-    private final Slot defaultForward = new StaticSlot(new ItemStackBuilder(Material.ARROW)
-            .displayName("Forward")
+    protected final Slot defaultForward = new StaticSlot(new ItemStackBuilder()
+            .let(builder -> {
+                ItemStackBuilderBc.of(builder).playerHead();
+            })
+            .displayName("Вправо")
+            .lore(Colorizer.asList(
+                    "|a|ЛКМ|y|: Скролл вправо",
+                    "|a|Shift|y|+|a|ЛКМ|y|: Перейти на следующую страницу"
+            ))
+            .nbt(GuiUtils.FORWARD_NBT)
             .build()) {
         @Override
         public void onClick(SlotClickEvent e) {
@@ -85,6 +118,23 @@ public class Scroll9x5View<G extends Gui, L extends SlotLayout> extends View<G, 
         int limit = getLayout().getWidth() - 1;
         if(limit < 0) limit = 0;
         return limit;
+    }
+
+    @Override public void onOutsideClick(Player player, ClickType click) {
+        switch (click) {
+            case LEFT: {
+                moveBackward(1);
+            } break;
+            case SHIFT_LEFT: {
+                moveBackward(width);
+            }
+            case RIGHT: {
+                moveForward(1);
+            } break;
+            case SHIFT_RIGHT: {
+                moveForward(width);
+            } break;
+        }
     }
 
     public void moveBackward(int dx) {

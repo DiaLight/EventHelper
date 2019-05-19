@@ -4,6 +4,7 @@ import dialight.observable.collection.ObservableCollection;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -89,12 +90,12 @@ public class OnlineObservable extends ObservableCollection<Player> implements Li
         throw new IllegalArgumentException("OnlineObservable is immutable");
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerJoin(PlayerJoinEvent e) {
         fireAdd(e.getPlayer());
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
         proj.runTask(() -> fireRemove(player));

@@ -1,9 +1,12 @@
-package dialight.teleporter;
+package dialight.teleporter.gui;
 
+import dialight.compatibility.PlayerInventoryBc;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
+import dialight.teleporter.Teleporter;
+import dialight.teleporter.TeleporterTool;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -37,10 +40,13 @@ public class TeleporterSlot implements Slot {
             case LEFT:
             case SHIFT_LEFT: {
                 player.closeInventory();
-                proj.getToollib().giveTool(player, TeleporterTool.ID);
+                TeleporterTool tool = proj.getToollib().get(TeleporterTool.class);
+                if (tool != null) {
+                    PlayerInventoryBc.of(e.getPlayer().getInventory()).setItemInMainHand(tool.createItem());
+                }
             } break;
             case RIGHT: {
-//                plugin.guilib?.openGui(player, plugin.teleportergui)
+                proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
             } break;
         }
     }

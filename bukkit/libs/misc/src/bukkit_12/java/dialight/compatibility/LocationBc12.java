@@ -9,7 +9,11 @@ public class LocationBc12 extends LocationBc {
     }
 
     @Override public Location toBlockLocation() {
-        return location.toBlockLocation();
+        Location blockLoc = location.clone();
+        blockLoc.setX(location.getBlockX());
+        blockLoc.setY(location.getBlockY());
+        blockLoc.setZ(location.getBlockZ());
+        return blockLoc;
     }
 
 }

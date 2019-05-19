@@ -43,7 +43,7 @@ public class ReflectionUtils {
         return Integer.parseInt(name.split("\\.")[0]);
     }
 
-    @Nullable public static Class<?> getNMSClass(String name) {
+    @NotNull public static Class<?> getNMSClass(String name) {
         try {
             return Class.forName("net.minecraft.server." + SERVER_VERSION + "." + name);
         } catch (ClassNotFoundException e) {
@@ -51,7 +51,7 @@ public class ReflectionUtils {
         }
     }
 
-    @Nullable public static Class<?> getCraftbukkitClass(String name) {
+    @NotNull public static Class<?> getCraftbukkitClass(String name) {
         try {
             return Class.forName("org.bukkit.craftbukkit." + SERVER_VERSION + "." + name);
         } catch (ClassNotFoundException e) {
@@ -90,9 +90,11 @@ public class ReflectionUtils {
         }
     }
 
-    @SuppressWarnings("unused")
     public static void setFieldValue(Object obj, String name, Object value) {
-        Class<?> clazz = obj.getClass();
+        setFieldValue(obj.getClass(), obj, name, value);
+    }
+
+    public static void setFieldValue(Class<?> clazz, Object obj, String name, Object value) {
         Field field = getField(clazz, name);
         if (!field.isAccessible()) field.setAccessible(true);
         try {
@@ -103,8 +105,14 @@ public class ReflectionUtils {
     }
 
     @Nullable public static Object getFieldValue(Object obj, String name) {
-        Class<?> clazz = obj.getClass();
-        Field field = getField(clazz, name);
+        return getFieldValue(obj.getClass(), obj, name);
+    }
+
+    @Nullable public static Object getFieldValue(Class<?> clazz, Object obj, String name) {
+        return getFieldValue(getField(clazz, name), obj);
+    }
+
+    @Nullable public static Object getFieldValue(Field field, Object obj) {
         if (!field.isAccessible()) field.setAccessible(true);
         try {
             return field.get(obj);
@@ -223,12 +231,6 @@ public class ReflectionUtils {
         return throwMethodNotFound(clazz, ret, names, params);
     }
 
-    public static Method findSingleDeclaredMethod(Class<?> clazz, Class<?> ret, Class<?>... params) {
-        List<Method> methods = findDeclaredMethod(clazz, ret, params);
-        if(methods.isEmpty()) throw new NoSuchMethodError();
-        if(methods.size() != 1) throw new NoSuchMethodError("there couple of matched methods: " + methods);
-        return methods.get(0);
-    }
     public static List<Method> findDeclaredMethod(Class<?> clazz, Class<?> ret, Class<?>... params) {
         ArrayList<Method> result = new ArrayList<>();
         for (Method method : clazz.getDeclaredMethods()) {
@@ -238,8 +240,14 @@ public class ReflectionUtils {
         }
         return result;
     }
+    public static Method findSingleDeclaredMethod(Class<?> clazz, Class<?> ret, Class<?>... params) {
+        List<Method> methods = findDeclaredMethod(clazz, ret, params);
+        if(methods.isEmpty()) throw new NoSuchMethodError();
+        if(methods.size() != 1) throw new NoSuchMethodError("there couple of matched methods: " + methods);
+        return methods.get(0);
+    }
 
-    @NotNull private static Field getField(Class<?> clazz, String name) {
+    @NotNull public static Field getField(Class<?> clazz, String name) {
         try {
             return clazz.getField(name);
         } catch (NoSuchFieldException ignored) {}
@@ -247,6 +255,46 @@ public class ReflectionUtils {
             return clazz.getDeclaredField(name);
         } catch (NoSuchFieldException ignored) {}
         throw new NoSuchFieldError("? " + clazz.getSimpleName() + "." + name);
+    }
+
+    public static List<Field> findFields(Class<?> clazz, Class<?> type) {
+        ArrayList<Field> result = new ArrayList<>();
+        for (Field field : clazz.getFields()) {
+            if(field.getType() != type) continue;
+            result.add(field);
+        }
+        return result;
+    }
+
+    @Nullable public static Field findFirstFieldOrNull(Class<?> clazz, Class<?> type) {
+        List<Field> fields = findFields(clazz, type);
+        if(fields.isEmpty()) return null;
+        return fields.get(0);
+    }
+    @NotNull public static Field findFirstField(Class<?> clazz, Class<?> type) {
+        List<Field> fields = findFields(clazz, type);
+        if(fields.isEmpty()) throw new NoSuchMethodError(type.getSimpleName() + " " + clazz.getSimpleName());
+        return fields.get(0);
+    }
+
+    public static List<Field> findDeclaredFields(Class<?> clazz, Class<?> type) {
+        ArrayList<Field> result = new ArrayList<>();
+        for (Field field : clazz.getDeclaredFields()) {
+            if(field.getType() != type) continue;
+            result.add(field);
+        }
+        return result;
+    }
+
+    @Nullable public static Field findFirstDeclaredFieldOrNull(Class<?> clazz, Class<?> type) {
+        List<Field> fields = findDeclaredFields(clazz, type);
+        if(fields.isEmpty()) return null;
+        return fields.get(0);
+    }
+    @NotNull public static Field findFirstDeclaredField(Class<?> clazz, Class<?> type) {
+        List<Field> fields = findDeclaredFields(clazz, type);
+        if(fields.isEmpty()) throw new NoSuchMethodError(type.getSimpleName() + " " + clazz.getSimpleName());
+        return fields.get(0);
     }
 
     public static String formatMethods(Class<?> clazz) {
@@ -284,6 +332,17 @@ public class ReflectionUtils {
         String method = ret.getSimpleName() + " " + clazz.getSimpleName() + "." + names + args;
         System.err.println("NoSuchMethodError: " + method + "\n" + formatMethods(clazz));
         throw new NoSuchMethodError(method);
+    }
+
+    @NotNull public static <T> Constructor<? extends T> findCompatibleClass(Class<T> clazz, Class<?>... args) {
+        for (int minor = ReflectionUtils.MINOR_VERSION; minor >= 5; minor--) {
+            final String classPath = clazz.getName() + minor;
+            try {
+                Class<? extends T> act = (Class<? extends T>) Class.forName(classPath);
+                return act.getConstructor(args);
+            } catch (ClassNotFoundException | NoSuchMethodException ignore) {}
+        }
+        throw new RuntimeException("Unsupported version");
     }
 
 }

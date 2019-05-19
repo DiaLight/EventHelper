@@ -52,7 +52,7 @@ public class ToolListener implements Listener {
         Tool tool = identifyTool(item);
         if (tool == null) return;
         if (!proj.hasAccess(e.getPlayer())) return;
-        if (item.getType().isBlock()) return;
+//        if (item.getType().isBlock()) return;
         ToolInteractEvent toolEvent = null;
         switch(e.getAction()) {
             case LEFT_CLICK_AIR: {

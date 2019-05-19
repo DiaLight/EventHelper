@@ -1,8 +1,9 @@
 package dialight.eventhelper;
 
 import dialight.eventhelper.project.ProjectApi;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,10 +42,15 @@ public class EventHelper extends JavaPlugin {
     }
 
     @SuppressWarnings("unchecked")
-    public <P extends ProjectApi> P require(String name) {
+    @NotNull public <P extends ProjectApi> P require(String name) {
         ProjectApi project = this.projects.get(name);
         if(project == null) throw new RuntimeException("Project with name " + name + " is not registered");
         return (P) project;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable public <P extends ProjectApi> P optional(String name) {
+        return (P) this.projects.get(name);
     }
 
 }

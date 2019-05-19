@@ -42,6 +42,10 @@ val bcs = mapOf(
     "bukkit_13" to mapOf(
         "api" to "com.destroystokyo.paper:paper-api:1.13.2-R0.1-SNAPSHOT",
         "provided" to "org.bukkit:craftbukkit:1.13.2-R0.1-SNAPSHOT"
+    ),
+    "bukkit_14" to mapOf(
+        "api" to "org.spigotmc:spigot-api:1.14.1-R0.1-SNAPSHOT",
+        "provided" to "org.bukkit:craftbukkit:1.14.1-R0.1-SNAPSHOT"
     )
 )
 
@@ -67,11 +71,12 @@ dependencies {
         val implementation = configurations["${it.key}Implementation"]
         val compile = configurations["${it.key}Compile"]
         val compileOnly = configurations["${it.key}CompileOnly"]
-//        compileOnly(it.value["provided"]!!)
+        compileOnly(it.value["provided"]!!)
         implementation(it.value["api"]!!)
         implementation("org.jetbrains:annotations:13.0")
         compile(sourceSets["main"].output)
     }
+    compileOnly("io.netty:netty-all:4.1.9.Final")
 }
 
 bcs.forEach {

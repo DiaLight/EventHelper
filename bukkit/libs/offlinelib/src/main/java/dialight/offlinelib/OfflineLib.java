@@ -48,8 +48,8 @@ public class OfflineLib extends Project {
         HandlerList.unregisterAll(online);
         HandlerList.unregisterAll(offline);
         listener = null;
-        online = null;
-        offline = null;
+//        online = null;
+//        offline = null;
     }
 
     @Override

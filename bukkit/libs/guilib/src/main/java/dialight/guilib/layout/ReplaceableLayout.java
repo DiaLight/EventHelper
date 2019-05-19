@@ -20,10 +20,12 @@ public class ReplaceableLayout<L extends SlotLayout> extends SlotLayout implemen
 
 
     @Override public void subscribe(LayoutListener listener) {
+        if(optional == null) throw new IllegalStateException("You forget to set current layout in replaceable layout");
         if(this.subscribed.isEmpty()) optional.subscribe(this);
         super.subscribe(listener);
     }
     @Override public void unsubscribe(LayoutListener listener) {
+        if(optional == null) throw new IllegalStateException("You forget to set current layout in replaceable layout");
         super.unsubscribe(listener);
         if(this.subscribed.isEmpty()) optional.unsubscribe(this);
     }

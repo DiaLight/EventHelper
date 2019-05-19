@@ -1,11 +1,11 @@
 package dialight.eventhelper;
 
 import dialight.eventhelper.project.Project;
-import dialight.freezer.Freezer;
 import dialight.guilib.GuiLib;
 import dialight.maingui.MainGuiProject;
 import dialight.modulelib.ModuleLib;
 import dialight.offlinelib.OfflineLib;
+import dialight.teams.Teams;
 import dialight.teleporter.Teleporter;
 import dialight.toollib.ToolLib;
 
@@ -23,8 +23,9 @@ public final class EventHelperBuiltin extends EventHelper {
         builtinProjects.put("OfflineLib", new OfflineLib(this));
         builtinProjects.put("MainGui", new MainGuiProject(this));
         builtinProjects.put("Teleporter", new Teleporter(this));
-        builtinProjects.put("Freezer", new Freezer(this));
+//        builtinProjects.put("Freezer", new Freezer(this));
 //        builtinProjects.put("AutoRespawn", new AutoRespawn(this));
+        builtinProjects.put("Teams", new Teams(this));
         for(Map.Entry<String, Project> pair : builtinProjects.entrySet()) {
             register(pair.getKey(), pair.getValue().getApi());
         }

@@ -1,5 +1,6 @@
 package dialight.maingui;
 
+import dialight.compatibility.PlayerInventoryBc;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.gui.Gui;
@@ -28,16 +29,6 @@ public class MainGui implements Gui {
     public MainGui(MainGuiProject proj) {
         this.proj = proj;
 
-        ObservableCollection<Tool> tools = proj.getToollib().getTools();
-        tools.onAdd(toolsDataFlow::add);
-        tools.onRemove(toolsDataFlow::remove);
-        tools.forEach(toolsDataFlow::add);
-
-        ObservableCollection<Module> modules = proj.getModulelib().getModules();
-        modules.onAdd(modulesDataFlow::add);
-        modules.onRemove(modulesDataFlow::remove);
-        modules.forEach(modulesDataFlow::add);
-
         toolsDataFlow.setSlotFunction(tool -> {
             Slot slot = proj.getToolSlot(tool.getId());
             if(slot != null) return slot;
@@ -52,7 +43,7 @@ public class MainGui implements Gui {
                     switch (e.getEvent().getClick()) {
                         case LEFT: {
                             e.getPlayer().closeInventory();
-                            proj.getToollib().giveTool(e.getPlayer(), tool.getId());
+                            PlayerInventoryBc.of(e.getPlayer().getInventory()).setItemInMainHand(tool.createItem());
                         } break;
                     }
                 }
@@ -77,6 +68,15 @@ public class MainGui implements Gui {
                 }
             };
         });
+        ObservableCollection<Tool> tools = proj.getToollib().getTools();
+        tools.onAdd(toolsDataFlow::add);
+        tools.onRemove(toolsDataFlow::remove);
+        tools.forEach(toolsDataFlow::add);
+
+        ObservableCollection<Module> modules = proj.getModulelib().getModules();
+        modules.onAdd(modulesDataFlow::add);
+        modules.onRemove(modulesDataFlow::remove);
+        modules.forEach(modulesDataFlow::add);
     }
 
     @Override

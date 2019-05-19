@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class SelectedViewState extends ReplaceableLayout<NamedLayout<OfflinePlayer>> {
+public class TeleporterViewState extends ReplaceableLayout<NamedLayout<OfflinePlayer>> {
 
     private class SelectionSlot implements Slot {
 
@@ -103,7 +103,7 @@ public class SelectedViewState extends ReplaceableLayout<NamedLayout<OfflinePlay
     @NotNull private final Server server;
     @NotNull private final SelectedPlayers selected;
 
-    public SelectedViewState(Teleporter proj, SelectedPlayers selected) {
+    public TeleporterViewState(Teleporter proj, SelectedPlayers selected) {
         this.proj = proj;
         this.server = proj.getPlugin().getServer();
         this.selected = selected;
@@ -124,12 +124,14 @@ public class SelectedViewState extends ReplaceableLayout<NamedLayout<OfflinePlay
 
         selected.onAdd(this::onSelect);
         selected.onRemove(this::onUnselect);
-        OfflineObservable offline = proj.getOfflinelib().getOffline();
-        offline.onAdd(this::onAddOffline);
-        offline.onRemove(this::onRemoveOffline);
+
         OnlineObservable online = proj.getOfflinelib().getOnline();
         online.onAdd(this::onAddOnline);
         online.onRemove(this::onRemoveOnline);
+
+        OfflineObservable offline = proj.getOfflinelib().getOffline();
+        offline.onAdd(this::onAddOffline);
+        offline.onRemove(this::onRemoveOffline);
 
         setCurrent(allLayout);
     }

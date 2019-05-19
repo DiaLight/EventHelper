@@ -1,10 +1,14 @@
 package dialight.extensions;
 
 import dialight.nms.ItemStackNms;
+import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.material.Colorable;
 import org.bukkit.material.MaterialData;
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +50,20 @@ public class ItemStackBuilder {
         return this;
     }
 
+    public ItemStackBuilder bannerMeta(Consumer<BannerMeta> op) {
+        BannerMeta im = (BannerMeta) itemStack.getItemMeta();
+        op.accept(im);
+        itemStack.setItemMeta(im);
+        return this;
+    }
+
+    public ItemStackBuilder leatherArmorColor(Color color) {
+        LeatherArmorMeta im = (LeatherArmorMeta) itemStack.getItemMeta();
+        im.setColor(color);
+        itemStack.setItemMeta(im);
+        return this;
+    }
+
     public ItemStackBuilder lore(@NotNull String... lore) {
         return lore(Arrays.asList(lore));
     }
@@ -71,6 +89,34 @@ public class ItemStackBuilder {
         }
         itemStack.setItemMeta(im);
         return this;
+    }
+    private ItemStackBuilder hideFlag(boolean hide, ItemFlag flag) {
+        ItemMeta im = itemStack.getItemMeta();
+        if(hide) {
+            im.addItemFlags(flag);
+        } else {
+            im.removeItemFlags(flag);
+        }
+        itemStack.setItemMeta(im);
+        return this;
+    }
+    public ItemStackBuilder hideAttributes(boolean hide) {
+        return hideFlag(hide, ItemFlag.HIDE_ATTRIBUTES);
+    }
+    public ItemStackBuilder hideMiscellaneous(boolean hide) {
+        return hideFlag(hide, ItemFlag.HIDE_POTION_EFFECTS);
+    }
+    public ItemStackBuilder hideCanPlace(boolean hide) {
+        return hideFlag(hide, ItemFlag.HIDE_PLACED_ON);
+    }
+    public ItemStackBuilder hideCanDestroy(boolean hide) {
+        return hideFlag(hide, ItemFlag.HIDE_DESTROYS);
+    }
+    public ItemStackBuilder hideEnchantments(boolean hide) {
+        return hideFlag(hide, ItemFlag.HIDE_ENCHANTS);
+    }
+    public ItemStackBuilder hideUnbreakable(boolean hide) {
+        return hideFlag(hide, ItemFlag.HIDE_UNBREAKABLE);
     }
 
     public ItemStackBuilder amount(int amount) {

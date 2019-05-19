@@ -1,5 +1,6 @@
 package dialight.maingui;
 
+import dialight.compatibility.PlayerInventoryBc;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
@@ -34,10 +35,10 @@ public class MainGuiSlot implements Slot {
             case LEFT:
             case SHIFT_LEFT: {
                 e.getPlayer().closeInventory();
-                proj.getToollib().giveTool(e.getPlayer(), MainGuiTool.ID);
+                PlayerInventoryBc.of(e.getPlayer().getInventory()).setItemInMainHand(proj.getTool().createItem());
             } break;
             case RIGHT: {
-                proj.getToollib().giveTool(e.getPlayer(), MainGuiTool.ID);
+                PlayerInventoryBc.of(e.getPlayer().getInventory()).setItemInMainHand(proj.getTool().createItem());
             }
         }
     }

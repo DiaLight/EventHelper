@@ -4,8 +4,6 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -86,8 +84,11 @@ public class MainGuiListener implements Listener {
         status.count++;
         if(status.count >= 3) {
             status.count = 0;
-            player.getInventory().setItem(status.min(), proj.getToollib().buildItem(MainGuiTool.ID));
-        }
+            MainGuiTool tool = proj.getToollib().get(MainGuiTool.class);
+            if(tool != null) {
+                player.getInventory().setItem(status.min(), tool.createItem());
+            }
+    }
     }
 
 }
