@@ -13,7 +13,7 @@ public class TeamBc8 extends TeamBc {
     public ChatColor getColor() {
         ChatColor color = ChatColor.WHITE;
         String prefix = team.getPrefix();
-        for (int i = prefix.length() - 1; i > -1; i++) {
+        for (int i = prefix.length() - 1; i > -1; i--) {
             char c = prefix.charAt(i);
             ChatColor cur = ChatColor.getByChar(c);
             if (cur == null) continue;

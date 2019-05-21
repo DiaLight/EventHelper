@@ -121,11 +121,7 @@ task("copyToServer_allInOne_update") {
     dependsOn(tasks["fatJar_allInOne"])
     val jar = tasks["fatJar_allInOne"] as Jar
     outputs.upToDateWhen { false }  // update every time
-//    into("")
     libDirs.forEach {
-//        from(jar) {
-//            into(it)
-//        }
         copy {
             this.rename {
                 val dir = FilenameUtils.getFullPathNoEndSeparator(it)
