@@ -68,4 +68,23 @@ public class PacketOutTeam {
         return null;
     }
 
+    @Override
+    public String toString() {
+        if(isCreate()) {
+            return "PacketOutTeam{create " + getName() + '}';
+        }
+        if(isRemove()) {
+            return "PacketOutTeam{remove " + getName() + '}';
+        }
+        if(isUpdate()) {
+            return "PacketOutTeam{update " + getName() + '}';
+        }
+        if(isAddPlayer()) {
+            return "PacketOutTeam{add_members " + getMembers() + '}';
+        }
+        if(isRemovePlayer()) {
+            return "PacketOutTeam{remove_members " + getMembers() + '}';
+        }
+        return "PacketOutTeam{unknown}";
+    }
 }

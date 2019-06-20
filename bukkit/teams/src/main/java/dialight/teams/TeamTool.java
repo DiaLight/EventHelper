@@ -75,7 +75,7 @@ public class TeamTool extends SubTool {
     }
 
     public ItemStack createItem(Team team) {
-        return new ItemStackBuilder(item)
+        return new ItemStackBuilder(item.clone())
                 .displayName(Colorizer.apply("|a|Команда " + team.getName()))
                 .bannerMeta(bm -> {
                     DyeColor color = ColorConverter.toWoolColor(TeamBc.of(team).getColor());

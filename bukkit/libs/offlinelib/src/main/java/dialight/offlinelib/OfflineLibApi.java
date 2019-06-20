@@ -2,6 +2,7 @@ package dialight.offlinelib;
 
 import dialight.eventhelper.project.ProjectApi;
 import dialight.extensions.OfflinePlayerEx;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,6 +17,9 @@ public class OfflineLibApi implements ProjectApi {
         this.proj = proj;
     }
 
+    @NotNull public OfflinePlayer getOfflinePlayerByName(String name) {
+        return proj.getOfflinePlayerByName(name);
+    }
     @NotNull public OfflinePlayerEx getOfflinePlayerEx(UUID uuid) {
         return proj.getOrCreate(uuid);
     }

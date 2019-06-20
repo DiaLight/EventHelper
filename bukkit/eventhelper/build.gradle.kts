@@ -41,9 +41,8 @@ val join = listOf(
 
 configureProject(join, deps)
 
-sourceSets {
-    sourceSets.create("allInOne")
-}
+val allInOne by sourceSets.creating
+val main by sourceSets.getting
 
 configurations {
     this["allInOneCompile"].extendsFrom(this["compile"])
@@ -63,31 +62,31 @@ dependencies {
     parts.forEach { allInOneImplementation(project(it)) }
 }
 
-tasks["fatJar"].apply { this as Jar
+
+val jar by tasks.getting(Jar::class)
+val fatJar by tasks.getting(Jar::class) {
     val tokens = mapOf(
         "version" to allVersion,
         "main_class" to "dialight.eventhelper.EventHelper"
     )
-    from(sourceSets["main"].resources.srcDirs) {
+    from(main.resources.srcDirs) {
         filter<ReplaceTokens>("tokens" to tokens)
     }
 }
-task("fatJar_allInOne", Jar::class) {
-    from(sourceSets["allInOne"].output)
-    join.forEach {
-        dependsOn("$it:build")  // we need execution if reobfJar task if it exists
-        dependsOn("$it:joinJar")
-    }
-    parts.forEach {
-        dependsOn("$it:build")  // we need execution if reobfJar task if it exists
-        dependsOn("$it:joinJar")
+val fatJar_allInOne by tasks.creating(Jar::class) {
+    from(allInOne.output)
+    val deps = join + parts
+    deps.forEach {
+        val proj = project(it)
+        val joinJar by proj.tasks.getting(Jar::class)
+        dependsOn(joinJar)
+        inputs.files(joinJar)
     }
     doFirst {
-        join.forEach {
-            from(project(it).tasks["joinJar"].outputs.files.map { zipTree(it) })
-        }
-        parts.forEach {
-            from(project(it).tasks["joinJar"].outputs.files.map { zipTree(it) })
+        deps.forEach {
+            val proj = project(it)
+            val joinJar by proj.tasks.getting(Jar::class)
+            from(joinJar.outputs.files.map { zipTree(it) })
         }
     }
     baseName = "${project.name}-fat-allInOne"
@@ -95,46 +94,44 @@ task("fatJar_allInOne", Jar::class) {
         "version" to allVersion,
         "main_class" to "dialight.eventhelper.EventHelperBuiltin"
     )
-    from(sourceSets["allInOne"].resources.srcDirs) {
+    from(allInOne.resources.srcDirs) {
         filter<ReplaceTokens>("tokens" to tokens)
     }
-    outputs.upToDateWhen { false }  // update every time
+//    outputs.upToDateWhen { false }  // update every time
 }
-task("copyToServer_allInOne", Copy::class) {
+val copyToServer_allInOne by tasks.creating(Copy::class) {
     doFirst {
         val libDirFile = File(libDir)
         libDirFile.deleteRecursively()
         libDirFile.mkdirs()
     }
-    dependsOn(tasks["fatJar_allInOne"])
-    val jar = tasks["fatJar_allInOne"] as Jar
-    from(jar)
+    dependsOn(fatJar_allInOne)
+    from(fatJar_allInOne)
     this.rename {
         val dir = FilenameUtils.getFullPathNoEndSeparator(it)
         val name = FilenameUtils.getBaseName(it).split("-")[0]
         return@rename "$dir/$name.jar"
     }
     into(libDir)
-    outputs.upToDateWhen { false }  // update every time
+//    outputs.upToDateWhen { false }  // update every time
 }
-task("copyToServer_allInOne_update") {
-    dependsOn(tasks["fatJar_allInOne"])
-    val jar = tasks["fatJar_allInOne"] as Jar
-    outputs.upToDateWhen { false }  // update every time
-    libDirs.forEach {
-        copy {
-            this.rename {
-                val dir = FilenameUtils.getFullPathNoEndSeparator(it)
-                val name = FilenameUtils.getBaseName(it).split("-")[0]
-                return@rename "$dir/$name.jar"
+val copyToServer_allInOne_update by tasks.creating {
+    dependsOn(fatJar_allInOne)
+    doFirst {
+        libDirs.forEach {
+            copy {
+                this.rename {
+                    val dir = FilenameUtils.getFullPathNoEndSeparator(it)
+                    val name = FilenameUtils.getBaseName(it).split("-")[0]
+                    return@rename "$dir/$name.jar"
+                }
+                from(fatJar_allInOne)
+                into(it)
             }
-            from(jar)
-            into(it)
-            outputs.upToDateWhen { false }  // update every time
         }
     }
 }
-task("copyToServer_splitted", Copy::class) {
+val copyToServer_splitted by tasks.creating(Copy::class) {
     doFirst {
         val libDirFile = File(libDir)
         libDirFile.deleteRecursively()
@@ -143,11 +140,11 @@ task("copyToServer_splitted", Copy::class) {
     parts.forEach {
         dependsOn("$it:fatJar")
         doFirst {
-            val jar_task = project(it).tasks["fatJar"] as Jar
-            from(jar_task.outputs.files)
+            val proj = project(it)
+            val fatJar by proj.tasks.getting(Jar::class)
+            from(fatJar.outputs.files)
         }
     }
-    val jar = tasks["jar"] as Jar
     from(jar)
     doFirst {
         exclude(jar.outputs.files.singleFile.name)

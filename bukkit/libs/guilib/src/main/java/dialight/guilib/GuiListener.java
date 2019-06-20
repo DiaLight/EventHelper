@@ -82,12 +82,12 @@ public class GuiListener implements Listener {
         Player player = (Player) e.getPlayer();
         Gui gui = view.getGui();
         SlotLayout layout = view.getLayout();
-        if(!gui.onOpen(player)) {
-            e.setCancelled(true);
-            return;
-        }
+
         layout.subscribe(view);
-        view.onOpen(player);
+        gui.fireOpenView(player);
+        layout.fireOpenView(player);
+        view.fireOpenView(player);
+
         proj.getUsageRegistry().onOpenGui(player, gui);
 //        Inventory inventory = player.getOpenInventory().getTopInventory();
         proj.runTask(() -> {
@@ -102,9 +102,12 @@ public class GuiListener implements Listener {
         Player player = (Player) e.getPlayer();
         Gui gui = view.getGui();
         SlotLayout layout = view.getLayout();
-        gui.onClose(player);
-        view.onClose(player);
+
+        gui.fireCloseView(player);
+        layout.fireCloseView(player);
+        view.fireCloseView(player);
         layout.unsubscribe(view);
+
         proj.getUsageRegistry().onCloseGui(player, gui);
     }
 

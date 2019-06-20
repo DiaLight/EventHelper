@@ -6,7 +6,7 @@ import dialight.guilib.view.View;
 import dialight.teams.Teams;
 import org.bukkit.entity.Player;
 
-public class AddTeamGui implements Gui {
+public class AddTeamGui extends Gui {
 
     private final Teams proj;
     private final AddTeamLayout layout;
@@ -25,4 +25,5 @@ public class AddTeamGui implements Gui {
     public Teams getProj() {
         return proj;
     }
+
 }

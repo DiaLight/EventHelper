@@ -67,4 +67,10 @@ public class NamedSetLayout<T, H> extends NamedLayout<T> {
         }
         return result;
     }
+
+    @Override
+    public void clear() {
+        hashMap.clear();
+        super.clear();
+    }
 }

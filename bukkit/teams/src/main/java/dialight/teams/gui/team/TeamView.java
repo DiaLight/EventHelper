@@ -39,8 +39,9 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
                 .displayName("Команда " + oteam.getName())
                 .lore(DEFAULT_BACKGROUND_LORE)
                 .addLore(Colorizer.asList(
+                        "|y|display name: |g|" + oteam.getTeam().getDisplayName(),
                         "",
-                        "|g|Плагин: |y|Телепорт",
+                        "|g|Плагин: |y|Команды",
                         "|g|Версия: |y|v" + desc.getVersion()
                 ))
                 .build());
@@ -59,9 +60,6 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
                         getLayout().setCurrent(getLayout().getTeamLayout());
                     } break;
                     case RIGHT: {
-                        getLayout().setCurrent(getLayout().getNotTeamLayout());
-                    } break;
-                    case SHIFT_RIGHT: {
                         getLayout().setCurrent(getLayout().getNotCurTeamLayout());
                     } break;
                 }

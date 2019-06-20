@@ -198,9 +198,9 @@ public class Scroll9x5View<G extends Gui, L extends SlotLayout> extends View<G, 
     }
 
     @Override
-    public void onOpen(Player player) {
+    public void onOpenView(Player player) {
         refresh();
-        super.onOpen(player);
+        super.onOpenView(player);
     }
 
     protected void setBotPaneSlot(int x, Slot slot) {

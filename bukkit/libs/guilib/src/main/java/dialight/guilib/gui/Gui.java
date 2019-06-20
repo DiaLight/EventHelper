@@ -1,16 +1,13 @@
 package dialight.guilib.gui;
 
+import dialight.guilib.Viewable;
 import dialight.guilib.view.View;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 
 // 1 data flow <-> * view
 // 1 view <-> * players
-public interface Gui {
+public abstract class Gui extends Viewable {
 
-    View createView(Player player);
-
-    default boolean onOpen(Player player) { return true; }
-    default void onClose(Player player) {}
+    abstract public View createView(Player player);
 
 }

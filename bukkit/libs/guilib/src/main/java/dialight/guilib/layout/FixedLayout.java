@@ -29,6 +29,7 @@ public class FixedLayout extends DataLayout<Slot> {
     @Override public boolean update(@NotNull Slot data) {
         throw new NotImplementedException();
     }
+    @Override public void clear() { throw new NotImplementedException(); }
 
     @Override public Slot getSlot(int x, int y) {
         return slots[x][y];

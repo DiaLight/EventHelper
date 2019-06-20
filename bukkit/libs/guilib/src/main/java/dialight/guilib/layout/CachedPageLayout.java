@@ -55,6 +55,10 @@ public class CachedPageLayout<T> extends DataLayout<T> {
         return true;
     }
 
+    public int size() {
+        return slots.size();
+    }
+
     private BackedSlot<T> removeAtIndex(int index) {
         BackedSlot<T> backedSlot = slots.remove(index);
         for (int i = index; i < slots.size(); i++) {
@@ -90,6 +94,15 @@ public class CachedPageLayout<T> extends DataLayout<T> {
             return true;
         }
         return false;
+    }
+
+    @Override public void clear() {
+        for (int i = 0; i < slots.size(); i++) {
+            Vec2i loc = getLoc(i);
+            fireUpdateSlot(loc.x, loc.y, null);
+        }
+        slots.clear();
+        fireUpdateDataBounds(getWidth(), getHeight());
     }
 
     @NotNull private Vec2i getLoc(int index) {

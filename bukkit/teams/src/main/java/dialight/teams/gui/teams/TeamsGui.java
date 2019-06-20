@@ -14,8 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TeamsGui implements Gui {
-
+public class TeamsGui extends Gui {
 
     @NotNull private final Teams proj;
     private final AddTeamGui addTeamGui;
@@ -31,10 +30,14 @@ public class TeamsGui implements Gui {
 
         ObservableCollection<? extends ObservableTeam> teams = proj.getTeamsInternal();
 
-        teams.onAdd(ot -> teamGuiMap.put(ot.getName(), new TeamGui(this.proj, ot)));
+        teams.onAdd(ot -> {
+            teamGuiMap.put(ot.getName(), new TeamGui(this.proj, ot));
+        });
         teams.onRemove(ot -> {
             TeamGui teamGui = teamGuiMap.remove(ot.getName());
-            teamGui.unregister();
+            for (Player viewer : teamGui.getViewers()) {
+                viewer.closeInventory();
+            }
         });
         teams.forEach(ot -> teamGuiMap.put(ot.getName(), new TeamGui(this.proj, ot)));
     }

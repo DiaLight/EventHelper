@@ -1,5 +1,6 @@
 package dialight.guilib.layout;
 
+import dialight.guilib.Viewable;
 import dialight.guilib.slot.Slot;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * Creates 2D Slot representation of mutable collection
  */
-public abstract class SlotLayout {
+public abstract class SlotLayout extends Viewable {
 
     protected final List<LayoutListener> subscribed = new ArrayList<>();
 

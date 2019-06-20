@@ -4,6 +4,8 @@ import dialight.eventhelper.EventHelper;
 import dialight.eventhelper.project.Project;
 import dialight.eventhelper.project.ProjectApi;
 import dialight.extensions.OfflinePlayerEx;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Server;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
@@ -81,4 +83,11 @@ public class OfflineLib extends Project {
         return offline;
     }
 
+    public OfflinePlayer getOfflinePlayerByName(String name) {
+        Server server = getPlugin().getServer();
+        for (OfflinePlayer op : server.getOfflinePlayers()) {
+            if(op.getName().equals(name)) return op;
+        }
+        return server.getOfflinePlayer(name);
+    }
 }

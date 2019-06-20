@@ -1,6 +1,7 @@
 package dialight.guilib.layout;
 
 import dialight.guilib.slot.Slot;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -99,6 +100,18 @@ public class HorizontalMultiLayout extends SlotLayout {
             for (CachedLayout cache : layouts) {
                 cache.layout.unsubscribe(cache);
             }
+        }
+    }
+
+    @Override public void onOpenView(Player player) {
+        for (CachedLayout cache : layouts) {
+            cache.layout.fireOpenView(player);
+        }
+    }
+
+    @Override public void onCloseView(Player player) {
+        for (CachedLayout cache : layouts) {
+            cache.layout.fireCloseView(player);
         }
     }
 

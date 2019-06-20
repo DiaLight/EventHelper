@@ -150,10 +150,9 @@ public class Scroll7x6View<G extends Gui, L extends SlotLayout> extends View<G, 
         setTitle(prefix + " " + (offset + 1) + "/" + getLayout().getWidth());
     }
 
-    @Override
-    public void onOpen(Player player) {
+    @Override public void onOpenView(Player player) {
         refresh();
-        super.onOpen(player);
+        super.onOpenView(player);
     }
 
     protected void setLeftPaneSlot(int y, Slot slot) {

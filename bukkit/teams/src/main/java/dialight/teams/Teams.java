@@ -9,8 +9,9 @@ import dialight.observable.collection.ObservableCollection;
 import dialight.observable.map.ObservableMap;
 import dialight.observable.map.ObservableMapWrapper;
 import dialight.offlinelib.OfflineLibApi;
-import dialight.teams.gui.teams.TeamsGui;
+import dialight.teams.event.TeamEvent;
 import dialight.teams.gui.TeamsSlot;
+import dialight.teams.gui.teams.TeamsGui;
 import dialight.teleporter.TeleporterApi;
 import dialight.toollib.ToolLibApi;
 import org.bukkit.OfflinePlayer;
@@ -19,7 +20,10 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class Teams extends Project {
@@ -39,10 +43,6 @@ public class Teams extends Project {
     private final ObservableCollection<ObservableTeamImpl> teamsInternal = teamsMap.asCollectionObaervable(ObservableTeamImpl::getName);
     private final ObservableCollection<ObservableTeamImpl> teamsImmutable = teamsMap.asImmutableCollectionObaervable(ObservableTeamImpl::getName);
 
-    private final ObservableMap<UUID, OfflinePlayer> notInTeam = new ObservableMapWrapper<>();
-    private final ObservableCollection<OfflinePlayer> notInTeamInternal = notInTeam.asCollectionObaervable(OfflinePlayer::getUniqueId);
-    private final ObservableCollection<OfflinePlayer> notInTeamImmutable = notInTeam.asImmutableCollectionObaervable(OfflinePlayer::getUniqueId);
-
     private final Collection<Consumer<ObservableTeam>> onUpdate = new LinkedList<>();
 
     public Teams(JavaPlugin plugin) {
@@ -56,9 +56,6 @@ public class Teams extends Project {
         guilib = eh.require("GuiLib");
         teleporter = eh.optional("Teleporter");
 
-        offlinelib.getOffline().onAdd(this::onAddOffline);
-        offlinelib.getOffline().onRemove(this::onRemoveOffline);
-
         update();
 
         scoreboard = getPlugin().getServer().getScoreboardManager().getMainScoreboard();
@@ -69,23 +66,11 @@ public class Teams extends Project {
         toollib.register(tool);
 
         listener = new TeamsListener(this);
-        listener.start(getPlugin());
     }
 
     @Override public void disable() {
         listener.stop();
         listener = null;
-
-        offlinelib.getOffline().unregisterOnAdd(this::onAddOffline);
-        offlinelib.getOffline().unregisterOnRemove(this::onRemoveOffline);
-    }
-
-    private void onAddOffline(OfflinePlayer op) {
-        notInTeamInternal.add(op);
-    }
-
-    private void onRemoveOffline(OfflinePlayer op) {
-        notInTeamInternal.remove(op);
     }
 
     @Override public ProjectApi getApi() {
@@ -101,7 +86,7 @@ public class Teams extends Project {
             ObservableTeamImpl oteam = new ObservableTeamImpl(this, team);
             if(teamsMap.putIfAbsent(team.getName(), oteam) == null) {
                 for (String member : team.getEntries()) {
-                    OfflinePlayer op = getPlugin().getServer().getOfflinePlayer(member);
+                    OfflinePlayer op = offlinelib.getOfflinePlayerByName(member);
                     if(op == null) continue;
                     oteam.onAddMember(op);
                     notInTeamToRemove.add(op);
@@ -113,20 +98,20 @@ public class Teams extends Project {
         for (String name : teamsToRemove) {
             teamsMap.remove(name);
         }
-        notInTeamInternal.addAll(notInTeamToAdd);
-        notInTeamInternal.removeAll(notInTeamToRemove);
     }
 
-    public ObservableCollection<? extends ObservableTeam> getTeamsInternal() {
-        return teamsInternal;
+    @SuppressWarnings("unchecked")
+    public ObservableCollection<ObservableTeam> getTeamsInternal() {
+        return (ObservableCollection<ObservableTeam>) (ObservableCollection) teamsInternal;
     }
 
-    public ObservableCollection<? extends ObservableTeam> getTeamsImmutable() {
-        return teamsImmutable;
+    @SuppressWarnings("unchecked")
+    public ObservableCollection<ObservableTeam> getTeamsImmutable() {
+        return (ObservableCollection<ObservableTeam>) (ObservableCollection) teamsImmutable;
     }
 
-    public ObservableCollection<OfflinePlayer> getNotInTeamImmutable() {
-        return notInTeamImmutable;
+    public TeamsListener getListener() {
+        return listener;
     }
 
     public MainGuiApi getMaingui() {
@@ -161,47 +146,53 @@ public class Teams extends Project {
         return teamsMap.get(name);
     }
 
-    public void onTeamAdd(String teamName) {
-//        System.out.println("onTeamAdd: " + teamName);
-        Team team = scoreboard.getTeam(teamName);
-        teamsInternal.add(new ObservableTeamImpl(this, team));
-    }
-
-    public void onTeamRemove(String teamName) {
-//        System.out.println("onTeamRemove: " + teamName);
-        ObservableTeamImpl oteam = teamsMap.remove(teamName);
-    }
-
-    public void onTeamUpdate(String teamName) {
-//        System.out.println("onTeamUpdate: " + teamName);
-        ObservableTeamImpl oteam = teamsMap.get(teamName);
-        oteam.onUpdate();
-        for (Consumer<ObservableTeam> op : onUpdate) {
-            op.accept(oteam);
-        }
-    }
-
-    public void onTeamAddMember(String teamName, String member) {
-        OfflinePlayer op = getPlugin().getServer().getOfflinePlayer(member);
-        if(op == null) return;
-        ObservableTeamImpl oteam = teamsMap.get(teamName);
-        oteam.onAddMember(op);
-        notInTeamInternal.remove(op);
-    }
-
-    public void onTeamRemoveMember(String teamName, String member) {
-        OfflinePlayer op = getPlugin().getServer().getOfflinePlayer(member);
-        if(op == null) return;
-        ObservableTeamImpl oteam = teamsMap.get(teamName);
-        oteam.onRemoveMember(op);
-        notInTeamInternal.add(op);
-    }
-
     public void onTeamUpdate(Consumer<ObservableTeam> op) {
         onUpdate.add(op);
     }
     public void unregisterOnTeamUpdate(Consumer<ObservableTeam> op) {
         onUpdate.add(op);
+    }
+
+    public void onTeamEvent(TeamEvent event) {
+        switch (event.getType()) {
+            case ADD: {
+                Team team = scoreboard.getTeam(event.getName());
+                ObservableTeamImpl ot = new ObservableTeamImpl(this, team);
+                if(!teamsInternal.contains(ot)) teamsInternal.add(ot);
+            } break;
+            case REMOVE: {
+                ObservableTeamImpl oteam = teamsMap.remove(event.getName());
+            } break;
+            case UPDATE: {
+                ObservableTeamImpl ot = teamsMap.get(event.getName());
+                ot.onUpdate();
+                for (Consumer<ObservableTeam> op : onUpdate) {
+                    op.accept(ot);
+                }
+            } break;
+            case ADD_MEMBERS: {
+                ObservableTeamImpl oteam = teamsMap.get(event.getName());
+                TeamEvent.Members membersEvent = (TeamEvent.Members) event;
+//                System.out.println("ADD_MEMBERS " + event.getName() + " " + membersEvent.getMembers());
+                for (String member : membersEvent.getMembers()) {
+                    OfflinePlayer op = offlinelib.getOfflinePlayerByName(member);
+                    if(op != null) {
+                        oteam.onAddMember(op);
+                    }
+                }
+            } break;
+            case REMOVE_MEMBERS: {
+                ObservableTeamImpl oteam = teamsMap.get(event.getName());
+                TeamEvent.Members membersEvent = (TeamEvent.Members) event;
+//                System.out.println("REMOVE_MEMBERS " + event.getName() + " " + membersEvent.getMembers());
+                for (String member : membersEvent.getMembers()) {
+                    OfflinePlayer op = offlinelib.getOfflinePlayerByName(member);
+                    if (op != null) {
+                        oteam.onRemoveMember(op);
+                    }
+                }
+            } break;
+        }
     }
 
 }

@@ -6,8 +6,7 @@ import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
 import org.bukkit.entity.Player;
 
-public class TeamGui implements Gui {
-
+public class TeamGui extends Gui {
 
     private final Teams proj;
     private final ObservableTeam oteam;
@@ -24,13 +23,6 @@ public class TeamGui implements Gui {
     @Override
     public View createView(Player player) {
         return view;
-    }
-
-    public void unregister() {
-        for (Player viewer : this.view.getViewers()) {
-            viewer.closeInventory();
-        }
-        this.layout.unregister();
     }
 
     public ObservableTeam getOteam() {

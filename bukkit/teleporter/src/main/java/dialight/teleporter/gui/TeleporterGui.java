@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class TeleporterGui implements Gui {
+public class TeleporterGui extends Gui {
 
     private final Teleporter proj;
     private final Map<UUID, TeleporterViewState> layoutMap = new HashMap<>();
@@ -36,4 +36,5 @@ public class TeleporterGui implements Gui {
     public Teleporter getTeleporter() {
         return proj;
     }
+
 }

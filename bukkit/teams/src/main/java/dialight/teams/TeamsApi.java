@@ -12,7 +12,7 @@ public class TeamsApi implements ProjectApi {
         this.proj = proj;
     }
 
-    public ObservableCollection<? extends ObservableTeam> getTeams() {
+    public ObservableCollection<ObservableTeam> getTeams() {
         return this.proj.getTeamsImmutable();
     }
 

@@ -58,12 +58,6 @@ public abstract class View<G extends Gui, L extends SlotLayout> implements Inven
 
     }
 
-    public void onOpen(Player player) {
-    }
-
-    public void onClose(Player player) {
-    }
-
     public void setTitle(@NotNull String title) {
         if(this.title.equals(title)) return;
         this.title = title;
@@ -77,6 +71,21 @@ public abstract class View<G extends Gui, L extends SlotLayout> implements Inven
     @NotNull public String getTitle() {
         return title;
     }
+
+    public final void fireOpenView(Player player) {
+        onOpenView(player);
+        if(inventory.getViewers().size() == 1) onViewersNotEmpty();
+    }
+    public final void fireCloseView(Player player) {
+        onCloseView(player);
+        if(inventory.getViewers().isEmpty()) onViewersEmpty();
+    }
+
+    public void onOpenView(Player player) {}
+    public void onCloseView(Player player) {}
+
+    public void onViewersNotEmpty() {}
+    public void onViewersEmpty() {}
 
     public Collection<Player> getViewers() {
         return inventory.getViewers().stream()

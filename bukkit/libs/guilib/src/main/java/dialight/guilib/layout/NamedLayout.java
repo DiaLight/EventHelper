@@ -274,6 +274,19 @@ public class NamedLayout<T> extends DataLayout<T> {
         return true;
     }
 
+    @Override public void clear() {
+        for (NamedBlock<T> namedBlock : sorted.values()) {
+            for (int i = 0; i < namedBlock.relative.size(); i++) {
+                Vec2i pos = namedBlock.indexToPos(i);
+                fireUpdateSlot(pos.x, pos.y, null);
+            }
+            namedBlock.relative.clear();
+        }
+        sorted.clear();
+        backed.clear();
+        fireUpdateDataBounds(getWidth(), getHeight());
+    }
+
     private void refreshTail() {
         int x = backed.size();
         for (int y = 0; y < height; y++) {

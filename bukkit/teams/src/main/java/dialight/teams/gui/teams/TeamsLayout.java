@@ -1,91 +1,81 @@
 package dialight.teams.gui.teams;
 
-import dialight.compatibility.PlayerInventoryBc;
-import dialight.compatibility.TeamBc;
-import dialight.extensions.ColorConverter;
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.indexcache.SparkIndexCache;
 import dialight.guilib.layout.CachedPageLayout;
 import dialight.guilib.slot.Slot;
-import dialight.guilib.slot.SlotClickEvent;
 import dialight.observable.collection.ObservableCollection;
 import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class TeamsLayout extends CachedPageLayout<ObservableTeam> {
 
-    private class TeamSlot implements Slot {
-
-        @NotNull
-        private final ObservableTeam oteam;
-        private final ItemStack item;
-
-        private TeamSlot(ObservableTeam oteam) {
-            this.oteam = oteam;
-            this.item = new ItemStackBuilder(Material.LEATHER_CHESTPLATE)
-                    .leatherArmorColor(ColorConverter.toLeatherColor(TeamBc.of(oteam.getTeam()).getColor()))
-                    .hideAttributes(true)
-                    .hideMiscellaneous(true)
-                    .displayName(Colorizer.apply("|a|" + oteam.getName()))
-                    .lore(Colorizer.asList(
-                            "|a|ЛКМ|y|: Получить инструмент",
-                            "|y| управления командой",
-                            "|a|Shift|y|+|a|ЛКМ|y|: добавить всех в команду",
-                            "|a|Shift|y|+|a|ПКМ|y|: очистить команду",
-                            "|a|СКМ|y|: удалить команду"
-                    ))
-                    .build();
-        }
-
-        @Override public void onClick(SlotClickEvent e) {
-            switch (e.getEvent().getClick()) {
-                case LEFT:
-                    e.getPlayer().closeInventory();
-                    PlayerInventoryBc.of(e.getPlayer().getInventory()).setItemInMainHand(proj.getTool().createItem(oteam.getTeam()));
-                    break;
-                case SHIFT_LEFT:
-                    for (Player player : proj.getPlugin().getServer().getOnlinePlayers()) {
-                        oteam.getTeam().addEntry(player.getName());
-                    }
-                    break;
-                case RIGHT:
-                    break;
-                case SHIFT_RIGHT:
-                    oteam.getMembers().clear();
-                    break;
-                case MIDDLE:
-                    oteam.getTeam().unregister();
-                    break;
-            }
-        }
-
-        @NotNull @Override public ItemStack createItem() {
-            return item;
-        }
-
-    }
-
     @NotNull private final Teams proj;
+    private final Consumer<ObservableTeam> onAdd = this::onAdd;
+    private final Consumer<ObservableTeam> onRemove = this::onRemove;
+    private final Function<Player, Player> getNextPlayer = this::getNextPlayer;
+    private final Consumer<ObservableTeam> onTeamUpdate = this::update;
 
     public TeamsLayout(Teams proj) {
-        super(new SparkIndexCache(9, 6));
+        super(new SparkIndexCache(9, 5));
+//        super(new SpiralIndexCache(9, 5));
         this.proj = proj;
 
-
         this.setNameFunction(ObservableTeam::getName);
-        this.setSlotFunction(TeamSlot::new);
+        this.setSlotFunction(this::createSlot);
+    }
 
-        proj.onTeamUpdate(this::update);
+    private Slot createSlot(ObservableTeam oteam) {
+        TeamSlot slot = new TeamSlot(proj, oteam);
+        slot.ti = size() + 1;
+        return slot;
+    }
 
-        ObservableCollection<? extends ObservableTeam> teams = proj.getTeamsInternal();
-        teams.onAdd(this::add);
-        teams.onRemove(this::remove);
+
+    @Override public void onViewersNotEmpty() {
+        proj.getListener().registerTeamsObserver(getNextPlayer);
+
+        proj.onTeamUpdate(onTeamUpdate);
+
+        ObservableCollection<ObservableTeam> teams = proj.getTeamsInternal();
+        teams.onAdd(onAdd);
+        teams.onRemove(onRemove);
         teams.forEach(this::add);
+    }
+
+    @Override public void onViewersEmpty() {
+        proj.getListener().unregisterTeamsObserver(getNextPlayer);
+
+        proj.unregisterOnTeamUpdate(onTeamUpdate);
+
+        ObservableCollection<ObservableTeam> teams = proj.getTeamsInternal();
+        teams.unregisterOnAdd(onAdd);
+        teams.unregisterOnRemove(onRemove);
+        proj.runTask(this::clear);
+    }
+
+    private Player getNextPlayer(Player player) {
+        ObservableCollection<Player> viewers = getViewers();
+        if(player == null) {
+            if(viewers.isEmpty()) return null;
+            return viewers.iterator().next();
+        }
+        for (Player viewer : viewers) {
+            if(viewer.getUniqueId() == player.getUniqueId()) continue;
+            return viewer;
+        }
+        return null;
+    }
+
+    private void onAdd(ObservableTeam oteam) {
+        this.add(oteam);
+    }
+    private void onRemove(ObservableTeam oteam) {
+        this.remove(oteam);
     }
 
 }

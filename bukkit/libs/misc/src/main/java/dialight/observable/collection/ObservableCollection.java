@@ -9,6 +9,7 @@ public abstract class ObservableCollection<E> implements Collection<E> {
     private final Collection<Consumer<E>> onAdd = new LinkedList<>();
     private final Collection<Consumer<E>> onRemove = new LinkedList<>();
 
+    private int listenerCounter = 0;
 
     protected void fireAdd(E e) {
         for(Consumer<E> op : onAdd) {
@@ -48,6 +49,9 @@ public abstract class ObservableCollection<E> implements Collection<E> {
         return this;
     }
 
+    public ObservableCollection<E> asImmutableCollectionObaervable() {
+        return new ImmutableObservableCollection<>(this);
+    }
 
 //    public abstract boolean add(E element);
 //    public abstract boolean remove(E element);
