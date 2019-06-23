@@ -31,10 +31,9 @@ public class TeamsLayout extends CachedPageLayout<ObservableTeam> {
 
     private Slot createSlot(ObservableTeam oteam) {
         TeamSlot slot = new TeamSlot(proj, oteam);
-        slot.ti = size() + 1;
+//        slot.ti = size() + 1;
         return slot;
     }
-
 
     @Override public void onViewersNotEmpty() {
         proj.getListener().registerTeamsObserver(getNextPlayer);

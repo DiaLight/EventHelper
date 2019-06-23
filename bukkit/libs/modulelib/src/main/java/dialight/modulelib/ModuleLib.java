@@ -10,7 +10,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class ModuleLib extends Project {
 
     private final ObservableMapWrapper<String, Module> toolregistry = new ObservableMapWrapper<>();
-    private final ObservableCollection<Module> observable = toolregistry.asCollectionObaervable(Module::getId);
+    private final ObservableCollection<Module> immutableObservable = toolregistry.asImmutableCollectionObaervable(Module::getId);
+
 
     public ModuleLib(JavaPlugin plugin) {
         super(plugin);
@@ -31,6 +32,11 @@ public class ModuleLib extends Project {
     }
 
     public ObservableCollection<Module> getModules() {
-        return observable;
+        return immutableObservable;
     }
+
+    public void register(Module module) {
+        toolregistry.put(module.getId(), module);
+    }
+
 }

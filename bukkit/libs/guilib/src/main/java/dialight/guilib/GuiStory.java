@@ -4,9 +4,7 @@ import dialight.guilib.gui.Gui;
 import dialight.guilib.view.View;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +38,11 @@ public class GuiStory {
         if(DEBUG) Bukkit.broadcastMessage("opened: " + toString(player));
     }
 
+    public void stripTailTo(@NotNull Player player, @NotNull Gui gui) {
+        Story story = guiStory.get(player.getUniqueId());
+        if (story == null) return;
+        story.stripTailTo(gui);
+    }
     @Nullable public Gui getPrev(@NotNull Player player) {
         Story story = guiStory.get(player.getUniqueId());
         if (story == null) return null;

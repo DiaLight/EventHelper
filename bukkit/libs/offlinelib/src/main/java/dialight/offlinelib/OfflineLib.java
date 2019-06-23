@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class OfflineLib extends Project {
@@ -86,7 +87,7 @@ public class OfflineLib extends Project {
     public OfflinePlayer getOfflinePlayerByName(String name) {
         Server server = getPlugin().getServer();
         for (OfflinePlayer op : server.getOfflinePlayers()) {
-            if(op.getName().equals(name)) return op;
+            if(Objects.equals(op.getName(), name)) return op;
         }
         return server.getOfflinePlayer(name);
     }

@@ -28,7 +28,7 @@ val parts = arrayOf(
     ":bukkit:teleporter",
     ":bukkit:freezer",
     ":bukkit:teams",
-//    ":bukkit:random",
+    ":bukkit:randomizer",
     ":bukkit:autorespawn"
 //    ":bukkit:oldpvp",  // not ready yet
 //    ":bukkit:captain"
@@ -97,7 +97,7 @@ val fatJar_allInOne by tasks.creating(Jar::class) {
     from(allInOne.resources.srcDirs) {
         filter<ReplaceTokens>("tokens" to tokens)
     }
-//    outputs.upToDateWhen { false }  // update every time
+    outputs.upToDateWhen { false }  // update every time
 }
 val copyToServer_allInOne by tasks.creating(Copy::class) {
     doFirst {
@@ -128,6 +128,17 @@ val copyToServer_allInOne_update by tasks.creating {
                 from(fatJar_allInOne)
                 into(it)
             }
+        }
+        copy {
+            this.rename {
+                val dir = FilenameUtils.getFullPathNoEndSeparator(it)
+                val name = FilenameUtils.getBaseName(it).split("-")[0]
+                return@rename "$dir/EventHelper-bukkit-1.8.X-build-$buildVersion.jar"
+            }
+            val binDir = File("$buildDir/bin")
+            binDir.deleteRecursively()
+            from(fatJar_allInOne)
+            into(binDir)
         }
     }
 }

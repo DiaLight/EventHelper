@@ -77,7 +77,7 @@ Useful tool to help event masters with theirs job
 Зависит от: `toollib`, [`guilib`], [`maingui`], [`teleporter`]
 * [X] Sponge
   * Зависит от: `kotlinrt`
-* [ ] Bukkit
+* [X] Bukkit
 
 #### Модули
 ##### captain
@@ -88,13 +88,13 @@ Useful tool to help event masters with theirs job
   * Зависит от: `kotlinrt`
 * [ ] Bukkit
 
-##### random
+##### random(randomizer in bukkit)
 Рандомное распределение игроков по командам
 
-Зависит от: `modulelib`, `teams`, [`guilib`], [`maingui`]
+Зависит от: `teams`, [`guilib`], [`maingui`]
 * [X] Sponge
-  * Зависит от: `kotlinrt`
-* [ ] Bukkit
+  * Зависит от: `modulelib`, `kotlinrt`
+* [X] Bukkit
 
 ##### autorespawn
 Автоматический респавн игрока после смерти

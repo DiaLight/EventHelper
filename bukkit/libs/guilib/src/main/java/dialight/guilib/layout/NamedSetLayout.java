@@ -25,9 +25,9 @@ public class NamedSetLayout<T, H> extends NamedLayout<T> {
         for (Map.Entry<Character, NamedBlock<T>> entry : sorted.entrySet()) {
             StringBuilder sb = new StringBuilder();
             for (BackedSlot<T> slot : entry.getValue().relative) {
-                sb.append(nameFunction.apply(slot.data));
+                sb.append(nameFunction.apply((T) slot.usage.getData()));
                 sb.append(":");
-                H key = hashObjFunction.apply(slot.data);
+                H key = hashObjFunction.apply((T) slot.usage.getData());
                 sb.append(key);
                 sb.append(", ");
             }
@@ -39,7 +39,7 @@ public class NamedSetLayout<T, H> extends NamedLayout<T> {
     @Override
     protected void updateBackedSlot(NamedBlock<T> block, Vec2i pos, @Nullable BackedSlot<T> backedSlot) {
         if(backedSlot != null) {
-            H key = hashObjFunction.apply(backedSlot.data);
+            H key = hashObjFunction.apply((T) backedSlot.usage.getData());
             hashMap.put(key, new Tuple3t<>(block, pos, backedSlot));
         }
         super.updateBackedSlot(block, pos, backedSlot);

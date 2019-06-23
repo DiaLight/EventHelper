@@ -3,13 +3,12 @@ package dialight.random
 import dialight.extensions.Server_getPlayers
 import dialight.extensions.getOrNull
 import dialight.modulelib.ActionModule
-import dialight.modulelib.Module
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.channel.MessageReceiver
 import java.util.*
 
-class RandomModule(val plugin: RandomPlugin) : ActionModule(RandomModule.ID, "Random") {
+class RandomModule(val plugin: RandomPlugin) : ActionModule(ID, "Random") {
 
     companion object {
         val ID = "random"

@@ -12,6 +12,7 @@ import dialight.offlinelib.OfflineLibApi;
 import dialight.teams.event.TeamEvent;
 import dialight.teams.gui.TeamsSlot;
 import dialight.teams.gui.teams.TeamsGui;
+import dialight.teams.gui.control.ControlGui;
 import dialight.teleporter.TeleporterApi;
 import dialight.toollib.ToolLibApi;
 import org.bukkit.OfflinePlayer;
@@ -36,6 +37,7 @@ public class Teams extends Project {
 
     private Scoreboard scoreboard;
     private TeamsTool tool;
+    private ControlGui controlGui;
     private TeamsGui gui;
     private TeamsListener listener;
 
@@ -60,6 +62,7 @@ public class Teams extends Project {
 
         scoreboard = getPlugin().getServer().getScoreboardManager().getMainScoreboard();
         tool = new TeamsTool(this);
+        controlGui = new ControlGui(this);
         gui = new TeamsGui(this);
 
         maingui.registerToolItem(TeamsTool.ID, new TeamsSlot(this));
@@ -69,8 +72,10 @@ public class Teams extends Project {
     }
 
     @Override public void disable() {
-        listener.stop();
-        listener = null;
+        if(listener != null) {
+            listener.stop();
+            listener = null;
+        }
     }
 
     @Override public ProjectApi getApi() {
@@ -87,7 +92,6 @@ public class Teams extends Project {
             if(teamsMap.putIfAbsent(team.getName(), oteam) == null) {
                 for (String member : team.getEntries()) {
                     OfflinePlayer op = offlinelib.getOfflinePlayerByName(member);
-                    if(op == null) continue;
                     oteam.onAddMember(op);
                     notInTeamToRemove.add(op);
                     notInTeamToAdd.remove(op);
@@ -132,6 +136,10 @@ public class Teams extends Project {
 
     @Nullable public TeleporterApi getTeleporter() {
         return teleporter;
+    }
+
+    public ControlGui getControlGui() {
+        return controlGui;
     }
 
     public TeamsGui getGui() {

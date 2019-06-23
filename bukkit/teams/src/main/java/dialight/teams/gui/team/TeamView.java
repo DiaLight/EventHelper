@@ -1,7 +1,6 @@
 package dialight.teams.gui.team;
 
 import dialight.compatibility.ItemStackBuilderBc;
-import dialight.compatibility.TeamBc;
 import dialight.extensions.ColorConverter;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
@@ -24,6 +23,8 @@ import java.util.stream.Collectors;
 public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
 
     private final Slot background;
+    private final Slot backward = buildDefaultBackward(this);
+    private final Slot forward = buildDefaultForward(this);
     private final Slot selectView;
     private final Slot groupSelect;
 
@@ -34,7 +35,7 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
         ObservableTeam oteam = gui.getOteam();
         background = new StaticSlot(new ItemStackBuilder()
                 .let(builder -> {
-                    ItemStackBuilderBc.of(builder).stainedGlassPane(ColorConverter.toWoolColor(TeamBc.of(oteam.getTeam()).getColor()));
+                    ItemStackBuilderBc.of(builder).stainedGlassPane(ColorConverter.toWoolColor(oteam.getColor()));
                 })
                 .displayName("Команда " + oteam.getName())
                 .lore(DEFAULT_BACKGROUND_LORE)
@@ -113,10 +114,10 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
                 setBotPaneSlot(x, selectView);
             } else if(x == 1) {
                 setBotPaneSlot(x, groupSelect);
-            } else if(x == 3 && offset != 0) {
-                setBotPaneSlot(x, defaultBackward);
-            } else if(x == 5 && offset != limit) {
-                setBotPaneSlot(x, defaultForward);
+            } else if(x == 3 && getOffset() != 0) {
+                setBotPaneSlot(x, backward);
+            } else if(x == 5 && getOffset() != limit) {
+                setBotPaneSlot(x, forward);
             } else {
                 setBotPaneSlot(x, background);
             }

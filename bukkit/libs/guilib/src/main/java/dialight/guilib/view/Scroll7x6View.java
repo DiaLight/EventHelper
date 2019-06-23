@@ -1,12 +1,10 @@
 package dialight.guilib.view;
 
-import dialight.compatibility.ItemStackBuilderBc;
-import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.gui.Gui;
 import dialight.guilib.layout.SlotLayout;
-import dialight.guilib.slot.*;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
+import dialight.guilib.slot.LocSlot;
+import dialight.guilib.slot.Slot;
+import dialight.guilib.slot.Vec2i;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -30,51 +28,14 @@ import org.jetbrains.annotations.Nullable;
  * _ - SlotLayout content
  *
  */
-public class Scroll7x6View<G extends Gui, L extends SlotLayout> extends View<G, L> {
+public abstract class Scroll7x6View<G extends Gui, L extends SlotLayout> extends ScrollView<G, L> {
 
-    protected final int width = 7;
-    protected final int height = 6;
+    private final int width = 7;
+    private final int height = 6;
     private final Slot[] leftPane = new Slot[6];
     private final Slot[] rightPane = new Slot[6];
+    private int offset = 0;
     protected String prefix;
-    protected int offset = 0;
-
-    private final Slot defaultBackground = new StaticSlot(new ItemStackBuilder()
-            .let(builder -> {
-                ItemStackBuilderBc.of(builder).stainedGlassPane(DyeColor.LIGHT_BLUE);
-            })
-            .displayName("")
-            .build());
-    private final Slot defaultBackward = new StaticSlot(new ItemStackBuilder(Material.ARROW)
-            .displayName("Backward")
-            .build()) {
-        @Override
-        public void onClick(SlotClickEvent e) {
-            switch (e.getEvent().getClick()) {
-                case LEFT: {
-                    moveBackward(1);
-                } break;
-                case SHIFT_LEFT: {
-                    moveBackward(width);
-                } break;
-            }
-        }
-    };
-    private final Slot defaultForward = new StaticSlot(new ItemStackBuilder(Material.ARROW)
-            .displayName("Forward")
-            .build()) {
-        @Override
-        public void onClick(SlotClickEvent e) {
-            switch (e.getEvent().getClick()) {
-                case LEFT: {
-                    moveForward(1);
-                } break;
-                case SHIFT_LEFT: {
-                    moveForward(width);
-                }
-            }
-        }
-    };
 
     public Scroll7x6View(G gui, L layout, String title) {
         super(gui, layout, 9, 6, title);
@@ -87,7 +48,7 @@ public class Scroll7x6View<G extends Gui, L extends SlotLayout> extends View<G, 
         return limit;
     }
 
-    public void moveBackward(int dx) {
+    @Override public void moveBackward(int dx) {
         int oldValue = offset;
         offset -= dx;
         if(offset < 0) {
@@ -100,7 +61,7 @@ public class Scroll7x6View<G extends Gui, L extends SlotLayout> extends View<G, 
         }
     }
 
-    public void moveForward(int dx) {
+    @Override public void moveForward(int dx) {
         int oldValue = offset;
         offset += dx;
         int limit = calcLimit();
@@ -114,21 +75,7 @@ public class Scroll7x6View<G extends Gui, L extends SlotLayout> extends View<G, 
         }
     }
 
-    protected void updateViewPanels() {
-        int limit = calcLimit();
-        for (int y = 0; y < 6; y++) {
-            if((y == 2 || y == 3) && offset != 0) {
-                setLeftPaneSlot(y, defaultBackward);
-            } else {
-                setLeftPaneSlot(y, defaultBackground);
-            }
-            if((y == 2 || y == 3) && offset != limit) {
-                setRightPaneSlot(y, defaultForward);
-            } else {
-                setRightPaneSlot(y, defaultBackground);
-            }
-        }
-    }
+    protected abstract void updateViewPanels();
 
     @Override public void refresh() {
         int limit = calcLimit();
@@ -147,7 +94,13 @@ public class Scroll7x6View<G extends Gui, L extends SlotLayout> extends View<G, 
     }
 
     protected void updateTitle() {
-        setTitle(prefix + " " + (offset + 1) + "/" + getLayout().getWidth());
+        int page = offset + 1;
+        int pages = getLayout().getWidth();
+        if(pages == 1) {
+            setTitle(prefix);
+        } else {
+            setTitle(prefix + " " + page + "/" + pages);
+        }
     }
 
     @Override public void onOpenView(Player player) {
@@ -201,6 +154,34 @@ public class Scroll7x6View<G extends Gui, L extends SlotLayout> extends View<G, 
     public void setTitlePrefix(@NotNull String prefix) {
         this.prefix = prefix;
         updateTitle();
+    }
+
+    @Override public int getWidth() {
+        return width;
+    }
+
+    @Override public int getHeight() {
+        return height;
+    }
+
+    @Override public int getOffset() {
+        return offset;
+    }
+
+    public static void defaultUpdateViewPanels(Scroll7x6View view, Slot background, Slot forward, Slot backward) {
+        int limit = view.calcLimit();
+        for (int y = 0; y < 6; y++) {
+            if((y == 2 || y == 3) && view.getOffset() != 0) {
+                view.setLeftPaneSlot(y, backward);
+            } else {
+                view.setLeftPaneSlot(y, background);
+            }
+            if((y == 2 || y == 3) && view.getOffset() != limit) {
+                view.setRightPaneSlot(y, forward);
+            } else {
+                view.setRightPaneSlot(y, background);
+            }
+        }
     }
 
 }

@@ -12,9 +12,13 @@ import dialight.observable.collection.ObservableCollection;
 import dialight.toollib.Tool;
 import org.bukkit.Material;
 
+import java.util.function.Consumer;
+
 public class ToolsLayout extends CachedPageLayout<Tool> {
 
     private final MainGuiProject proj;
+    private final Consumer<Tool> onAdd = this::add;
+    private final Consumer<Tool> onRemove = this::remove;
 
     public ToolsLayout(MainGuiProject proj) {
         super(new SparkIndexCache(7, 6));
@@ -45,8 +49,8 @@ public class ToolsLayout extends CachedPageLayout<Tool> {
     @Override public void onViewersNotEmpty() {
 //        System.out.println("ToolsLayout.onViewersNotEmpty");
         ObservableCollection<Tool> tools = proj.getToollib().getTools();
-        tools.onAdd(this::add);
-        tools.onRemove(this::remove);
+        tools.onAdd(onAdd);
+        tools.onRemove(onRemove);
 
         tools.forEach(this::add);
     }
@@ -54,8 +58,8 @@ public class ToolsLayout extends CachedPageLayout<Tool> {
     @Override public void onViewersEmpty() {
 //        System.out.println("ToolsLayout.onViewersEmpty");
         ObservableCollection<Tool> tools = proj.getToollib().getTools();
-        tools.unregisterOnAdd(this::add);
-        tools.unregisterOnRemove(this::remove);
+        tools.unregisterOnAdd(onAdd);
+        tools.unregisterOnRemove(onRemove);
 
         proj.runTask(this::clear);
     }

@@ -6,6 +6,7 @@ import dialight.maingui.MainGuiProject;
 import dialight.modulelib.ModuleLib;
 import dialight.offlinelib.OfflineLib;
 import dialight.teams.Teams;
+import dialight.teams.random.TeamRandomizerProject;
 import dialight.teleporter.Teleporter;
 import dialight.toollib.ToolLib;
 
@@ -26,6 +27,7 @@ public final class EventHelperBuiltin extends EventHelper {
 //        builtinProjects.put("Freezer", new Freezer(this));
 //        builtinProjects.put("AutoRespawn", new AutoRespawn(this));
         builtinProjects.put("Teams", new Teams(this));
+        builtinProjects.put("TeamRandomizer", new TeamRandomizerProject(this));
         for(Map.Entry<String, Project> pair : builtinProjects.entrySet()) {
             register(pair.getKey(), pair.getValue().getApi());
         }

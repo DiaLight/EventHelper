@@ -2,8 +2,6 @@ package dialight.teams.gui.teams;
 
 
 import dialight.compatibility.PlayerInventoryBc;
-import dialight.compatibility.TeamBc;
-import dialight.extensions.ColorConverter;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
@@ -25,7 +23,7 @@ public class TeamSlot implements Slot {
         this.proj = proj;
         this.oteam = oteam;
         this.item = new ItemStackBuilder(Material.LEATHER_CHESTPLATE)
-                .leatherArmorColor(ColorConverter.toLeatherColor(TeamBc.of(oteam.getTeam()).getColor()))
+                .leatherArmorColor(oteam.getLeatherColor())
                 .hideAttributes(true)
                 .hideMiscellaneous(true)
                 .displayName(Colorizer.apply("|a|" + oteam.getName()))
@@ -66,7 +64,7 @@ public class TeamSlot implements Slot {
     public int ti = 1;
     @NotNull @Override public ItemStack createItem() {
         ItemStack item = this.item.clone();
-        item.setAmount(ti);
+//        item.setAmount(ti);
         return item;
     }
 

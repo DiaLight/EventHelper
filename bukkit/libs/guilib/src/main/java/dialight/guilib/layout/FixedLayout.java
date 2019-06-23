@@ -46,8 +46,7 @@ public class FixedLayout extends DataLayout<Slot> {
     public Slot setSlot(int x, int y, Slot slot) {
         Slot oldslot = slots[x][y];
         slots[x][y] = slot;
-//        view.setItem(x, y, slot.createItem());
-        // for each view
+        fireUpdateSlot(x, y, slot);
         return oldslot;
     }
 

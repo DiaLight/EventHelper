@@ -2,6 +2,7 @@ package dialight.guilib.layout;
 
 import dialight.guilib.indexcache.IndexCache;
 import dialight.guilib.slot.Slot;
+import dialight.guilib.slot.SlotUsage;
 import dialight.guilib.slot.Vec2i;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,14 +12,20 @@ import java.util.List;
 
 public class CachedPageLayout<T> extends DataLayout<T> {
 
-    private static final class BackedSlot<T> {
+    private static final class BackedSlot<T> implements SlotUsage {
 
+        private final CachedPageLayout<T> layout;
         public final Slot slot;
         public final T data;
 
-        public BackedSlot(Slot slot, T data) {
+        public BackedSlot(CachedPageLayout<T> layout, Slot slot, T data) {
+            this.layout = layout;
             this.slot = slot;
             this.data = data;
+        }
+
+        @Override public void update() {
+            layout.update(this.data);
         }
 
     }
@@ -47,7 +54,9 @@ public class CachedPageLayout<T> extends DataLayout<T> {
         int index = slots.size();
         Vec2i loc = getLoc(index);
         Slot slot = slotFunction.apply(data);
-        slots.add(new BackedSlot<>(slot, data));
+        BackedSlot<T> backedSlot = new BackedSlot<>(this, slot, data);
+        slots.add(backedSlot);
+        slot.attached(backedSlot);
         fireUpdateSlot(loc.x, loc.y, slot);
         if(slots.size() % (width * height) == 1) {
             fireUpdateDataBounds(getWidth(), getHeight());
@@ -68,6 +77,7 @@ public class CachedPageLayout<T> extends DataLayout<T> {
         }
         Vec2i loc = getLoc(slots.size());
         fireUpdateSlot(loc.x, loc.y, null);
+        backedSlot.slot.detached(backedSlot);
         if(slots.size() % (width * height) == 0) {
             fireUpdateDataBounds(getWidth(), getHeight());
         }

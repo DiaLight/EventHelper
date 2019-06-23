@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 public class TeleporterView extends NamedLayoutScroll9x5View<TeleporterGui, TeleporterViewState> {
 
     private final Slot background;
+    private final Slot backward = buildDefaultBackward(this);
+    private final Slot forward = buildDefaultForward(this);
     private final Slot selectView;
     private final Slot groupSelect;
 
@@ -121,10 +123,10 @@ public class TeleporterView extends NamedLayoutScroll9x5View<TeleporterGui, Tele
                 setBotPaneSlot(x, selectView);
             } else if(x == 1) {
                 setBotPaneSlot(x, groupSelect);
-            } else if(x == 3 && offset != 0) {
-                setBotPaneSlot(x, defaultBackward);
-            } else if(x == 5 && offset != limit) {
-                setBotPaneSlot(x, defaultForward);
+            } else if(x == 3 && getOffset() != 0) {
+                setBotPaneSlot(x, backward);
+            } else if(x == 5 && getOffset() != limit) {
+                setBotPaneSlot(x, forward);
             } else {
                 setBotPaneSlot(x, background);
             }

@@ -2,7 +2,6 @@ package dialight.teleporter.gui;
 
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
-import dialight.guilib.layout.SlotLayout;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.offlinelib.OfflineLibApi;
@@ -23,18 +22,12 @@ public class SelectionSlot implements Slot {
     @NotNull private final Server server;
     @NotNull private final SelectedPlayers selected;
     @NotNull private final UUID uuid;
-    private SlotLayout layout;
 
     public SelectionSlot(Teleporter proj, SelectedPlayers selected, UUID uuid) {
         this.proj = proj;
         this.server = proj.getPlugin().getServer();
         this.selected = selected;
         this.uuid = uuid;
-    }
-
-    @Override
-    public void attached(SlotLayout layout) {
-        this.layout = layout;
     }
 
     @Override

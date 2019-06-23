@@ -12,7 +12,7 @@ public abstract class NamedLayoutScroll9x5View<G extends Gui, L extends SlotLayo
     }
 
     @Override protected int calcLimit() {
-        int limit = getLayout().getWidth() - width;
+        int limit = getLayout().getWidth() - getWidth();
         if(limit < 0) limit = 0;
         return limit;
     }
@@ -21,7 +21,7 @@ public abstract class NamedLayoutScroll9x5View<G extends Gui, L extends SlotLayo
 
     @Override protected void updateTitle() {
         NamedLayout<?> layout = getNamedLayout();
-        String header = layout.buildColumnsHeader(offset, width);
+        String header = layout.buildColumnsHeader(getOffset(), getWidth());
         StringBuilder titleBuilder = new StringBuilder();
         for (int i = 0; i < header.length(); i++) {
             char c = header.charAt(i);

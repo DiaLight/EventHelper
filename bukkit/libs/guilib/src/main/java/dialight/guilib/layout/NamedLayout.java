@@ -1,5 +1,6 @@
 package dialight.guilib.layout;
 
+import dialight.guilib.slot.DataSlotUsage;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.Vec2i;
 import dialight.tuple.Tuple2t;
@@ -18,12 +19,18 @@ public class NamedLayout<T> extends DataLayout<T> {
 
         public char c = '_';
         public Slot slot = null;
-        public T data = null;
+        public DataSlotUsage usage = null;
 
         public void clear() {
             c = '_';
             slot = null;
-            data = null;
+            usage = null;
+        }
+
+        public void moveTo(BackedSlot<T> that) {
+            that.c = this.c;
+            that.slot = this.slot;
+            that.usage = this.usage;
         }
     }
 
@@ -53,7 +60,7 @@ public class NamedLayout<T> extends DataLayout<T> {
         @Nullable public Tuple2t<Vec2i, BackedSlot<T>> findByData(@NotNull T data) {
             for (int i = 0; i < relative.size(); i++) {
                 BackedSlot<T> backedSlot = relative.get(i);
-                if(data.equals(backedSlot.data)) {
+                if(data.equals(backedSlot.usage.getData())) {
                     Vec2i pos = indexToPos(i);
                     return new Tuple2t<>(pos, backedSlot);
                 }
@@ -88,9 +95,7 @@ public class NamedLayout<T> extends DataLayout<T> {
             for (int i = index; i < relative.size() - 1; i++) {
                 BackedSlot<T> backedSlot = relative.get(i);
                 BackedSlot<T> nextBackedSlot = relative.get(i + 1);
-                backedSlot.c = nextBackedSlot.c;
-                backedSlot.slot = nextBackedSlot.slot;
-                backedSlot.data = nextBackedSlot.data;
+                nextBackedSlot.moveTo(backedSlot);
             }
             int lastIndex = relative.size() - 1;
             BackedSlot<T> removed = relative.remove(lastIndex);
@@ -127,7 +132,7 @@ public class NamedLayout<T> extends DataLayout<T> {
 
     public void dump() {
         for (Map.Entry<Character, NamedBlock<T>> entry : sorted.entrySet()) {
-            String collect = entry.getValue().relative.stream().map(o -> nameFunction.apply(o.data)).collect(Collectors.joining(", "));
+            String collect = entry.getValue().relative.stream().map(o -> nameFunction.apply((T) o.usage.getData())).collect(Collectors.joining(", "));
             System.out.println("" + entry.getKey() + ": " + collect);
         }
     }
@@ -213,8 +218,8 @@ public class NamedLayout<T> extends DataLayout<T> {
             backedSlot = column[tail.y];
             backedSlot.c = c;
             backedSlot.slot = slotFunction.apply(data);
-            backedSlot.slot.attached(this);
-            backedSlot.data = data;
+            backedSlot.usage = new DataSlotUsage(this, data);
+            backedSlot.slot.attached(backedSlot.usage);
             block.add(backedSlot);
 
             refreshAfter(c);
@@ -225,7 +230,8 @@ public class NamedLayout<T> extends DataLayout<T> {
             backedSlot = column[tail.y];
             backedSlot.c = c;
             backedSlot.slot = slotFunction.apply(data);
-            backedSlot.data = data;
+            backedSlot.usage = new DataSlotUsage(this, data);
+            backedSlot.slot.attached(backedSlot.usage);
             block.add(backedSlot);
 
             updateBackedSlot(block, tail, backedSlot);
@@ -239,9 +245,10 @@ public class NamedLayout<T> extends DataLayout<T> {
         block.forEachFrom(pos, (p, backedSlot) -> {
             updateBackedSlot(block, p, backedSlot);
         });
+        updateBackedSlot(block, tail, null);
+        removed.slot.detached(removed.usage);
         char c = removed.c;
         removed.clear();
-        updateBackedSlot(block, tail, null);
         if(tail.y == 0) {
             removeCacheColumn(tail.x, c);
             refreshAfter(c);
@@ -283,6 +290,14 @@ public class NamedLayout<T> extends DataLayout<T> {
             namedBlock.relative.clear();
         }
         sorted.clear();
+        for (BackedSlot<T>[] backedSlots : backed) {
+            for (BackedSlot<T> backedSlot : backedSlots) {
+                if(backedSlot.slot != null) {
+                    backedSlot.slot.detached(backedSlot.usage);
+                }
+                backedSlot.clear();
+            }
+        }
         backed.clear();
         fireUpdateDataBounds(getWidth(), getHeight());
     }
@@ -315,13 +330,13 @@ public class NamedLayout<T> extends DataLayout<T> {
     @Nullable @Override public T getData(int x, int y) {
         BackedSlot<T> backedSlot = getBackedSlot(x, y);
         if(backedSlot == null) return null;
-        return backedSlot.data;
+        return (T) backedSlot.usage.getData();
     }
 
     @Override public T remove(int x, int y) {
         BackedSlot<T> backedSlot = getBackedSlot(x, y);
         if(backedSlot == null) return null;
-        T data = backedSlot.data;
+        T data = (T) backedSlot.usage.getData();
         if(data == null) return null;
         NamedBlock<T> block = sorted.get(backedSlot.c);
         Vec2i pos = new Vec2i(x, y);

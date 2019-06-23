@@ -1,8 +1,12 @@
 package dialight.teams;
 
+import dialight.compatibility.TeamBc;
+import dialight.extensions.ColorConverter;
 import dialight.observable.collection.ObservableCollection;
 import dialight.observable.map.ObservableMap;
 import dialight.observable.map.ObservableMapWrapper;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.scoreboard.Team;
 
@@ -26,6 +30,14 @@ public class ObservableTeamImpl implements ObservableTeam {
 
     @Override public String getName() {
         return this.name;
+    }
+
+    @Override public ChatColor getColor() {
+        return TeamBc.of(team).getColor();
+    }
+
+    @Override public Color getLeatherColor() {
+        return ColorConverter.toLeatherColor(getColor());
     }
 
     @Override public ObservableCollection<OfflinePlayer> getMembers() {

@@ -1,20 +1,14 @@
 package dialight.guilib.view;
 
-import dialight.compatibility.ItemStackBuilderBc;
-import dialight.extensions.Colorizer;
-import dialight.extensions.GuiUtils;
-import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.gui.Gui;
 import dialight.guilib.layout.SlotLayout;
-import dialight.guilib.slot.*;
-import org.bukkit.DyeColor;
+import dialight.guilib.slot.LocSlot;
+import dialight.guilib.slot.Slot;
+import dialight.guilib.slot.Vec2i;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  *
@@ -35,79 +29,13 @@ import java.util.List;
  * _ - SlotLayout content
  *
  */
-public class Scroll9x5View<G extends Gui, L extends SlotLayout> extends View<G, L> {
+public abstract class Scroll9x5View<G extends Gui, L extends SlotLayout> extends ScrollView<G, L> {
 
-    protected final int width = 9;
-    protected final int height = 5;
+    private final int width = 9;
+    private final int height = 5;
     private final Slot[] botPane = new Slot[9];
+    private int offset = 0;
     protected String prefix;
-    protected int offset = 0;
-
-    protected static final List<String> DEFAULT_BACKGROUND_LORE = Colorizer.asList(
-            "|r|Для верного отображения",
-            "|r|заголовков столбцов",
-            "|r|используйте шрифт Unicode.",
-            "|w|Навигация",
-            "|a|ЛКМ снаружи инвертаря|y|:",
-            "|y| Скролл влево",
-            "|a|ПКМ снаружи инвертаря|y|:",
-            "|y| Скролл вправо",
-            "|a|СКМ снаружи инвертаря|y|:",
-            "|y| Вернуться назад"
-    );
-    protected final Slot defaultBackground = new StaticSlot(new ItemStackBuilder()
-            .let(builder -> {
-                ItemStackBuilderBc.of(builder).stainedGlassPane(DyeColor.LIGHT_BLUE);
-            })
-            .displayName(" ")
-            .lore(DEFAULT_BACKGROUND_LORE)
-            .build());
-    protected final Slot defaultBackward = new StaticSlot(new ItemStackBuilder()
-            .let(builder -> {
-                ItemStackBuilderBc.of(builder).playerHead();
-            })
-            .displayName("Влево")
-            .lore(Colorizer.asList(
-                    "|a|ЛКМ|y|: Скролл влево",
-                    "|a|Shift|y|+|a|ЛКМ|y|: Перейти на предыдущую страницу"
-            ))
-            .nbt(GuiUtils.BACKWARD_NBT)
-            .build()) {
-        @Override
-        public void onClick(SlotClickEvent e) {
-            switch (e.getEvent().getClick()) {
-                case LEFT: {
-                    moveBackward(1);
-                } break;
-                case SHIFT_LEFT: {
-                    moveBackward(width);
-                } break;
-            }
-        }
-    };
-    protected final Slot defaultForward = new StaticSlot(new ItemStackBuilder()
-            .let(builder -> {
-                ItemStackBuilderBc.of(builder).playerHead();
-            })
-            .displayName("Вправо")
-            .lore(Colorizer.asList(
-                    "|a|ЛКМ|y|: Скролл вправо",
-                    "|a|Shift|y|+|a|ЛКМ|y|: Перейти на следующую страницу"
-            ))
-            .nbt(GuiUtils.FORWARD_NBT)
-            .build()) {
-        @Override
-        public void onClick(SlotClickEvent e) {
-            switch (e.getEvent().getClick()) {
-                case LEFT: {
-                    moveForward(1);
-                } break;
-                case SHIFT_LEFT: {
-                    moveForward(width);
-                }
-            }
-        }
-    };
 
     public Scroll9x5View(G gui, L layout, String title) {
         super(gui, layout, 9, 6, title);
@@ -120,24 +48,7 @@ public class Scroll9x5View<G extends Gui, L extends SlotLayout> extends View<G, 
         return limit;
     }
 
-    @Override public void onOutsideClick(Player player, ClickType click) {
-        switch (click) {
-            case LEFT: {
-                moveBackward(1);
-            } break;
-            case SHIFT_LEFT: {
-                moveBackward(width);
-            }
-            case RIGHT: {
-                moveForward(1);
-            } break;
-            case SHIFT_RIGHT: {
-                moveForward(width);
-            } break;
-        }
-    }
-
-    public void moveBackward(int dx) {
+    @Override public void moveBackward(int dx) {
         int oldValue = offset;
         offset -= dx;
         if(offset < 0) {
@@ -150,7 +61,7 @@ public class Scroll9x5View<G extends Gui, L extends SlotLayout> extends View<G, 
         }
     }
 
-    public void moveForward(int dx) {
+    @Override public void moveForward(int dx) {
         int oldValue = offset;
         offset += dx;
         int limit = calcLimit();
@@ -164,18 +75,7 @@ public class Scroll9x5View<G extends Gui, L extends SlotLayout> extends View<G, 
         }
     }
 
-    protected void updateView() {
-        int limit = calcLimit();
-        for (int x = 0; x < 9; x++) {
-            if(x == 3 && offset != 0) {
-                setBotPaneSlot(x, defaultBackward);
-            } else if(x == 5 && offset != limit) {
-                setBotPaneSlot(x, defaultForward);
-            } else {
-                setBotPaneSlot(x, defaultBackground);
-            }
-        }
-    }
+    protected abstract void updateView();
 
     @Override public void refresh() {
         int limit = calcLimit();
@@ -194,11 +94,16 @@ public class Scroll9x5View<G extends Gui, L extends SlotLayout> extends View<G, 
     }
 
     protected void updateTitle() {
-        setTitle(prefix + " " + (offset + 1) + "/" + getLayout().getWidth());
+        int page = offset + 1;
+        int pages = getLayout().getWidth();
+        if(pages == 1) {
+            setTitle(prefix);
+        } else {
+            setTitle(prefix + " " + page + "/" + pages);
+        }
     }
 
-    @Override
-    public void onOpenView(Player player) {
+    @Override public void onOpenView(Player player) {
         refresh();
         super.onOpenView(player);
     }
@@ -219,8 +124,7 @@ public class Scroll9x5View<G extends Gui, L extends SlotLayout> extends View<G, 
         return new LocSlot(pos, slot);
     }
 
-    @Override
-    public void updateSlot(int x, int y, @Nullable Slot slot) {
+    @Override public void updateSlot(int x, int y, @Nullable Slot slot) {
         x -= offset;
         if(x < 0) return;
         if(x >= width) return;
@@ -230,8 +134,7 @@ public class Scroll9x5View<G extends Gui, L extends SlotLayout> extends View<G, 
         getInventory().setItem(x + y * 9, item);
     }
 
-    @Override
-    public void updateDataBounds(int width, int height) {
+    @Override public void updateDataBounds(int width, int height) {
         int limit = calcLimit();
         if(offset > limit) {
             offset = limit;
@@ -244,6 +147,31 @@ public class Scroll9x5View<G extends Gui, L extends SlotLayout> extends View<G, 
     public void setTitlePrefix(@NotNull String prefix) {
         this.prefix = prefix;
         updateTitle();
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    @Override public int getOffset() {
+        return offset;
+    }
+
+    public static void defaultUpdateView(Scroll9x5View view, Slot background, Slot forward, Slot backward) {
+        int limit = view.calcLimit();
+        for (int x = 0; x < 9; x++) {
+            if(x == 3 && view.getOffset() != 0) {
+                view.setBotPaneSlot(x, backward);
+            } else if(x == 5 && view.getOffset() != limit) {
+                view.setBotPaneSlot(x, forward);
+            } else {
+                view.setBotPaneSlot(x, background);
+            }
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 package dialight.teams;
 
 import dialight.eventhelper.project.ProjectApi;
+import dialight.guilib.slot.Slot;
 import dialight.observable.collection.ObservableCollection;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,4 +21,7 @@ public class TeamsApi implements ProjectApi {
         return proj.get(teamName);
     }
 
+    public void addControlItem(Slot slot) {
+        proj.getControlGui().addControlItem(slot);
+    }
 }

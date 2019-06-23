@@ -7,7 +7,7 @@ import dialight.guilib.layout.CachedPageLayout;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
-import dialight.guilib.view.Scroll9x5View;
+import dialight.guilib.view.page.Scroll9x5PageView;
 import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
 import org.bukkit.DyeColor;
@@ -18,10 +18,13 @@ import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 
-public class TeamsView extends Scroll9x5View<TeamsGui, CachedPageLayout<ObservableTeam>> {
+public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageLayout<ObservableTeam>> {
 
     private final Slot background;
+    private final Slot backward = buildDefaultBackward(this);
+    private final Slot forward = buildDefaultForward(this);
     private final Slot addTeam;
+    private final Slot controlItems;
 
     public TeamsView(TeamsGui gui, CachedPageLayout<ObservableTeam> layout) {
         super(gui, layout, "Команды");
@@ -36,7 +39,7 @@ public class TeamsView extends Scroll9x5View<TeamsGui, CachedPageLayout<Observab
                 .lore(DEFAULT_BACKGROUND_LORE)
                 .addLore(Colorizer.asList(
                         "",
-                        "|g|Плагин: |y|Телепорт",
+                        "|g|Плагин: |y|Команды",
                         "|g|Версия: |y|v" + desc.getVersion()
                 ))
                 .build());
@@ -48,8 +51,7 @@ public class TeamsView extends Scroll9x5View<TeamsGui, CachedPageLayout<Observab
                         "|a|Shift|y|+|a|ПКМ|y|: очистить все команды"
                 ))
                 .build()) {
-            @Override
-            public void onClick(SlotClickEvent e) {
+            @Override public void onClick(SlotClickEvent e) {
                 switch (e.getEvent().getClick()) {
                     case LEFT: {
                         proj.getGuilib().openGui(e.getPlayer(), gui.getAddTeamGui());
@@ -70,6 +72,26 @@ public class TeamsView extends Scroll9x5View<TeamsGui, CachedPageLayout<Observab
                 }
             }
         };
+        controlItems = new StaticSlot(new ItemStackBuilder(Material.BED)
+                .displayName("Распределение команд")
+                .addLore(Colorizer.asList(
+                        "|a|ЛКМ|y|: Откыть список распределителей"
+                ))
+                .build()) {
+            @Override public void onClick(SlotClickEvent e) {
+                switch (e.getEvent().getClick()) {
+                    case LEFT:
+                        proj.getGuilib().openGui(e.getPlayer(), proj.getControlGui());
+                        break;
+                    case SHIFT_LEFT:
+                        break;
+                    case RIGHT:
+                        break;
+                    case SHIFT_RIGHT:
+                        break;
+                }
+            }
+        };
     }
 
     @Override protected void updateView() {
@@ -77,20 +99,16 @@ public class TeamsView extends Scroll9x5View<TeamsGui, CachedPageLayout<Observab
         for (int x = 0; x < 9; x++) {
             if(x == 0) {
                 setBotPaneSlot(x, addTeam);
-            } else if(x == 3 && offset != 0) {
-                setBotPaneSlot(x, defaultBackward);
-            } else if(x == 5 && offset != limit) {
-                setBotPaneSlot(x, defaultForward);
+            } else if(x == 1) {
+                setBotPaneSlot(x, controlItems);
+            } else if(x == 3 && getOffset() != 0) {
+                setBotPaneSlot(x, backward);
+            } else if(x == 5 && getOffset() != limit) {
+                setBotPaneSlot(x, forward);
             } else {
                 setBotPaneSlot(x, background);
             }
         }
-    }
-
-    @Override protected int calcLimit() {
-        int limit = getLayout().getWidth() - width;
-        if(limit < 0) limit = 0;
-        return limit;
     }
 
 }

@@ -128,7 +128,7 @@ public class AddTeamLayout extends CachedPageLayout<ChatColor> {
 
         proj.onTeamUpdate(onTeamUpdate);
         coloredTeams.addAll(proj.getTeamsImmutable().stream()
-                .map(oteam -> TeamBc.of(oteam.getTeam()).getColor())
+                .map(ObservableTeam::getColor)
                 .collect(Collectors.toList()));
 
         COLORS.forEach(this::add);

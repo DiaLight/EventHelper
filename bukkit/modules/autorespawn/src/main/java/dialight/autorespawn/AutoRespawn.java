@@ -32,7 +32,7 @@ public class AutoRespawn extends Project {
         module = new AutoRespawnModule(this);
 
         maingui.registerModuleItem(AutoRespawnModule.ID, new AutoRespawnSlot(this));
-        modulelib.getModules().add(module);
+        modulelib.register(module);
         PluginManager pm = getPlugin().getServer().getPluginManager();
         pm.registerEvents(listener, getPlugin());
     }
