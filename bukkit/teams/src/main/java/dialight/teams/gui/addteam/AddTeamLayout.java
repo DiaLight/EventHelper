@@ -8,13 +8,11 @@ import dialight.guilib.indexcache.IndexCache;
 import dialight.guilib.layout.CachedPageLayout;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
-import dialight.observable.collection.ObservableCollection;
 import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
 import dialight.teams.TeamsMessages;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -25,7 +23,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class AddTeamLayout extends CachedPageLayout<ChatColor> {
@@ -53,36 +50,35 @@ public class AddTeamLayout extends CachedPageLayout<ChatColor> {
     private class AddTeamSlot implements Slot {
 
         private final ChatColor color;
+        private final String name;
 
         public AddTeamSlot(ChatColor color) {
             this.color = color;
+            String team_name = color.name().toLowerCase();
+            if (team_name.length() > 16) {
+                team_name = team_name.substring(0, 16);
+            }
+            this.name = team_name;
         }
 
-        @Override
-        public void onClick(SlotClickEvent e) {
+        @Override public void onClick(SlotClickEvent e) {
             if (coloredTeams.contains(color)) {
                 e.getPlayer().sendMessage(TeamsMessages.thisColorAlreadyInUse);
                 return;
             }
-            String team_name = color.name() + "_team";
-            if (team_name.length() > 16) {
-                team_name = team_name.substring(0, 16);
-            }
-            Team team = scoreboard.getTeam(team_name);
+            Team team = scoreboard.getTeam(name);
             if (team != null) {
                 e.getPlayer().sendMessage(TeamsMessages.thisNameAlreadyInUse);
                 return;
             }
-            team = scoreboard.registerNewTeam(team_name);
+            team = scoreboard.registerNewTeam(name);
             TeamBc.of(team).setColor(color);
             team.setSuffix(ChatColor.RESET.toString());
             e.getPlayer().sendMessage(TeamsMessages.addTeam(team));
             proj.getGuilib().openPrev(e.getPlayer());
         }
 
-        @NotNull
-        @Override
-        public ItemStack createItem() {
+        @NotNull @Override public ItemStack createItem() {
             Material material;
             if (coloredTeams.contains(color)) {
                 material = Material.LEATHER_BOOTS;
@@ -91,12 +87,12 @@ public class AddTeamLayout extends CachedPageLayout<ChatColor> {
             }
             ItemStackBuilder isb = new ItemStackBuilder(material);
             isb.leatherArmorColor(ColorConverter.toLeatherColor(color));
-            isb.displayName(color.name());
+            isb.displayName(color + Colorizer.apply("⬛ |w|" + name));
             isb.hideAttributes(true);
             isb.hideMiscellaneous(true);
             if (coloredTeams.contains(color)) {
                 isb.lore(Colorizer.asList(
-                        "|y|Команда с таким цветом уже создана"
+                        "|r|Команда с таким цветом уже создана"
                 ));
             } else {
                 isb.lore(Colorizer.asList(
@@ -111,8 +107,6 @@ public class AddTeamLayout extends CachedPageLayout<ChatColor> {
     private final Set<ChatColor> coloredTeams = EnumSet.noneOf(ChatColor.class);
     @NotNull private final Teams proj;
     @NotNull private final Scoreboard scoreboard;
-    private final Function<Player, Player> getNextPlayer = this::getNextPlayer;
-
 
     public AddTeamLayout(Teams proj, IndexCache cache) {
         super(cache);
@@ -124,7 +118,7 @@ public class AddTeamLayout extends CachedPageLayout<ChatColor> {
     }
 
     @Override public void onViewersNotEmpty() {
-        proj.getListener().registerTeamsObserver(getNextPlayer);
+        proj.getListener().registerTeamsObserver(this);
 
         proj.onTeamUpdate(onTeamUpdate);
         coloredTeams.addAll(proj.getTeamsImmutable().stream()
@@ -136,7 +130,7 @@ public class AddTeamLayout extends CachedPageLayout<ChatColor> {
 
 
     @Override public void onViewersEmpty() {
-        proj.getListener().unregisterTeamsObserver(getNextPlayer);
+        proj.getListener().unregisterTeamsObserver(this);
 
         proj.onTeamUpdate(onTeamUpdate);
         coloredTeams.clear();
@@ -149,19 +143,6 @@ public class AddTeamLayout extends CachedPageLayout<ChatColor> {
 //        coloredTeams.addAll(proj.getTeamsImmutable().stream()
 //                .map(ot -> TeamEx.of(ot.getTeam()).getChatColor())
 //                .collect(Collectors.toList()));
-    }
-
-    private Player getNextPlayer(Player player) {
-        ObservableCollection<Player> viewers = getViewers();
-        if(player == null) {
-            if(viewers.isEmpty()) return null;
-            return viewers.iterator().next();
-        }
-        for (Player viewer : viewers) {
-            if(viewer.getUniqueId() == player.getUniqueId()) continue;
-            return viewer;
-        }
-        return null;
     }
 
 }

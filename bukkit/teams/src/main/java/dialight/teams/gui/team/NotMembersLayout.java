@@ -42,12 +42,8 @@ public class NotMembersLayout extends NamedSetLayout<OfflinePlayer, UUID> {
         online.onRemove(onRemoveOnline);
 
         OfflineObservable offline = proj.getOfflinelib().getOffline();
-//        for (OfflinePlayer op : oteam.getMembers()) {
-//            System.out.println("member " + op.getName() + " " + op.getUniqueId());
-//        }
         for (OfflinePlayer op : offline) {
             if (!oteam.getMembers().contains(op)) {
-//                System.out.println("add " + op.getName() + " " + op.getUniqueId());
                 add(op);
             }
         }

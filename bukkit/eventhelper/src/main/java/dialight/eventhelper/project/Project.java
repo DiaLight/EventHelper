@@ -1,8 +1,12 @@
 package dialight.eventhelper.project;
 
 import dialight.eventhelper.EventHelper;
+import dialight.extensions.Colorizer;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.List;
 
 public abstract class Project {
 
@@ -24,6 +28,14 @@ public abstract class Project {
 
     public BukkitTask runTask(Runnable op) {
         return getPlugin().getServer().getScheduler().runTask(getPlugin(), op);
+    }
+
+    public List<String> getItemSuffix() {
+        PluginDescriptionFile desc = getPlugin().getDescription();
+        return Colorizer.asList(
+                "|g|Плагин: |y|" + desc.getName(),
+                "|g|Версия: |y|v" + desc.getVersion()
+        );
     }
 
 }

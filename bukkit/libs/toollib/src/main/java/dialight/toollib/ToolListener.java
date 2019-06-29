@@ -9,7 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -52,7 +51,6 @@ public class ToolListener implements Listener {
         Tool tool = identifyTool(item);
         if (tool == null) return;
         if (!proj.hasAccess(e.getPlayer())) return;
-//        if (item.getType().isBlock()) return;
         ToolInteractEvent toolEvent = null;
         switch(e.getAction()) {
             case LEFT_CLICK_AIR: {
@@ -71,7 +69,7 @@ public class ToolListener implements Listener {
                 return;
         }
         tool.onClick(toolEvent);
-//        if (toolEvent.isCancelled()) e.setCancelled(true);
+        if (toolEvent.isCancelled()) e.setCancelled(true);
     }
 
     @EventHandler
@@ -102,19 +100,19 @@ public class ToolListener implements Listener {
         if (toolEvent.isCancelled()) e.setCancelled(true);
     }
 
-    @EventHandler
-    public void onBlockPlace(BlockPlaceEvent e) {
-        Player player = e.getPlayer();
-        if (!proj.hasAccess(player)) return;
-        ItemStack item = e.getItemInHand();
-        Tool tool = identifyTool(item);
-        if (tool == null) return;
-        if (!item.getType().isBlock()) return;
-//        ToolInteractEvent toolEvent = new ToolInteractEvent.Block(player, item, e.getBlock(), ToolInteractEvent.Action.RIGHT_CLICK);
-//        tool.onClick(toolEvent);
-//        if (toolEvent.isCancelled()) e.setCancelled(true);
-        e.setCancelled(true);
-    }
+//    @EventHandler
+//    public void onBlockPlace(BlockPlaceEvent e) {
+//        Player player = e.getPlayer();
+//        if (!proj.hasAccess(player)) return;
+//        ItemStack item = e.getItemInHand();
+//        Tool tool = identifyTool(item);
+//        if (tool == null) return;
+//
+////        ToolInteractEvent toolEvent = new ToolInteractEvent.Block(player, item, e.getBlock(), ToolInteractEvent.Action.RIGHT_CLICK);
+////        tool.onClick(toolEvent);
+////        if (toolEvent.isCancelled()) e.setCancelled(true);
+////        e.setCancelled(true);
+//    }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {

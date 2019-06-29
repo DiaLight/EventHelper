@@ -63,6 +63,7 @@ public class MainGuiListener implements Listener {
     public void onItemHeld(PlayerItemHeldEvent e) {
         Player player = e.getPlayer();
         if(player.getGameMode() != GameMode.CREATIVE) return;
+        if(!player.isOp()) return;
         int button = e.getNewSlot();
         GetToolStatus status = getOrCreate(player.getUniqueId());
 

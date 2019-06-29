@@ -14,7 +14,7 @@ public class ControlGui extends Gui {
 
     public ControlGui(Teams proj) {
         this.proj = proj;
-        this.layout = new ControlLayout();
+        this.layout = new ControlLayout(proj);
         this.view = new ControlView(this, layout);
     }
 
@@ -24,6 +24,10 @@ public class ControlGui extends Gui {
 
     public void addControlItem(Slot slot) {
         layout.add(slot);
+    }
+
+    public Teams getProj() {
+        return proj;
     }
 
 }

@@ -22,11 +22,11 @@ public class OfflinePlayerEx {
     public OfflinePlayerEx(Server server, UUID uuid) {
         this.server = server;
         this.uuid = uuid;
-        load();
     }
 
-    public void load() {
+    public boolean load() {
         nbt = OfflinePlayerNms.getData(uuid);
+        return nbt != null;
     }
 
     public void save() {
@@ -44,7 +44,8 @@ public class OfflinePlayerEx {
     public String getName() {
         Player player = getPlayer();
         if(player != null) return player.getName();
-        return nbt.getString("lastKnownName");
+        NBTTagCompoundNms bukkit = nbt.getCompound("bukkit");
+        return bukkit.getString("lastKnownName");
     }
     private UUID getWorldUniqueId() {
         return new UUID(nbt.getLong("WorldUUIDMost"), nbt.getLong("WorldUUIDLeast"));

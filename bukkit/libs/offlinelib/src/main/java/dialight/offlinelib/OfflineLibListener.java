@@ -19,8 +19,7 @@ public class OfflineLibListener implements Listener {
         this.server = proj.getPlugin().getServer();
     }
 
-    @EventHandler
-    public void onPreLogin(AsyncPlayerPreLoginEvent e) {
+    @EventHandler public void onPreLogin(AsyncPlayerPreLoginEvent e) {
         UUID uuid = e.getUniqueId();
         proj.runTask(() -> {
             OfflinePlayerEx opex = proj.get(uuid);
@@ -28,11 +27,11 @@ public class OfflineLibListener implements Listener {
         });
     }
 
-    @EventHandler
-    public void onQuit(PlayerQuitEvent e) {
+    @EventHandler public void onQuit(PlayerQuitEvent e) {
         UUID uuid = e.getPlayer().getUniqueId();
         proj.runTask(() -> {
-            proj.getOrCreate(uuid).load();
+            OfflinePlayerEx opex = proj.getOrLoad(uuid);
+            if (opex != null) opex.load();
         });
     }
 

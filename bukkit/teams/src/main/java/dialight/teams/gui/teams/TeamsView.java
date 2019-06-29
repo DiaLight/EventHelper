@@ -44,7 +44,7 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageLayout<Obse
                 ))
                 .build());
         addTeam = new StaticSlot(new ItemStackBuilder(Material.NETHER_STAR)
-                .displayName("Добавить команду")
+                .displayName(Colorizer.apply("|a|Добавить команду"))
                 .lore(Colorizer.asList(
                         "|a|ЛКМ|y|: добавить команду",
                         "|a|Shift|y|+|a|ЛКМ|y|: удалить все команды",
@@ -72,8 +72,11 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageLayout<Obse
                 }
             }
         };
-        controlItems = new StaticSlot(new ItemStackBuilder(Material.BED)
-                .displayName("Распределение команд")
+        controlItems = new StaticSlot(new ItemStackBuilder()
+                .let(isb -> {
+                    ItemStackBuilderBc.of(isb).bed(DyeColor.WHITE);
+                })
+                .displayName(Colorizer.apply("|a|Распределение команд"))
                 .addLore(Colorizer.asList(
                         "|a|ЛКМ|y|: Откыть список распределителей"
                 ))
@@ -92,23 +95,12 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageLayout<Obse
                 }
             }
         };
+        setBotPaneSlot(0, addTeam);
+        setBotPaneSlot(1, controlItems);
     }
 
-    @Override protected void updateView() {
-        int limit = calcLimit();
-        for (int x = 0; x < 9; x++) {
-            if(x == 0) {
-                setBotPaneSlot(x, addTeam);
-            } else if(x == 1) {
-                setBotPaneSlot(x, controlItems);
-            } else if(x == 3 && getOffset() != 0) {
-                setBotPaneSlot(x, backward);
-            } else if(x == 5 && getOffset() != limit) {
-                setBotPaneSlot(x, forward);
-            } else {
-                setBotPaneSlot(x, background);
-            }
-        }
+    @Override protected Slot createBotBackground(int x) {
+        return defaultCreateBotBackground(this, x, background, forward, backward);
     }
 
 }

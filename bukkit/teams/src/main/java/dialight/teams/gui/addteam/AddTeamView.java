@@ -15,8 +15,8 @@ public class AddTeamView extends Scroll9x5PageView<AddTeamGui, CachedPageLayout<
         super(gui, layout, "Добавление команды");
     }
 
-    @Override public void updateView() {
-        defaultUpdateView(this, background, forward, backward);
+    @Override protected Slot createBotBackground(int x) {
+        return defaultCreateBotBackground(this, x, background, forward, backward);
     }
 
 }

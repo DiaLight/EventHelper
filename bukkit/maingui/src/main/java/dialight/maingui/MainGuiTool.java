@@ -2,7 +2,6 @@ package dialight.maingui;
 
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
-import dialight.nms.ItemStackNms;
 import dialight.toollib.Tool;
 import dialight.toollib.events.ToolInteractEvent;
 import org.bukkit.Material;
@@ -21,7 +20,7 @@ public class MainGuiTool extends Tool {
                 .displayName(Colorizer.apply("|a|Вещь всея Майнкрафта"))
                 .lore(Colorizer.asList(
                         "|a|ПКМ|y|: Открыть «Инвентарь EventHelper»",
-                        "|a|Shift|y|+|a|ПКМ|y|: Открыть ранее открытый",
+                        "|a|Shift|y|+|a|ЛКМ|y|: Открыть ранее открытый",
                         "|y| инентарь",
                         "|y|Аналог: |g|/eh"
                 ))
@@ -34,16 +33,13 @@ public class MainGuiTool extends Tool {
             case LEFT_CLICK: if(!e.isSneaking()) {
 
             } else {
-                ItemStack is = e.getPlayer().getInventory().getItem(8);
-                if(is != null && is.getType() != Material.AIR) {
-                    ItemStackNms.dump(is);
-                }
+
             } break;
             case RIGHT_CLICK: if(!e.isSneaking()) {
                 proj.getGuilib().clearStory(e.getPlayer());
                 proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
             } else {
-                if(proj.getGuilib().openLast(e.getPlayer()) != null) {
+                if(proj.getGuilib().openLast(e.getPlayer()) == null) {
                     proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
                 }
             } break;

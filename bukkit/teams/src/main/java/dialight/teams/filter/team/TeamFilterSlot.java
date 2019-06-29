@@ -1,23 +1,23 @@
-package dialight.teams.random.gui.filter;
+package dialight.teams.filter.team;
 
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.teams.ObservableTeam;
-import dialight.teams.random.TeamRandomizerProject;
+import dialight.teams.Teams;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
-public class FilterSlot implements Slot {
+public class TeamFilterSlot implements Slot {
 
-    @NotNull private final TeamRandomizerProject proj;
+    @NotNull private final Teams proj;
     private final ObservableTeam oteam;
 
-    public FilterSlot(TeamRandomizerProject proj, ObservableTeam oteam) {
+    public TeamFilterSlot(Teams proj, ObservableTeam oteam) {
         this.proj = proj;
         this.oteam = oteam;
     }
@@ -25,7 +25,7 @@ public class FilterSlot implements Slot {
     @Override public void onClick(SlotClickEvent e) {
         switch (e.getEvent().getClick()) {
             case LEFT:
-                Collection<String> filter = proj.getFilter();
+                Collection<String> filter = proj.getTeamFilter();
                 if (filter.contains(oteam.getName())) {
                     filter.remove(oteam.getName());
                 } else {
@@ -42,7 +42,7 @@ public class FilterSlot implements Slot {
     }
 
     @NotNull @Override public ItemStack createItem() {
-        boolean inFilter = proj.getFilter().contains(oteam.getName());
+        boolean inFilter = proj.getTeamFilter().contains(oteam.getName());
         Material material;
         if (inFilter) {
             material = Material.LEATHER_BOOTS;
@@ -50,6 +50,7 @@ public class FilterSlot implements Slot {
             material = Material.LEATHER_CHESTPLATE;
         }
         ItemStackBuilder isb = new ItemStackBuilder(material)
+                .displayName(oteam.getColor() + Colorizer.apply("⬛ |w|" + oteam.getName()))
                 .leatherArmorColor(oteam.getLeatherColor())
                 .hideAttributes(true)
                 .hideMiscellaneous(true);

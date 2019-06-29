@@ -10,7 +10,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -40,6 +39,12 @@ public class OfflineLib extends Project {
         pm.registerEvents(listener, getPlugin());
         pm.registerEvents(online, getPlugin());
         pm.registerEvents(offline, getPlugin());
+
+//        for (OfflinePlayer op : getPlugin().getServer().getOfflinePlayers()) {
+//            UUID uuid = op.getUniqueId();
+//            OfflinePlayerEx opex = new OfflinePlayerEx(getPlugin().getServer(), uuid);
+//            offlinePlayers.put(uuid, opex);
+//        }
     }
 
     @Override
@@ -55,19 +60,18 @@ public class OfflineLib extends Project {
 //        offline = null;
     }
 
-    @Override
-    public ProjectApi getApi() {
+    @Override public ProjectApi getApi() {
         return new OfflineLibApi(this);
     }
 
     @Nullable public OfflinePlayerEx get(UUID uuid) {
         return offlinePlayers.get(uuid);
     }
-    @NotNull public OfflinePlayerEx getOrCreate(UUID uuid) {
+    @Nullable public OfflinePlayerEx getOrLoad(UUID uuid) {
         OfflinePlayerEx opex = offlinePlayers.get(uuid);
         if(opex != null) return opex;
-        getPlugin().getServer().getOfflinePlayer(uuid);
         opex = new OfflinePlayerEx(getPlugin().getServer(), uuid);
+        if(!opex.load()) return null;
         offlinePlayers.put(uuid, opex);
         return opex;
     }
@@ -84,11 +88,11 @@ public class OfflineLib extends Project {
         return offline;
     }
 
-    public OfflinePlayer getOfflinePlayerByName(String name) {
+    @Nullable public OfflinePlayer getOfflinePlayerByName(String name) {
         Server server = getPlugin().getServer();
         for (OfflinePlayer op : server.getOfflinePlayers()) {
             if(Objects.equals(op.getName(), name)) return op;
         }
-        return server.getOfflinePlayer(name);
+        return null;
     }
 }

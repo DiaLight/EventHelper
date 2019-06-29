@@ -17,11 +17,15 @@ public class OfflineLibApi implements ProjectApi {
         this.proj = proj;
     }
 
-    @NotNull public OfflinePlayer getOfflinePlayerByName(String name) {
+    @Nullable public OfflinePlayer getOfflinePlayerByName(String name) {
         return proj.getOfflinePlayerByName(name);
     }
-    @NotNull public OfflinePlayerEx getOfflinePlayerEx(UUID uuid) {
-        return proj.getOrCreate(uuid);
+    @Nullable public OfflinePlayerEx getOfflinePlayerEx(UUID uuid) {
+        return proj.getOrLoad(uuid);
+    }
+
+    @NotNull public UuidPlayer getUuidPlayer(UUID uuid) {
+        return new UuidPlayer(proj, uuid);
     }
 
     @Nullable public OfflinePlayerEx getOfflinePlayerExByEntity(Entity entity) {

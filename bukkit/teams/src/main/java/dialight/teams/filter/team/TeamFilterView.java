@@ -1,17 +1,16 @@
-package dialight.teams.gui.control;
+package dialight.teams.filter.team;
 
 import dialight.guilib.slot.Slot;
 import dialight.guilib.view.page.Scroll9x5PageView;
 
-public class ControlView extends Scroll9x5PageView<ControlGui, ControlLayout> {
+public class TeamFilterView extends Scroll9x5PageView<TeamFilterGui, TeamFilterLayout> {
 
     private final Slot background = buildDefaultBackground();
     private final Slot forward = buildDefaultForward(this);
     private final Slot backward = buildDefaultBackward(this);
 
-    public ControlView(ControlGui gui, ControlLayout layout) {
-        super(gui, layout, "Распределители команд");
-        this.setBotPaneSlot(0, new ControlFiltersSlot(gui.getProj()));
+    public TeamFilterView(TeamFilterGui gui, TeamFilterLayout layout, String title) {
+        super(gui, layout, title);
     }
 
     @Override protected Slot createBotBackground(int x) {

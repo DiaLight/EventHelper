@@ -183,9 +183,11 @@ public class NBTTagCompoundNms {
         return (int[]) ReflectionUtils.invokeMethod(nbt, "getIntArray",
                 new Class[]{String.class}, path);
     }
-    public Object getCompound(String path) {
-        return ReflectionUtils.invokeMethod(nbt, "getCompound",
+    public NBTTagCompoundNms getCompound(String path) {
+        Object nbt = ReflectionUtils.invokeMethod(this.nbt, "getCompound",
                 new Class[]{String.class}, path);
+        if(nbt == null) return null;
+        return new NBTTagCompoundNms(nbt);
     }
     @Nullable public NBTTagListNms getList(String path, Type type) {
         return new NBTTagListNms(ReflectionUtils.invokeMethod(nbt, "getList",

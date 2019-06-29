@@ -114,25 +114,13 @@ public class TeleporterView extends NamedLayoutScroll9x5View<TeleporterGui, Tele
                 }
             }
         };
+        setBotPaneSlot(0, selectView);
+        setBotPaneSlot(1, groupSelect);
     }
 
-    @Override protected void updateView() {
-        int limit = calcLimit();
-        for (int x = 0; x < 9; x++) {
-            if(x == 0) {
-                setBotPaneSlot(x, selectView);
-            } else if(x == 1) {
-                setBotPaneSlot(x, groupSelect);
-            } else if(x == 3 && getOffset() != 0) {
-                setBotPaneSlot(x, backward);
-            } else if(x == 5 && getOffset() != limit) {
-                setBotPaneSlot(x, forward);
-            } else {
-                setBotPaneSlot(x, background);
-            }
-        }
+    @Override protected Slot createBotBackground(int x) {
+        return defaultCreateBotBackground(this, x, background, forward, backward);
     }
-
 
     @Override
     public NamedLayout getNamedLayout() {

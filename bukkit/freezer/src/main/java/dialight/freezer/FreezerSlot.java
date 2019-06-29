@@ -2,6 +2,7 @@ package dialight.freezer;
 
 import dialight.compatibility.PlayerInventoryBc;
 import dialight.extensions.Colorizer;
+import dialight.extensions.InventoryEx;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
@@ -22,13 +23,13 @@ public class FreezerSlot implements Slot {
         this.item = new ItemStackBuilder(Material.ICE)
                 .displayName(Colorizer.apply("|a|Замораживатель игроков"))
                 .lore(Colorizer.asList(
-                        "|a|ЛКМ|y|: получить инструмент",
-                        "|a|ПКМ|y|: Открыть редактор",
+                        "|a|ЛКМ|y|: Открыть редактор",
+                        "|a|ПКМ|y|: получить инструмент в активный слот",
+                        "|a|Shift|y|+|a|ПКМ|y|: добавить инструмент в инвентарь",
                         "|y| замороженных игроков",
-                        "",
-                        "|g|Плагин: |y|Замораживатель",
-                        "|g|Версия: |y|v" + desc.getVersion()
+                        ""
                 ))
+                .addLore(proj.getItemSuffix())
                 .build();
     }
 
@@ -36,16 +37,18 @@ public class FreezerSlot implements Slot {
     public void onClick(SlotClickEvent e) {
         Player player = e.getPlayer();
         switch (e.getEvent().getClick()) {
-            case LEFT:
-            case SHIFT_LEFT: {
-                player.closeInventory();
-                FreezerTool tool = proj.getToollib().get(FreezerTool.class);
-                if(tool != null) {
-                    PlayerInventoryBc.of(player.getInventory()).setItemInMainHand(tool.createItem());
-                }
+            case LEFT: {
+//                proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
             } break;
             case RIGHT: {
+                PlayerInventoryBc.of(player.getInventory()).setItemInMainHand(proj.getTool().createItem());
 //                proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
+            } break;
+            case SHIFT_RIGHT: {
+                ItemStack item = proj.getTool().createItem();
+                if(!InventoryEx.of(e.getPlayer().getInventory()).addToEmptySlot(item)) {
+                    e.getPlayer().sendMessage(Colorizer.apply("|r|Не могу добавить итем"));
+                }
             } break;
         }
     }

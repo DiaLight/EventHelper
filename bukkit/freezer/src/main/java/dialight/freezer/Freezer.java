@@ -60,4 +60,7 @@ public class Freezer extends Project {
         return guilib;
     }
 
+    public FreezerTool getTool() {
+        return tool;
+    }
 }

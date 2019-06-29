@@ -30,13 +30,12 @@ public class TeamsTool extends Tool {
                 .let(isb -> {
                     ItemStackBuilderBc.of(isb).banner(DyeColor.WHITE);
                 })
-                .displayName(Colorizer.apply("|a|Распределитель команд"))
+                .displayName(Colorizer.apply("|a|Команды"))
                 .lore(Colorizer.asList(
                         "|a|ПКМ|y|: открыть редактор команд",
-                        "",
-                        "|g|Плагин: |y|Распределитель команд",
-                        "|g|Версия: |y|v" + desc.getVersion()
+                        ""
                 ))
+                .addLore(proj.getItemSuffix())
                 .nbt("{BlockEntityTag:{Patterns:[" +
                         "{Color:11,Pattern:\"vhr\"}," +
                         "{Color:10,Pattern:\"vh\"}," +

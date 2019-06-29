@@ -26,7 +26,7 @@ public class TeamSlot implements Slot {
                 .leatherArmorColor(oteam.getLeatherColor())
                 .hideAttributes(true)
                 .hideMiscellaneous(true)
-                .displayName(Colorizer.apply("|a|" + oteam.getName()))
+                .displayName(oteam.getColor() + Colorizer.apply("⬛ |w|" + oteam.getName()))
                 .lore(Colorizer.asList(
                         "|a|ЛКМ|y|: Получить инструмент",
                         "|y| управления командой",

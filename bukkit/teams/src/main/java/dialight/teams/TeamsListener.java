@@ -3,6 +3,7 @@ package dialight.teams;
 import dialight.extensions.packet.BroadcastPacketListener;
 import dialight.extensions.packet.PacketEvent;
 import dialight.extensions.packet.protocol.PacketOutTeam;
+import dialight.guilib.Viewable;
 import dialight.teams.event.TeamEvent;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -67,11 +68,21 @@ public class TeamsListener extends BroadcastPacketListener {
 
     public void unregisterTeamsObserver(Function<Player, Player> op) {
 //        System.out.println("unregister " + op.getClass());
-        teamObservers.remove(op);
+        if(!teamObservers.remove(op)) {
+            System.out.println("Failed to unregister teams observer");
+        }
         if(teamObservers.isEmpty()) {
             stop();
 //            System.out.println("stop");
         }
+    }
+
+    public void registerTeamsObserver(Viewable viewable) {
+        registerTeamsObserver(new ViewableTeamObserver(viewable));
+    }
+
+    public void unregisterTeamsObserver(Viewable viewable) {
+        unregisterTeamsObserver(new ViewableTeamObserver(viewable));
     }
 
 }

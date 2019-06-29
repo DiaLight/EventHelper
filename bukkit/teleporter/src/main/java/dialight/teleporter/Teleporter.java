@@ -92,6 +92,7 @@ public class Teleporter extends Project {
 
     public void teleport(OfflinePlayer op, Location loc) {
         OfflinePlayerEx opex = offlinelib.getOfflinePlayerEx(op.getUniqueId());
+        if(opex == null) throw new IllegalArgumentException("Player not found");
         loc = loc.clone();
         while (loc.getBlock().getType().isSolid()) {
             loc.add(0, 1, 0);

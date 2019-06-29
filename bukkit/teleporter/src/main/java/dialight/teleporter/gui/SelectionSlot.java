@@ -2,6 +2,7 @@ package dialight.teleporter.gui;
 
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
+import dialight.extensions.OfflinePlayerEx;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.offlinelib.OfflineLibApi;
@@ -45,8 +46,13 @@ public class SelectionSlot implements Slot {
 //                } break;
             case SHIFT_RIGHT: {
                 OfflineLibApi offlinelib = proj.getOfflinelib();
-                Location to = offlinelib.getOfflinePlayerEx(uuid).getLocation();
-                proj.teleport(e.getPlayer(), to);
+                OfflinePlayerEx opex = offlinelib.getOfflinePlayerEx(uuid);
+                if(opex != null) {
+                    Location to = opex.getLocation();
+                    proj.teleport(e.getPlayer(), to);
+                } else {
+                    e.getPlayer().sendMessage(Colorizer.apply("|r|Игрок не найден"));
+                }
             } break;
         }
     }

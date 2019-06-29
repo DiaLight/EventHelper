@@ -3,7 +3,7 @@ package dialight.observable;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-class ObservableObject<V> {
+public class ObservableObject<V> {
 
     private V value;
     private final Collection<BiConsumer<V, V>> onChange = new LinkedList();
@@ -18,6 +18,10 @@ class ObservableObject<V> {
 
     public ObservableObject<V> onChange(BiConsumer<V, V> op) {
         onChange.add(op);
+        return this;
+    }
+    public ObservableObject<V> unregisterOnChange(BiConsumer<V, V> op) {
+        onChange.remove(op);
         return this;
     }
 

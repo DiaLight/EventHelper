@@ -1,6 +1,5 @@
-package dialight.teams.random;
+package dialight.teams.gui.control;
 
-import dialight.compatibility.ItemStackBuilderBc;
 import dialight.compatibility.TeamBc;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
@@ -9,8 +8,9 @@ import dialight.guilib.slot.SlotClickEvent;
 import dialight.observable.collection.ObservableCollection;
 import dialight.offlinelib.UuidPlayer;
 import dialight.teams.ObservableTeam;
+import dialight.teams.Teams;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
@@ -18,22 +18,22 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.UUID;
 
-public class TeamRandomizerSlot extends DynamicSlot {
+public class ControlFiltersSlot extends DynamicSlot {
 
-    private final TeamRandomizerProject proj;
+    private final Teams proj;
     private final Scoreboard scoreboard;
 
-    public TeamRandomizerSlot(TeamRandomizerProject proj) {
+    public ControlFiltersSlot(Teams proj) {
         this.proj = proj;
         this.scoreboard = proj.getPlugin().getServer().getScoreboardManager().getMainScoreboard();
-        ObservableCollection<String> teamFilter = proj.getTeams().getTeamFilter();
+        ObservableCollection<String> teamFilter = proj.getTeamFilter();
         teamFilter.onAdd(this::update);
         teamFilter.onRemove(this::update);
-        ObservableCollection<UUID> playerFilter = proj.getTeams().getPlayerFilter();
+        ObservableCollection<UUID> playerFilter = proj.getPlayerFilter();
         playerFilter.onAdd(this::update);
         playerFilter.onRemove(this::update);
-        proj.getTeams().onMemberJoin(this::update);
-        proj.getTeams().onMemberLeave(this::update);
+        proj.onMemberJoin(this::update);
+        proj.onMemberLeave(this::update);
     }
 
     private void update(String name) {
@@ -48,48 +48,39 @@ public class TeamRandomizerSlot extends DynamicSlot {
 
     @Override public void onClick(SlotClickEvent e) {
         switch (e.getEvent().getClick()) {
-            case LEFT:
-                proj.doFillRandomize();
-                break;
-            case SHIFT_LEFT:
-                proj.doRandomize();
-                break;
-            case RIGHT:
-                break;
-            case SHIFT_RIGHT:
-                break;
+            case LEFT: {
+                proj.getGuilib().openGui(e.getPlayer(), proj.getPlayerFilterGui());
+            } break;
+            case RIGHT: {
+                proj.getGuilib().openGui(e.getPlayer(), proj.getTeamFilterGui());
+            } break;
+            case SHIFT_LEFT: {
+                proj.setOfflineMode(!proj.isOfflineMode());
+            } break;
         }
     }
 
     @NotNull @Override public ItemStack createItem() {
-        PluginDescriptionFile desc = proj.getPlugin().getDescription();
-        ItemStackBuilder isb = new ItemStackBuilder();
-        ItemStackBuilderBc.of(isb).enderEye();
-        isb.displayName(Colorizer.apply("|a|Рандомизатор команд"));
-
-        isb.lore(Colorizer.asList(
-                "|a|ЛКМ|y|: дозаполнить команды",
-                "|y| игроками, которые не",
-                "|y| присутствуют ни в одной",
-                "|y| команде для рандомизации",
-                "|a|Shift|y|+|a|ЛКМ|y|: очистить команды и",
-                "|y| распределить всех игроков",
-                ""
-        ));
-        if(proj.getTeams().getTeamFilter().isEmpty()) {
+        ItemStackBuilder isb = new ItemStackBuilder(Material.HOPPER)
+                .displayName(Colorizer.apply("|a|Фильтры"))
+                .lore(Colorizer.asList(
+                        "|a|ЛКМ|y|: фильтр игроков",
+                        "|a|Shift|y|+|a|ЛКМ|y|: Учитывать офлайн игроков",
+                        "|a|ПКМ|y|: фильтр команд"
+                ));
+        if(proj.getTeamFilter().isEmpty()) {
             isb.addLore(Colorizer.asList(
-                    "|g|Команды для рандомизации:",
-                    " |a|все команды"
+                    "|g|Фильтр команд пуст"
             ));
         } else {
             isb.addLore(Colorizer.asList(
-                    "|g|Команды для рандомизации:"
+                    "|g|Команды в фильтре:"
             ));
-            for (String name : proj.getTeams().getTeamFilter()) {
-                ObservableTeam team = proj.getTeams().get(name);
+            for (String name : proj.getTeamFilter()) {
+                ObservableTeam team = proj.get(name);
                 if(team != null) {
                     isb.addLore(Colorizer.asList(
-                            "|g|- " + team.getColor() + "⬛ |w|" + name
+                            "|g|- " + team.getColor() + Colorizer.apply("⬛ |w|" + name)
                     ));
                 } else {
                     isb.addLore(Colorizer.asList(
@@ -98,16 +89,15 @@ public class TeamRandomizerSlot extends DynamicSlot {
                 }
             }
         }
-        if(proj.getTeams().getPlayerFilter().isEmpty()) {
+        if(proj.getPlayerFilter().isEmpty()) {
             isb.addLore(Colorizer.asList(
-                    "|g|Игроки для рандомизации:",
-                    " |a|все онлайн игроки"
+                    "|g|Фильтр игроков пуст"
             ));
         } else {
             isb.addLore(Colorizer.asList(
-                    "|g|Игроки для рандомизации:"
+                    "|g|Игроки в фильтре:"
             ));
-            ObservableCollection<UUID> playerFilter = proj.getTeams().getPlayerFilter();
+            ObservableCollection<UUID> playerFilter = proj.getPlayerFilter();
             Iterator<UUID> iterator = playerFilter.iterator();
             int previewSize = 8;
             for (int i = 0; i < previewSize && iterator.hasNext(); i++) {
@@ -132,12 +122,6 @@ public class TeamRandomizerSlot extends DynamicSlot {
                 ));
             }
         }
-        isb.addLore(Colorizer.asList(
-                "",
-                "|g|Плагин: |y|Рандомизатор команд",
-                "|g|Версия: |y|v" + desc.getVersion()
-        ));
-        isb.hideMiscellaneous(true);
         return isb.build();
     }
 

@@ -4,6 +4,7 @@ import dialight.compatibility.TeamBc;
 import dialight.extensions.ColorConverter;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
+import dialight.extensions.OfflinePlayerEx;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.observable.collection.ObservableCollection;
@@ -57,15 +58,19 @@ public class MemberSlot implements Slot {
                 TeleporterApi teleporter = proj.getTeleporter();
                 if (teleporter != null) {
                     OfflineLibApi offlinelib = proj.getOfflinelib();
-                    Location to = offlinelib.getOfflinePlayerEx(uuid).getLocation();
-                    teleporter.teleport(e.getPlayer(), to);
+                    OfflinePlayerEx opex = offlinelib.getOfflinePlayerEx(uuid);
+                    if(opex != null) {
+                        Location to = opex.getLocation();
+                        teleporter.teleport(e.getPlayer(), to);
+                    } else {
+                        e.getPlayer().sendMessage(Colorizer.apply("|r|Игрок не найден"));
+                    }
                 }
                 break;
         }
     }
 
-    @NotNull
-    @Override public ItemStack createItem() {
+    @NotNull @Override public ItemStack createItem() {
         OfflinePlayer op = server.getOfflinePlayer(this.uuid);
         Team team = scoreboard.getEntryTeam(op.getName());
         boolean isOnline = op.isOnline();
@@ -112,10 +117,10 @@ public class MemberSlot implements Slot {
             isb.addLore(Colorizer.apply("|a|Shift|y|+|a|ПКМ|y|: телепортироваться к игроку"));
         }
         if(team != null) {
-            isb.addLore(Colorizer.apply("|y|team: |g|" + team.getName()));
-            isb.addLore(Colorizer.apply("|y|display name: |g|" + team.getDisplayName()));
+            isb.addLore(Colorizer.apply("|y|team: ") + TeamBc.of(team).getColor() + Colorizer.apply("⬛ |w|" + team.getName()));
+            isb.addLore(Colorizer.apply("|y|display name: |w|" + team.getDisplayName()));
         }
-        isb.addLore(Colorizer.apply("|y|uuid: |g|" + op.getUniqueId()));
+        isb.addLore(Colorizer.apply("|y|uuid: |w|" + op.getUniqueId()));
         return isb.build();
     }
 

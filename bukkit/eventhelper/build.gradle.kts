@@ -34,7 +34,7 @@ val parts = arrayOf(
 //    ":bukkit:captain"
 )
 
-val deps = listOf()
+val deps = listOf<String>()
 val join = listOf(
     ":bukkit:misc"
 )

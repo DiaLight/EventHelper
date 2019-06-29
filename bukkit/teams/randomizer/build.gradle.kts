@@ -16,11 +16,12 @@ var configureProject: Project.(List<String>, List<String>) -> Unit by project(":
 val deps = listOf(
     ":bukkit:eventhelper",
     ":bukkit:guilib",
+    ":bukkit:offlinelib",
     ":bukkit:maingui",
     ":bukkit:teams",
     ":bukkit:misc"
 )
-val join = listOf(
+val join = listOf<String>(
 )
 
 configureProject(join, deps)

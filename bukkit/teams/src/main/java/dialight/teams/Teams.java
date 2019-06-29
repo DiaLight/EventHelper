@@ -5,14 +5,18 @@ import dialight.eventhelper.project.Project;
 import dialight.eventhelper.project.ProjectApi;
 import dialight.guilib.GuiLibApi;
 import dialight.maingui.MainGuiApi;
+import dialight.observable.ObservableObject;
 import dialight.observable.collection.ObservableCollection;
+import dialight.observable.collection.ObservableCollectionWrapper;
 import dialight.observable.map.ObservableMap;
 import dialight.observable.map.ObservableMapWrapper;
 import dialight.offlinelib.OfflineLibApi;
 import dialight.teams.event.TeamEvent;
+import dialight.teams.filter.players.PlayerFilterGui;
+import dialight.teams.filter.team.TeamFilterGui;
 import dialight.teams.gui.TeamsSlot;
-import dialight.teams.gui.teams.TeamsGui;
 import dialight.teams.gui.control.ControlGui;
+import dialight.teams.gui.teams.TeamsGui;
 import dialight.teleporter.TeleporterApi;
 import dialight.toollib.ToolLibApi;
 import org.bukkit.OfflinePlayer;
@@ -21,10 +25,8 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Teams extends Project {
@@ -39,6 +41,8 @@ public class Teams extends Project {
     private TeamsTool tool;
     private ControlGui controlGui;
     private TeamsGui gui;
+    private TeamFilterGui teamFilterGui;
+    private PlayerFilterGui playerFilterGui;
     private TeamsListener listener;
 
     private final ObservableMap<String, ObservableTeamImpl> teamsMap = new ObservableMapWrapper<>();
@@ -46,6 +50,12 @@ public class Teams extends Project {
     private final ObservableCollection<ObservableTeamImpl> teamsImmutable = teamsMap.asImmutableCollectionObaervable(ObservableTeamImpl::getName);
 
     private final Collection<Consumer<ObservableTeam>> onUpdate = new LinkedList<>();
+    private final Collection<BiConsumer<ObservableTeam, String>> onMemberJoin = new LinkedList<>();
+    private final Collection<BiConsumer<ObservableTeam, String>> onMemberLeave = new LinkedList<>();
+
+    private final ObservableCollection<String> teamFilter = new ObservableCollectionWrapper<>(new HashSet<>());
+    private final ObservableCollection<UUID> playerFilter = new ObservableCollectionWrapper<>(new HashSet<>());
+    private final ObservableObject<Boolean> offlineMode = new ObservableObject<>(false);
 
     public Teams(JavaPlugin plugin) {
         super(plugin);
@@ -64,6 +74,8 @@ public class Teams extends Project {
         tool = new TeamsTool(this);
         controlGui = new ControlGui(this);
         gui = new TeamsGui(this);
+        teamFilterGui = new TeamFilterGui(this);
+        playerFilterGui = new PlayerFilterGui(this);
 
         maingui.registerToolItem(TeamsTool.ID, new TeamsSlot(this));
         toollib.register(tool);
@@ -92,9 +104,11 @@ public class Teams extends Project {
             if(teamsMap.putIfAbsent(team.getName(), oteam) == null) {
                 for (String member : team.getEntries()) {
                     OfflinePlayer op = offlinelib.getOfflinePlayerByName(member);
-                    oteam.onAddMember(op);
-                    notInTeamToRemove.add(op);
-                    notInTeamToAdd.remove(op);
+                    if(op != null) {
+                        oteam.onAddMember(op);
+                        notInTeamToRemove.add(op);
+                        notInTeamToAdd.remove(op);
+                    }
                 }
             }
             teamsToRemove.remove(team.getName());
@@ -146,6 +160,14 @@ public class Teams extends Project {
         return gui;
     }
 
+    public TeamFilterGui getTeamFilterGui() {
+        return teamFilterGui;
+    }
+
+    public PlayerFilterGui getPlayerFilterGui() {
+        return playerFilterGui;
+    }
+
     public TeamsTool getTool() {
         return tool;
     }
@@ -160,6 +182,37 @@ public class Teams extends Project {
     public void unregisterOnTeamUpdate(Consumer<ObservableTeam> op) {
         onUpdate.add(op);
     }
+    public void onMemberJoin(BiConsumer<ObservableTeam, String> op) {
+        onMemberJoin.add(op);
+    }
+    public void unregisterOnMemberJoin(BiConsumer<ObservableTeam, String> op) {
+        onMemberJoin.remove(op);
+    }
+    public void onMemberLeave(BiConsumer<ObservableTeam, String> op) {
+        onMemberLeave.add(op);
+    }
+    public void unregisterOnMemberLeave(BiConsumer<ObservableTeam, String> op) {
+        onMemberLeave.remove(op);
+    }
+
+    public ObservableCollection<String> getTeamFilter() {
+        return teamFilter;
+    }
+
+    public ObservableCollection<UUID> getPlayerFilter() {
+        return playerFilter;
+    }
+
+    public ObservableObject<Boolean> getOfflineMode() {
+        return offlineMode;
+    }
+    public boolean isOfflineMode() {
+        return offlineMode.getValue();
+    }
+    public void setOfflineMode(boolean offlineMode) {
+        this.offlineMode.setValue(offlineMode);
+    }
+
 
     public void onTeamEvent(TeamEvent event) {
         switch (event.getType()) {
@@ -187,6 +240,9 @@ public class Teams extends Project {
                     if(op != null) {
                         oteam.onAddMember(op);
                     }
+                    for (BiConsumer<ObservableTeam, String> consumer : onMemberJoin) {
+                        consumer.accept(oteam, member);
+                    }
                 }
             } break;
             case REMOVE_MEMBERS: {
@@ -197,6 +253,9 @@ public class Teams extends Project {
                     OfflinePlayer op = offlinelib.getOfflinePlayerByName(member);
                     if (op != null) {
                         oteam.onRemoveMember(op);
+                    }
+                    for (BiConsumer<ObservableTeam, String> consumer : onMemberLeave) {
+                        consumer.accept(oteam, member);
                     }
                 }
             } break;

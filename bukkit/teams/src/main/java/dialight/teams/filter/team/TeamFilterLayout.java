@@ -1,23 +1,23 @@
-package dialight.teams.random.gui.filter;
+package dialight.teams.filter.team;
 
 import dialight.guilib.indexcache.SparkIndexCache;
 import dialight.guilib.layout.CachedPageLayout;
 import dialight.guilib.slot.Slot;
 import dialight.observable.collection.ObservableCollection;
 import dialight.teams.ObservableTeam;
-import dialight.teams.random.TeamRandomizerProject;
+import dialight.teams.Teams;
 
 import java.util.function.Consumer;
 
-public class FilterLayout extends CachedPageLayout<ObservableTeam> {
+public class TeamFilterLayout extends CachedPageLayout<ObservableTeam> {
 
-    private final TeamRandomizerProject proj;
+    private final Teams proj;
     private final Consumer<ObservableTeam> onAdd = this::add;
     private final Consumer<ObservableTeam> onRemove = this::remove;
     private final Consumer<String> onFilterAdd = this::onFilterAdd;
     private final Consumer<String> onFilterRemove = this::onFilterRemove;
 
-    public FilterLayout(TeamRandomizerProject proj) {
+    public TeamFilterLayout(Teams proj) {
         super(new SparkIndexCache(9, 5));
         this.proj = proj;
         this.setNameFunction(ObservableTeam::getName);
@@ -25,11 +25,11 @@ public class FilterLayout extends CachedPageLayout<ObservableTeam> {
     }
 
     @Override public void onViewersNotEmpty() {
-        ObservableCollection<ObservableTeam> teams = proj.getTeams().getTeams();
+        ObservableCollection<ObservableTeam> teams = proj.getTeamsImmutable();
         teams.onAdd(onAdd);
         teams.onRemove(onRemove);
 
-        ObservableCollection<String> filter = proj.getFilter();
+        ObservableCollection<String> filter = proj.getTeamFilter();
         filter.onAdd(onFilterAdd);
         filter.onRemove(onFilterRemove);
 
@@ -37,11 +37,11 @@ public class FilterLayout extends CachedPageLayout<ObservableTeam> {
     }
 
     @Override public void onViewersEmpty() {
-        ObservableCollection<ObservableTeam> teams = proj.getTeams().getTeams();
+        ObservableCollection<ObservableTeam> teams = proj.getTeamsImmutable();
         teams.unregisterOnAdd(onAdd);
         teams.unregisterOnRemove(onRemove);
 
-        ObservableCollection<String> filter = proj.getFilter();
+        ObservableCollection<String> filter = proj.getTeamFilter();
         filter.unregisterOnAdd(onFilterAdd);
         filter.unregisterOnRemove(onFilterRemove);
 
@@ -49,21 +49,21 @@ public class FilterLayout extends CachedPageLayout<ObservableTeam> {
     }
 
     private void onFilterAdd(String name) {
-        ObservableTeam oteam = proj.getTeams().get(name);
+        ObservableTeam oteam = proj.get(name);
         if(oteam != null) {
             update(oteam);
         }
     }
 
     private void onFilterRemove(String name) {
-        ObservableTeam oteam = proj.getTeams().get(name);
+        ObservableTeam oteam = proj.get(name);
         if(oteam != null) {
             update(oteam);
         }
     }
 
     private Slot createSlot(ObservableTeam oteam) {
-        return new FilterSlot(proj, oteam);
+        return new TeamFilterSlot(proj, oteam);
     }
 
 }

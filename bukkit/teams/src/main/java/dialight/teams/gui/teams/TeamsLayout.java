@@ -6,18 +6,15 @@ import dialight.guilib.slot.Slot;
 import dialight.observable.collection.ObservableCollection;
 import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class TeamsLayout extends CachedPageLayout<ObservableTeam> {
 
     @NotNull private final Teams proj;
     private final Consumer<ObservableTeam> onAdd = this::onAdd;
     private final Consumer<ObservableTeam> onRemove = this::onRemove;
-    private final Function<Player, Player> getNextPlayer = this::getNextPlayer;
     private final Consumer<ObservableTeam> onTeamUpdate = this::update;
 
     public TeamsLayout(Teams proj) {
@@ -36,7 +33,7 @@ public class TeamsLayout extends CachedPageLayout<ObservableTeam> {
     }
 
     @Override public void onViewersNotEmpty() {
-        proj.getListener().registerTeamsObserver(getNextPlayer);
+        proj.getListener().registerTeamsObserver(this);
 
         proj.onTeamUpdate(onTeamUpdate);
 
@@ -47,7 +44,7 @@ public class TeamsLayout extends CachedPageLayout<ObservableTeam> {
     }
 
     @Override public void onViewersEmpty() {
-        proj.getListener().unregisterTeamsObserver(getNextPlayer);
+        proj.getListener().unregisterTeamsObserver(this);
 
         proj.unregisterOnTeamUpdate(onTeamUpdate);
 
@@ -55,19 +52,6 @@ public class TeamsLayout extends CachedPageLayout<ObservableTeam> {
         teams.unregisterOnAdd(onAdd);
         teams.unregisterOnRemove(onRemove);
         proj.runTask(this::clear);
-    }
-
-    private Player getNextPlayer(Player player) {
-        ObservableCollection<Player> viewers = getViewers();
-        if(player == null) {
-            if(viewers.isEmpty()) return null;
-            return viewers.iterator().next();
-        }
-        for (Player viewer : viewers) {
-            if(viewer.getUniqueId() == player.getUniqueId()) continue;
-            return viewer;
-        }
-        return null;
     }
 
     private void onAdd(ObservableTeam oteam) {

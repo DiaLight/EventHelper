@@ -22,7 +22,7 @@ val deps = listOf(
     ":bukkit:maingui",
     ":bukkit:teleporter"
 )
-val join = listOf(
+val join = listOf<String>(
 )
 
 configureProject(join, deps)
