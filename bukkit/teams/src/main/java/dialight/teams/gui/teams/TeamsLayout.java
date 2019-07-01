@@ -8,6 +8,7 @@ import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class TeamsLayout extends CachedPageLayout<ObservableTeam> {
@@ -16,6 +17,10 @@ public class TeamsLayout extends CachedPageLayout<ObservableTeam> {
     private final Consumer<ObservableTeam> onAdd = this::onAdd;
     private final Consumer<ObservableTeam> onRemove = this::onRemove;
     private final Consumer<ObservableTeam> onTeamUpdate = this::update;
+    private final Consumer<String> onAddWhiteList = this::onAddWhiteList;
+    private final Consumer<String> onRemoveWhiteList = this::onRemoveWhiteList;
+    private final BiConsumer<ObservableTeam, String> onAddMember = this::onAddMember;
+    private final BiConsumer<ObservableTeam, String> onRemoveMember = this::onRemoveMember;
 
     public TeamsLayout(Teams proj) {
         super(new SparkIndexCache(9, 5));
@@ -27,9 +32,7 @@ public class TeamsLayout extends CachedPageLayout<ObservableTeam> {
     }
 
     private Slot createSlot(ObservableTeam oteam) {
-        TeamSlot slot = new TeamSlot(proj, oteam);
-//        slot.ti = size() + 1;
-        return slot;
+        return new TeamSlot(proj, oteam);
     }
 
     @Override public void onViewersNotEmpty() {
@@ -40,7 +43,15 @@ public class TeamsLayout extends CachedPageLayout<ObservableTeam> {
         ObservableCollection<ObservableTeam> teams = proj.getTeamsInternal();
         teams.onAdd(onAdd);
         teams.onRemove(onRemove);
-        teams.forEach(this::add);
+
+        ObservableCollection<String> teamWhiteList = proj.getTeamWhiteList();
+        teamWhiteList.onAdd(onAddWhiteList);
+        teamWhiteList.onRemove(onRemoveWhiteList);
+
+        proj.onMemberJoin(onAddMember);
+        proj.onMemberLeave(onRemoveMember);
+
+        teams.forEach(onAdd);
     }
 
     @Override public void onViewersEmpty() {
@@ -51,14 +62,46 @@ public class TeamsLayout extends CachedPageLayout<ObservableTeam> {
         ObservableCollection<ObservableTeam> teams = proj.getTeamsInternal();
         teams.unregisterOnAdd(onAdd);
         teams.unregisterOnRemove(onRemove);
+
+        ObservableCollection<String> teamWhiteList = proj.getTeamWhiteList();
+        teamWhiteList.unregisterOnAdd(onAddWhiteList);
+        teamWhiteList.unregisterOnRemove(onRemoveWhiteList);
+
+        proj.unregisterOnMemberJoin(onAddMember);
+        proj.unregisterOnMemberLeave(onRemoveMember);
+
         proj.runTask(this::clear);
     }
 
     private void onAdd(ObservableTeam oteam) {
-        this.add(oteam);
+        if(proj.getTeamWhiteList().contains(oteam.getName())) {
+            this.add(oteam);
+        }
     }
     private void onRemove(ObservableTeam oteam) {
         this.remove(oteam);
+    }
+
+    private void onAddWhiteList(String name) {
+        ObservableTeam oteam = proj.get(name);
+        if(oteam != null) {
+            this.add(oteam);
+        }
+    }
+
+    private void onRemoveWhiteList(String name) {
+        ObservableTeam oteam = proj.get(name);
+        if(oteam != null) {
+            this.remove(oteam);
+        }
+    }
+
+    private void onAddMember(ObservableTeam oteam, String member) {
+        this.update(oteam);
+    }
+
+    private void onRemoveMember(ObservableTeam oteam, String member) {
+        this.update(oteam);
     }
 
 }

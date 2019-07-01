@@ -116,6 +116,7 @@ public class TeleporterView extends NamedLayoutScroll9x5View<TeleporterGui, Tele
         };
         setBotPaneSlot(0, selectView);
         setBotPaneSlot(1, groupSelect);
+        setEmptyTitleReplace("Телепортер");
     }
 
     @Override protected Slot createBotBackground(int x) {

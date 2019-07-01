@@ -18,9 +18,6 @@ import java.util.List;
 public abstract class ScrollView<G extends Gui, L extends SlotLayout> extends View<G, L> {
 
     protected static final List<String> DEFAULT_BACKGROUND_LORE = Colorizer.asList(
-            "|r|Для верного отображения",
-            "|r|заголовков столбцов",
-            "|r|используйте шрифт Unicode.",
             "|w|Навигация",
             "|a|ЛКМ снаружи инвертаря|y|:",
             "|y| Скролл влево",

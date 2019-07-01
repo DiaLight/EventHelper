@@ -11,7 +11,7 @@ public class ControlView extends Scroll9x5PageView<ControlGui, ControlLayout> {
 
     public ControlView(ControlGui gui, ControlLayout layout) {
         super(gui, layout, "Распределители команд");
-        this.setBotPaneSlot(0, new ControlFiltersSlot(gui.getProj()));
+        this.setBotPaneSlot(0, new PlayerBlackListSlot(gui.getProj()));
     }
 
     @Override protected Slot createBotBackground(int x) {

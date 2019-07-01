@@ -91,7 +91,7 @@ public class GuiListener implements Listener {
         proj.getUsageRegistry().onOpenGui(player, gui);
 //        Inventory inventory = player.getOpenInventory().getTopInventory();
         proj.runTask(() -> {
-            InventoryNms.sendInventoryTitle(player, inventory, view.getTitle());
+            InventoryNms.sendInventoryTitle(player, inventory, view.getTitle(player));
         });
     }
 

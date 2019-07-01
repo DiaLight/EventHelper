@@ -1,4 +1,4 @@
-package dialight.teams.filter.players;
+package dialight.teams.gui.playerblacklist;
 
 import dialight.compatibility.ItemStackBuilderBc;
 import dialight.compatibility.TeamBc;
@@ -20,14 +20,14 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class PlayerFilterSlot implements Slot {
+public class PlayerBlackListSlot implements Slot {
 
     private final Teams proj;
     private final UUID uuid;
     @NotNull private final Server server;
     @NotNull private final Scoreboard scoreboard;
 
-    public PlayerFilterSlot(Teams proj, UUID uuid) {
+    public PlayerBlackListSlot(Teams proj, UUID uuid) {
         this.proj = proj;
         this.uuid = uuid;
         this.server = proj.getPlugin().getServer();
@@ -35,7 +35,7 @@ public class PlayerFilterSlot implements Slot {
     }
 
     @Override public void onClick(SlotClickEvent e) {
-        ObservableCollection<UUID> filter = proj.getPlayerFilter();
+        ObservableCollection<UUID> filter = proj.getPlayerBlackList();
         switch (e.getEvent().getClick()) {
             case LEFT:
                 if(filter.contains(uuid)) {
@@ -57,7 +57,7 @@ public class PlayerFilterSlot implements Slot {
         OfflinePlayer op = server.getOfflinePlayer(this.uuid);
         Team team = scoreboard.getEntryTeam(op.getName());
         boolean isOnline = op.isOnline();
-        boolean inFilter = proj.getPlayerFilter().contains(this.uuid);
+        boolean inFilter = proj.getPlayerBlackList().contains(this.uuid);
         ItemStackBuilder isb = new ItemStackBuilder();
         if(team != null) {
             ItemStackBuilderBc isbbc = ItemStackBuilderBc.of(isb);
@@ -96,9 +96,9 @@ public class PlayerFilterSlot implements Slot {
             isb.displayName(Colorizer.apply("|w|" + op.getName() + " |r|(Офлайн)"));
         }
         if (inFilter) {
-            isb.addLore(Colorizer.apply("|a|ЛКМ|y|: убрать игрока из фильтра"));
+            isb.addLore(Colorizer.apply("|a|ЛКМ|y|: убрать игрока из черного списка"));
         } else {
-            isb.addLore(Colorizer.apply("|a|ЛКМ|y|: добавить игрока в фильтр"));
+            isb.addLore(Colorizer.apply("|a|ЛКМ|y|: добавить игрока в черный список"));
         }
         if(team != null) {
             isb.addLore(Colorizer.apply("|y|team: " + TeamBc.of(team).getColor() + "⬛ |w|" + team.getName()));

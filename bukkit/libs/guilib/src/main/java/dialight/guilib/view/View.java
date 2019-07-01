@@ -25,7 +25,7 @@ public abstract class View<G extends Gui, L extends SlotLayout> implements Inven
     private final G gui;
     private final L layout;
     private final Inventory inventory;
-    private String title;
+    protected String title;
 
     public View(G gui, L layout, int width, int height, String title) {
         this.gui = gui;
@@ -68,7 +68,7 @@ public abstract class View<G extends Gui, L extends SlotLayout> implements Inven
         }
     }
 
-    @NotNull public String getTitle() {
+    @NotNull public String getTitle(Player player) {
         return title;
     }
 

@@ -1,4 +1,4 @@
-package dialight.teams.filter.team;
+package dialight.teams.gui.whitelist;
 
 import dialight.guilib.indexcache.SparkIndexCache;
 import dialight.guilib.layout.CachedPageLayout;
@@ -9,18 +9,17 @@ import dialight.teams.Teams;
 
 import java.util.function.Consumer;
 
-public class TeamFilterLayout extends CachedPageLayout<ObservableTeam> {
+public class TeamWhiteListLayout extends CachedPageLayout<String> {
 
     private final Teams proj;
-    private final Consumer<ObservableTeam> onAdd = this::add;
-    private final Consumer<ObservableTeam> onRemove = this::remove;
+    private final Consumer<ObservableTeam> onAdd = this::onTeamAdd;
+    private final Consumer<ObservableTeam> onRemove = this::onTeamRemove;
     private final Consumer<String> onFilterAdd = this::onFilterAdd;
     private final Consumer<String> onFilterRemove = this::onFilterRemove;
 
-    public TeamFilterLayout(Teams proj) {
+    public TeamWhiteListLayout(Teams proj) {
         super(new SparkIndexCache(9, 5));
         this.proj = proj;
-        this.setNameFunction(ObservableTeam::getName);
         this.setSlotFunction(this::createSlot);
     }
 
@@ -29,11 +28,12 @@ public class TeamFilterLayout extends CachedPageLayout<ObservableTeam> {
         teams.onAdd(onAdd);
         teams.onRemove(onRemove);
 
-        ObservableCollection<String> filter = proj.getTeamFilter();
+        ObservableCollection<String> filter = proj.getTeamWhiteList();
         filter.onAdd(onFilterAdd);
         filter.onRemove(onFilterRemove);
 
-        teams.forEach(this::add);
+        teams.forEach(this::onTeamAdd);
+        filter.forEach(this::onFilterAdd);
     }
 
     @Override public void onViewersEmpty() {
@@ -41,29 +41,39 @@ public class TeamFilterLayout extends CachedPageLayout<ObservableTeam> {
         teams.unregisterOnAdd(onAdd);
         teams.unregisterOnRemove(onRemove);
 
-        ObservableCollection<String> filter = proj.getTeamFilter();
+        ObservableCollection<String> filter = proj.getTeamWhiteList();
         filter.unregisterOnAdd(onFilterAdd);
         filter.unregisterOnRemove(onFilterRemove);
 
         proj.runTask(this::clear);
     }
 
+    private void onTeamAdd(ObservableTeam oteam) {
+        add(oteam.getName());
+    }
+    private void onTeamRemove(ObservableTeam oteam) {
+        update(oteam.getName());
+    }
+
     private void onFilterAdd(String name) {
         ObservableTeam oteam = proj.get(name);
         if(oteam != null) {
-            update(oteam);
+            update(name);
+        } else {
+            add(name);
         }
     }
-
     private void onFilterRemove(String name) {
         ObservableTeam oteam = proj.get(name);
         if(oteam != null) {
-            update(oteam);
+            update(name);
+        } else {
+            remove(name);
         }
     }
 
-    private Slot createSlot(ObservableTeam oteam) {
-        return new TeamFilterSlot(proj, oteam);
+    private Slot createSlot(String name) {
+        return new TeamWhiteListSlot(proj, name);
     }
 
 }

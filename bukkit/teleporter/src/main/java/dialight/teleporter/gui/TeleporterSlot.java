@@ -23,8 +23,9 @@ public class TeleporterSlot implements Slot {
         this.item = new ItemStackBuilder(Material.STICK)
                 .displayName(Colorizer.apply("|a|Телепорт игроков"))
                 .lore(Colorizer.asList(
-                        "|a|ЛКМ|y|: Открыть редактор",
+                        "|a|ЛКМ|y|: открыть телепортер",
                         "|a|ПКМ|y|: получить инструмент в активный слот",
+                        " |y|и открыть телепортер",
                         "|a|Shift|y|+|a|ПКМ|y|: добавить инструмент в инвентарь",
                         ""
                 ))

@@ -12,8 +12,8 @@ import dialight.observable.map.ObservableMap;
 import dialight.observable.map.ObservableMapWrapper;
 import dialight.offlinelib.OfflineLibApi;
 import dialight.teams.event.TeamEvent;
-import dialight.teams.filter.players.PlayerFilterGui;
-import dialight.teams.filter.team.TeamFilterGui;
+import dialight.teams.gui.playerblacklist.PlayerBlackListGui;
+import dialight.teams.gui.whitelist.TeamWhiteListGui;
 import dialight.teams.gui.TeamsSlot;
 import dialight.teams.gui.control.ControlGui;
 import dialight.teams.gui.teams.TeamsGui;
@@ -41,8 +41,8 @@ public class Teams extends Project {
     private TeamsTool tool;
     private ControlGui controlGui;
     private TeamsGui gui;
-    private TeamFilterGui teamFilterGui;
-    private PlayerFilterGui playerFilterGui;
+    private TeamWhiteListGui teamWhiteListGui;
+    private PlayerBlackListGui playerBlackListGui;
     private TeamsListener listener;
 
     private final ObservableMap<String, ObservableTeamImpl> teamsMap = new ObservableMapWrapper<>();
@@ -53,8 +53,8 @@ public class Teams extends Project {
     private final Collection<BiConsumer<ObservableTeam, String>> onMemberJoin = new LinkedList<>();
     private final Collection<BiConsumer<ObservableTeam, String>> onMemberLeave = new LinkedList<>();
 
-    private final ObservableCollection<String> teamFilter = new ObservableCollectionWrapper<>(new HashSet<>());
-    private final ObservableCollection<UUID> playerFilter = new ObservableCollectionWrapper<>(new HashSet<>());
+    private final ObservableCollection<String> teamWhiteList = new ObservableCollectionWrapper<>(new HashSet<>());
+    private final ObservableCollection<UUID> playerBlackList = new ObservableCollectionWrapper<>(new HashSet<>());
     private final ObservableObject<Boolean> offlineMode = new ObservableObject<>(false);
 
     public Teams(JavaPlugin plugin) {
@@ -74,8 +74,8 @@ public class Teams extends Project {
         tool = new TeamsTool(this);
         controlGui = new ControlGui(this);
         gui = new TeamsGui(this);
-        teamFilterGui = new TeamFilterGui(this);
-        playerFilterGui = new PlayerFilterGui(this);
+        teamWhiteListGui = new TeamWhiteListGui(this);
+        playerBlackListGui = new PlayerBlackListGui(this);
 
         maingui.registerToolItem(TeamsTool.ID, new TeamsSlot(this));
         toollib.register(tool);
@@ -160,12 +160,12 @@ public class Teams extends Project {
         return gui;
     }
 
-    public TeamFilterGui getTeamFilterGui() {
-        return teamFilterGui;
+    public TeamWhiteListGui getTeamWhiteListGui() {
+        return teamWhiteListGui;
     }
 
-    public PlayerFilterGui getPlayerFilterGui() {
-        return playerFilterGui;
+    public PlayerBlackListGui getPlayerBlackListGui() {
+        return playerBlackListGui;
     }
 
     public TeamsTool getTool() {
@@ -195,12 +195,12 @@ public class Teams extends Project {
         onMemberLeave.remove(op);
     }
 
-    public ObservableCollection<String> getTeamFilter() {
-        return teamFilter;
+    public ObservableCollection<String> getTeamWhiteList() {
+        return teamWhiteList;
     }
 
-    public ObservableCollection<UUID> getPlayerFilter() {
-        return playerFilter;
+    public ObservableCollection<UUID> getPlayerBlackList() {
+        return playerBlackList;
     }
 
     public ObservableObject<Boolean> getOfflineMode() {

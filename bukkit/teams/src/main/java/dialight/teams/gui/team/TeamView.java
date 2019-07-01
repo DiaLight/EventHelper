@@ -25,8 +25,6 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
     private final Slot background;
     private final Slot backward = buildDefaultBackward(this);
     private final Slot forward = buildDefaultForward(this);
-    private final Slot selectView;
-    private final Slot groupSelect;
 
     public TeamView(TeamGui gui, TeamLayout layout) {
         super(gui, layout);
@@ -37,36 +35,43 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
                 .let(builder -> {
                     ItemStackBuilderBc.of(builder).stainedGlassPane(ColorConverter.toWoolColor(oteam.getColor()));
                 })
-                .displayName("Команда " + oteam.getName())
-                .lore(DEFAULT_BACKGROUND_LORE)
+                .displayName(Colorizer.apply(
+                        "|g|- " + oteam.getColor() + "⬛ |w|" + oteam.getName()
+                ))
+                .lore(Colorizer.asList(
+                        "|y|display name: |w|" + oteam.getTeam().getDisplayName(),
+                        ""
+                ))
+                .addLore(DEFAULT_BACKGROUND_LORE)
                 .addLore(Colorizer.asList(
-                        "|y|display name: |g|" + oteam.getTeam().getDisplayName(),
                         "",
                         "|g|Плагин: |y|Команды",
                         "|g|Версия: |y|v" + desc.getVersion()
                 ))
                 .build());
-        selectView = new StaticSlot(new ItemStackBuilder(Material.BOOK)
+        Slot selectView = new StaticSlot(new ItemStackBuilder(Material.BOOK)
                 .displayName("Выбор представления данных")
                 .lore(Colorizer.asList(
                         "|a|ЛКМ|y|: Игроки в текущей команде",
-                        "|a|ПКМ|y|: Игроки ни в какой команде",
-                        "|a|Shift|y|+|a|ПКМ|y|: Игроки не в текущей команде"
+                        "|a|ПКМ|y|: Игроки не в текущей команде"
                 ))
                 .build()) {
             @Override
             public void onClick(SlotClickEvent e) {
                 switch (e.getEvent().getClick()) {
                     case LEFT: {
-                        getLayout().setCurrent(getLayout().getTeamLayout());
-                    } break;
+                        getLayout().setTeamLayout();
+                    }
+                    break;
                     case RIGHT: {
-                        getLayout().setCurrent(getLayout().getNotCurTeamLayout());
-                    } break;
+                        getLayout().setNotCurTeamLayout();
+                    }
+                    break;
                 }
             }
         };
         TeleporterApi teleporter = proj.getTeleporter();
+        Slot groupSelect;
         if(teleporter != null) {
             groupSelect = new StaticSlot(new ItemStackBuilder(Material.STICK)
                     .displayName("Групповое выделение в телепортере")
@@ -105,8 +110,32 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
         } else {
             groupSelect = background;
         }
+        Slot clearTeam = new StaticSlot(new ItemStackBuilder(Material.LAVA_BUCKET)
+                .displayName(Colorizer.apply("|a|Очистка"))
+                .addLore(Colorizer.asList(
+                        "|a|Shift|y|+|a|ЛКМ|y|: очистить команду"
+                ))
+                .build()) {
+            @Override
+            public void onClick(SlotClickEvent e) {
+                switch (e.getEvent().getClick()) {
+                    case LEFT:
+                        break;
+                    case SHIFT_LEFT:
+                        oteam.getMembers().clear();
+                        break;
+                    case RIGHT:
+                        break;
+                    case SHIFT_RIGHT:
+                        break;
+                }
+            }
+        };
         setBotPaneSlot(0, selectView);
         setBotPaneSlot(1, groupSelect);
+        setBotPaneSlot(8, clearTeam);
+//        setEmptyTitleReplace(Colorizer.apply(oteam.getColor() + "⬛ |w|" + oteam.getName()));
+        setEmptyTitleReplace(oteam.getName());
     }
 
     @Override protected Slot createBotBackground(int x) {

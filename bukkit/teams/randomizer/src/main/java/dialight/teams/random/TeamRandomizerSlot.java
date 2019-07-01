@@ -26,10 +26,10 @@ public class TeamRandomizerSlot extends DynamicSlot {
     public TeamRandomizerSlot(TeamRandomizerProject proj) {
         this.proj = proj;
         this.scoreboard = proj.getPlugin().getServer().getScoreboardManager().getMainScoreboard();
-        ObservableCollection<String> teamFilter = proj.getTeams().getTeamFilter();
+        ObservableCollection<String> teamFilter = proj.getTeams().getTeamWhiteList();
         teamFilter.onAdd(this::update);
         teamFilter.onRemove(this::update);
-        ObservableCollection<UUID> playerFilter = proj.getTeams().getPlayerFilter();
+        ObservableCollection<UUID> playerFilter = proj.getTeams().getPlayerBlackList();
         playerFilter.onAdd(this::update);
         playerFilter.onRemove(this::update);
         proj.getTeams().onMemberJoin(this::update);
@@ -49,10 +49,10 @@ public class TeamRandomizerSlot extends DynamicSlot {
     @Override public void onClick(SlotClickEvent e) {
         switch (e.getEvent().getClick()) {
             case LEFT:
-                proj.doFillRandomize();
+                proj.doFillRandomize(e.getPlayer());
                 break;
             case SHIFT_LEFT:
-                proj.doRandomize();
+                proj.doRandomize(e.getPlayer());
                 break;
             case RIGHT:
                 break;
@@ -76,7 +76,7 @@ public class TeamRandomizerSlot extends DynamicSlot {
                 "|y| распределить всех игроков",
                 ""
         ));
-        if(proj.getTeams().getTeamFilter().isEmpty()) {
+        if(proj.getTeams().getTeamWhiteList().isEmpty()) {
             isb.addLore(Colorizer.asList(
                     "|g|Команды для рандомизации:",
                     " |a|все команды"
@@ -85,7 +85,7 @@ public class TeamRandomizerSlot extends DynamicSlot {
             isb.addLore(Colorizer.asList(
                     "|g|Команды для рандомизации:"
             ));
-            for (String name : proj.getTeams().getTeamFilter()) {
+            for (String name : proj.getTeams().getTeamWhiteList()) {
                 ObservableTeam team = proj.getTeams().get(name);
                 if(team != null) {
                     isb.addLore(Colorizer.asList(
@@ -98,16 +98,16 @@ public class TeamRandomizerSlot extends DynamicSlot {
                 }
             }
         }
-        if(proj.getTeams().getPlayerFilter().isEmpty()) {
+        if(proj.getTeams().getPlayerBlackList().isEmpty()) {
             isb.addLore(Colorizer.asList(
-                    "|g|Игроки для рандомизации:",
-                    " |a|все онлайн игроки"
+                    "|g|Исключенные из рандомизации игроки:",
+                    " |a|нет таковых"
             ));
         } else {
             isb.addLore(Colorizer.asList(
-                    "|g|Игроки для рандомизации:"
+                    "|g|Исключенные из рандомизации игроки:"
             ));
-            ObservableCollection<UUID> playerFilter = proj.getTeams().getPlayerFilter();
+            ObservableCollection<UUID> playerFilter = proj.getTeams().getPlayerBlackList();
             Iterator<UUID> iterator = playerFilter.iterator();
             int previewSize = 8;
             for (int i = 0; i < previewSize && iterator.hasNext(); i++) {

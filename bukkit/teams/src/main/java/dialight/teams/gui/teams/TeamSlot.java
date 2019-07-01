@@ -3,15 +3,21 @@ package dialight.teams.gui.teams;
 
 import dialight.compatibility.PlayerInventoryBc;
 import dialight.extensions.Colorizer;
+import dialight.extensions.InventoryEx;
 import dialight.extensions.ItemStackBuilder;
+import dialight.guilib.gui.Gui;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
+import dialight.observable.collection.ObservableCollection;
 import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Iterator;
 
 public class TeamSlot implements Slot {
 
@@ -28,10 +34,10 @@ public class TeamSlot implements Slot {
                 .hideMiscellaneous(true)
                 .displayName(oteam.getColor() + Colorizer.apply("⬛ |w|" + oteam.getName()))
                 .lore(Colorizer.asList(
-                        "|a|ЛКМ|y|: Получить инструмент",
-                        "|y| управления командой",
+                        "|a|ЛКМ|y|: открыть управление командой",
+                        "|a|ПКМ|y|: получить инструмент в активный слот",
                         "|a|Shift|y|+|a|ЛКМ|y|: добавить всех в команду",
-                        "|a|Shift|y|+|a|ПКМ|y|: очистить команду",
+                        "|a|Shift|y|+|a|ПКМ|y|: добавить инструмент в инвентарь",
                         "|a|СКМ|y|: удалить команду"
                 ))
                 .build();
@@ -39,20 +45,31 @@ public class TeamSlot implements Slot {
 
     @Override public void onClick(SlotClickEvent e) {
         switch (e.getEvent().getClick()) {
-            case LEFT:
-                e.getPlayer().closeInventory();
-                PlayerInventoryBc.of(e.getPlayer().getInventory()).setItemInMainHand(proj.getTool().createItem(oteam.getTeam()));
-                break;
+            case LEFT: {
+                Gui teamGui = proj.getGui().teamGui(oteam.getName());
+                if (teamGui != null) {
+                    proj.getGuilib().openGui(e.getPlayer(), teamGui);
+                }
+            } break;
+            case RIGHT: {
+                Gui teamGui = proj.getGui().teamGui(oteam.getName());
+                if (teamGui != null) {
+                    proj.getGuilib().openGui(e.getPlayer(), teamGui);
+                }
+                ItemStack item = proj.getTool().createItem(oteam.getTeam());
+                PlayerInventoryBc.of(e.getPlayer().getInventory()).setItemInMainHand(item);
+            } break;
             case SHIFT_LEFT:
                 for (Player player : proj.getPlugin().getServer().getOnlinePlayers()) {
                     oteam.getTeam().addEntry(player.getName());
                 }
                 break;
-            case RIGHT:
-                break;
-            case SHIFT_RIGHT:
-                oteam.getMembers().clear();
-                break;
+            case SHIFT_RIGHT: {
+                ItemStack item = proj.getTool().createItem(oteam.getTeam());
+                if(!InventoryEx.of(e.getPlayer().getInventory()).addToEmptySlot(item)) {
+                    e.getPlayer().sendMessage(Colorizer.apply("|r|Не могу добавить итем"));
+                }
+            } break;
             case MIDDLE:
                 proj.runTask(() -> {
                     oteam.getTeam().unregister();
@@ -61,11 +78,36 @@ public class TeamSlot implements Slot {
         }
     }
 
-    public int ti = 1;
     @NotNull @Override public ItemStack createItem() {
         ItemStack item = this.item.clone();
-//        item.setAmount(ti);
-        return item;
+        ObservableCollection<OfflinePlayer> members = oteam.getMembers();
+        item.setAmount(members.size());
+        ItemStackBuilder isb = new ItemStackBuilder(item);
+        if(members.isEmpty()) {
+            isb.addLore(Colorizer.asList(
+                    "|g|В команде нет игроков"
+            ));
+        } else {
+            isb.addLore(Colorizer.asList(
+                    "|g|Игроки в команде:"
+            ));
+            Iterator<OfflinePlayer> iterator = members.iterator();
+            int previewSize = 8;
+            for (int i = 0; i < previewSize && iterator.hasNext(); i++) {
+                OfflinePlayer op = iterator.next();
+                String name = op.getName();
+                isb.addLore(Colorizer.asList(
+                        oteam.getColor() + "⬛ |w|" + name
+                ));
+            }
+            if (members.size() > previewSize) {
+                int left = members.size() - previewSize;
+                isb.addLore(Colorizer.asList(
+                        "|g|и еще |w|" + left + "|g| игроков"
+                ));
+            }
+        }
+        return isb.build();
     }
 
 }

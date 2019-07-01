@@ -1,4 +1,4 @@
-package dialight.teams.filter.players;
+package dialight.teams.gui.playerblacklist;
 
 import dialight.guilib.layout.NamedSetLayout;
 import dialight.guilib.slot.Slot;
@@ -14,7 +14,7 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class PlayersAllFilterLayout extends NamedSetLayout<UuidPlayer, UUID> {
+public class PlayersNotInBLLayout extends NamedSetLayout<UuidPlayer, UUID> {
 
     private final Teams proj;
     private final Consumer<UUID> onAdd = this::onAdd;
@@ -22,10 +22,8 @@ public class PlayersAllFilterLayout extends NamedSetLayout<UuidPlayer, UUID> {
     private final Consumer<Player> onAddOnline = this::onAddOnline;
     private final Consumer<Player> onRemoveOnline = this::onRemoveOnline;
     private final BiConsumer<Boolean, Boolean> onToggleOfflineMode = this::onToggleOfflineMode;
-    private final Consumer<OfflinePlayer> onAddOffline = this::onAddOffline;
-    private final Consumer<OfflinePlayer> onRemoveOffline = this::onRemoveOffline;
 
-    public PlayersAllFilterLayout(Teams proj) {
+    public PlayersNotInBLLayout(Teams proj) {
         super(5, UuidPlayer::getUuid);
         this.proj = proj;
 
@@ -34,7 +32,7 @@ public class PlayersAllFilterLayout extends NamedSetLayout<UuidPlayer, UUID> {
     }
 
     @Override public void onViewersNotEmpty() {
-        ObservableCollection<UUID> filter = proj.getPlayerFilter();
+        ObservableCollection<UUID> filter = proj.getPlayerBlackList();
         filter.onAdd(onAdd);
         filter.onRemove(onRemove);
 
@@ -42,17 +40,13 @@ public class PlayersAllFilterLayout extends NamedSetLayout<UuidPlayer, UUID> {
         online.onAdd(onAddOnline);
         online.onRemove(onRemoveOnline);
 
-        OfflineObservable offline = proj.getOfflinelib().getOffline();
-        offline.onAdd(onAddOffline);
-        offline.onRemove(onRemoveOffline);
-
         proj.getOfflineMode().onChange(onToggleOfflineMode);
 
         fillData();
     }
 
     @Override public void onViewersEmpty() {
-        ObservableCollection<UUID> filter = proj.getPlayerFilter();
+        ObservableCollection<UUID> filter = proj.getPlayerBlackList();
         filter.unregisterOnAdd(onAdd);
         filter.unregisterOnRemove(onRemove);
 
@@ -60,25 +54,26 @@ public class PlayersAllFilterLayout extends NamedSetLayout<UuidPlayer, UUID> {
         online.unregisterOnAdd(onAddOnline);
         online.unregisterOnRemove(onRemoveOnline);
 
-        OfflineObservable offline = proj.getOfflinelib().getOffline();
-        offline.unregisterOnAdd(onAddOffline);
-        offline.unregisterOnRemove(onRemoveOffline);
-
         proj.getOfflineMode().unregisterOnChange(onToggleOfflineMode);
 
         proj.runTask(this::clear);
     }
 
     private void fillData() {
+        ObservableCollection<UUID> filter = proj.getPlayerBlackList();
         if(proj.isOfflineMode()) {
             OfflineObservable offline = proj.getOfflinelib().getOffline();
             for (OfflinePlayer op : offline) {
-                add(proj.getOfflinelib().getUuidPlayer(op.getUniqueId()));
+                if (!filter.contains(op.getUniqueId())) {
+                    add(proj.getOfflinelib().getUuidPlayer(op.getUniqueId()));
+                }
             }
         } else {
             OnlineObservable online = proj.getOfflinelib().getOnline();
             for (Player op : online) {
-                add(proj.getOfflinelib().getUuidPlayer(op.getUniqueId()));
+                if (!filter.contains(op.getUniqueId())) {
+                    add(proj.getOfflinelib().getUuidPlayer(op.getUniqueId()));
+                }
             }
         }
     }
@@ -91,48 +86,21 @@ public class PlayersAllFilterLayout extends NamedSetLayout<UuidPlayer, UUID> {
     }
 
     private void onAdd(UUID uuid) {
-        this.update(proj.getOfflinelib().getUuidPlayer(uuid));
+        this.remove(proj.getOfflinelib().getUuidPlayer(uuid));
     }
     private void onRemove(UUID uuid) {
-        this.update(proj.getOfflinelib().getUuidPlayer(uuid));
+        this.add(proj.getOfflinelib().getUuidPlayer(uuid));
     }
 
     private void onAddOnline(Player player) {
-        UuidPlayer uuidPlayer = proj.getOfflinelib().getUuidPlayer(player.getUniqueId());
-        if(proj.isOfflineMode()) {
-            update(uuidPlayer);
-        } else {
-            add(uuidPlayer);
-        }
+        update(proj.getOfflinelib().getUuidPlayer(player.getUniqueId()));
     }
     private void onRemoveOnline(Player player) {
-        UuidPlayer uuidPlayer = proj.getOfflinelib().getUuidPlayer(player.getUniqueId());
-        if(proj.isOfflineMode()) {
-            update(uuidPlayer);
-        } else {
-            remove(uuidPlayer);
-        }
-    }
-
-    private void onAddOffline(OfflinePlayer op) {
-        UuidPlayer uuidPlayer = proj.getOfflinelib().getUuidPlayer(op.getUniqueId());
-        if(proj.isOfflineMode()) {
-            add(uuidPlayer);
-        } else {
-            update(uuidPlayer);
-        }
-    }
-    private void onRemoveOffline(OfflinePlayer op) {
-        UuidPlayer uuidPlayer = proj.getOfflinelib().getUuidPlayer(op.getUniqueId());
-        if(proj.isOfflineMode()) {
-            remove(uuidPlayer);
-        } else {
-            update(uuidPlayer);
-        }
+        update(proj.getOfflinelib().getUuidPlayer(player.getUniqueId()));
     }
 
     private Slot buildSlot(UuidPlayer op) {
-        return new PlayerFilterSlot(this.proj, op.getUuid());
+        return new PlayerBlackListSlot(this.proj, op.getUuid());
     }
 
 }

@@ -96,7 +96,7 @@ public abstract class Scroll7x6View<G extends Gui, L extends SlotLayout> extends
     protected void updateTitle() {
         int page = offset + 1;
         int pages = getLayout().getWidth();
-        if(pages == 1) {
+        if(pages <= 1) {
             setTitle(prefix);
         } else {
             setTitle(prefix + " " + page + "/" + pages);

@@ -138,6 +138,13 @@ public class CachedPageLayout<T> extends DataLayout<T> {
         if(backedSlot == null) return null;
         return backedSlot.slot;
     }
+    public Slot getSlot(@NotNull T data) {
+        for (BackedSlot<T> backedSlot : slots) {
+            if (!data.equals(backedSlot.data)) continue;
+            return backedSlot.slot;
+        }
+        return null;
+    }
 
     @Override public T getData(int x, int y) {
         int index = getBackedSlotIndex(x, y);

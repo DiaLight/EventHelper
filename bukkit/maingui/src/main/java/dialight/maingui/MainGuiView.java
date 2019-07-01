@@ -1,6 +1,7 @@
 package dialight.maingui;
 
 import dialight.compatibility.ItemStackBuilderBc;
+import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.layout.HorizontalMultiLayout;
 import dialight.guilib.slot.Slot;
@@ -14,13 +15,13 @@ public class MainGuiView extends Scroll7x6PageView<MainGui, HorizontalMultiLayou
             .let(builder -> {
                 ItemStackBuilderBc.of(builder).stainedGlassPane(DyeColor.LIGHT_BLUE);
             })
-            .displayName("Инструменты")
+            .displayName(Colorizer.apply("|a|Инструменты"))
             .build());
     private final Slot modulesBackground = new StaticSlot(new ItemStackBuilder()
             .let(builder -> {
                 ItemStackBuilderBc.of(builder).stainedGlassPane(DyeColor.GREEN);
             })
-            .displayName("Модули")
+            .displayName(Colorizer.apply("|a|Модули"))
             .build());
 
     private final Slot backward = buildDefaultBackward(this);

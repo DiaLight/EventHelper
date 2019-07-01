@@ -27,7 +27,7 @@ public abstract class Scroll9x5PageView<G extends Gui, L extends SlotLayout> ext
         int width = getWidth();
         int page = (getOffset() / width) + 1;
         int pages = ((getLayout().getWidth() + width - 1) / width);
-        if(pages == 1) {
+        if(pages <= 1) {
             setTitle(prefix);
         } else {
             setTitle(prefix + " " + page + "/" + pages);

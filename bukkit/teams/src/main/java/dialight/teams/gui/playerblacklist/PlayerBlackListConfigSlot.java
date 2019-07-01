@@ -1,4 +1,4 @@
-package dialight.teams.filter.players;
+package dialight.teams.gui.playerblacklist;
 
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
@@ -9,11 +9,11 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class PlayerFilterConfigSlot extends DynamicSlot {
+public class PlayerBlackListConfigSlot extends DynamicSlot {
 
     private final Teams proj;
 
-    public PlayerFilterConfigSlot(Teams proj) {
+    public PlayerBlackListConfigSlot(Teams proj) {
         this.proj = proj;
         proj.getOfflineMode().onChange(this::onChangeOfflineMode);
     }

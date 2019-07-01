@@ -52,12 +52,12 @@ public class TeamsApi implements ProjectApi {
         proj.getListener().unregisterTeamsObserver(new ViewableTeamObserver(viewable));
     }
 
-    public ObservableCollection<String> getTeamFilter() {
-        return proj.getTeamFilter();
+    public ObservableCollection<String> getTeamWhiteList() {
+        return proj.getTeamWhiteList();
     }
 
-    public ObservableCollection<UUID> getPlayerFilter() {
-        return proj.getPlayerFilter();
+    public ObservableCollection<UUID> getPlayerBlackList() {
+        return proj.getPlayerBlackList();
     }
 
     public ObservableObject<Boolean> getOfflineMode() {

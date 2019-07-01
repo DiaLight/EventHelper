@@ -27,12 +27,12 @@ public class TeamLayout extends ReplaceableLayout<NamedLayout<OfflinePlayer>> {
         proj.getListener().unregisterTeamsObserver(this);
     }
 
-    public NamedLayout<OfflinePlayer> getTeamLayout() {
-        return teamLayout;
+    public void setTeamLayout() {
+        setCurrent(teamLayout);
     }
 
-    public NamedLayout<OfflinePlayer> getNotCurTeamLayout() {
-        return notCurTeamLayout;
+    public void setNotCurTeamLayout() {
+        setCurrent(notCurTeamLayout);
     }
 
 }

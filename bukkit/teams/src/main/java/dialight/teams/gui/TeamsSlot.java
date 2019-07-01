@@ -27,8 +27,9 @@ public class TeamsSlot implements Slot {
                 })
                 .displayName(Colorizer.apply("|a|Команды"))
                 .lore(Colorizer.asList(
-                        "|a|ЛКМ|y|: открыть распределитель",
+                        "|a|ЛКМ|y|: открыть команды",
                         "|a|ПКМ|y|: получить инструмент в активный слот",
+                        " |y|и открыть команды",
                         "|a|Shift|y|+|a|ПКМ|y|: добавить инструмент в инвентарь",
                         ""
                 ))
