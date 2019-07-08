@@ -5,6 +5,8 @@ import dialight.extensions.ColorConverter;
 import dialight.observable.collection.ObservableCollection;
 import dialight.observable.map.ObservableMap;
 import dialight.observable.map.ObservableMapWrapper;
+import dialight.offlinelib.OfflineLibApi;
+import dialight.offlinelib.UuidPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.OfflinePlayer;
@@ -18,8 +20,8 @@ public class ObservableTeamImpl implements ObservableTeam {
     private final Teams proj;
     private final String name;
     private final Team team;
-    private final ObservableMap<UUID, OfflinePlayer> membersMap = new ObservableMapWrapper<>();
-    private final ObservableCollection<OfflinePlayer> members;
+    private final ObservableMap<UUID, UuidPlayer> membersMap = new ObservableMapWrapper<>();
+    private final ObservableCollection<UuidPlayer> members;
 
     public ObservableTeamImpl(Teams proj, Team team) {
         this.proj = proj;
@@ -40,7 +42,7 @@ public class ObservableTeamImpl implements ObservableTeam {
         return ColorConverter.toLeatherColor(getColor());
     }
 
-    @Override public ObservableCollection<OfflinePlayer> getMembers() {
+    @Override public ObservableCollection<UuidPlayer> getMembers() {
         return members;
     }
 
@@ -48,26 +50,33 @@ public class ObservableTeamImpl implements ObservableTeam {
         return team;
     }
 
-    @Override public void clear() {
+    @Override public void clearOfflines() {
+        OfflineLibApi offlinelib = proj.getOfflinelib();
         for (String name : new ArrayList<>(team.getEntries())) {
-            team.removeEntry(name);
+            OfflinePlayer op = offlinelib.getOfflinePlayerByName(name);
+//            UuidPlayer up;
+//            if(op != null) {
+//                up = offlinelib.getUuidPlayer(op.getUniqueId());
+//            } else {
+//                up = offlinelib.createUuidNotPlayer(name);
+//            }
+            if(op != null) team.removeEntry(name);
         }
     }
 
-    public void onAddMember(OfflinePlayer op) {
-        membersMap.put(op.getUniqueId(), op);
+    public void onAddMember(UuidPlayer op) {
+        membersMap.put(op.getUuid(), op);
     }
 
-    public void onRemoveMember(OfflinePlayer op) {
-        membersMap.remove(op.getUniqueId());
+    public void onRemoveMember(UuidPlayer op) {
+        membersMap.remove(op.getUuid());
     }
 
     public void onUpdate() {
         // update color
     }
 
-    @Override
-    public boolean equals(Object o) {
+    @Override public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -76,8 +85,7 @@ public class ObservableTeamImpl implements ObservableTeam {
         return name.equals(that.name);
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         return name.hashCode();
     }
 

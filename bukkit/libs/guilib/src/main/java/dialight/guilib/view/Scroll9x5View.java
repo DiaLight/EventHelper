@@ -78,7 +78,7 @@ public abstract class Scroll9x5View<G extends Gui, L extends SlotLayout> extends
 
     protected abstract Slot createBotBackground(int x);
 
-    private void updateView() {
+    protected void updateView() {
         for (int x = 0; x < botPane.length; x++) {
             BotPanelUsage slotUsage = botPane[x];
             Slot slot;
@@ -90,11 +90,11 @@ public abstract class Scroll9x5View<G extends Gui, L extends SlotLayout> extends
             getInventory().setItem(x + height * 9, slot.createItem());
         }
     }
-
-    @Override public void refresh() {
+    protected void updateOffset() {
         int limit = calcLimit();
         if(offset > limit) offset = limit;
-        updateView();
+    }
+    protected void renderContent() {
         SlotLayout layout = getLayout();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -104,6 +104,12 @@ public abstract class Scroll9x5View<G extends Gui, L extends SlotLayout> extends
                 getInventory().setItem(x + y * 9, item);
             }
         }
+    }
+
+    @Override public void refresh() {
+        updateOffset();
+        updateView();
+        renderContent();
         updateTitle();
     }
 
@@ -133,6 +139,10 @@ public abstract class Scroll9x5View<G extends Gui, L extends SlotLayout> extends
         getInventory().setItem(x + height * 9, slot.createItem());
     }
 
+    protected Slot getLayoutSlot(int x, int y) {
+        return getLayout().getSlot(x, y);
+    }
+
     @Nullable @Override public LocSlot getSlot(Player player, int index) {
         int x = index % 9;
         int y = index / 9;
@@ -146,9 +156,8 @@ public abstract class Scroll9x5View<G extends Gui, L extends SlotLayout> extends
             }
             return new LocSlot(null, slot);
         }
-        SlotLayout layout = getLayout();
         Vec2i pos = new Vec2i(x + offset, y);
-        Slot slot = layout.getSlot(pos.x, pos.y);
+        Slot slot = getLayoutSlot(pos.x, pos.y);
         if(slot == null) return null;
         return new LocSlot(pos, slot);
     }

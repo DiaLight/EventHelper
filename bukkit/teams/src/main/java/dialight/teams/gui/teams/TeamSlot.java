@@ -9,10 +9,10 @@ import dialight.guilib.gui.Gui;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.observable.collection.ObservableCollection;
+import dialight.offlinelib.UuidPlayer;
 import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -80,7 +80,7 @@ public class TeamSlot implements Slot {
 
     @NotNull @Override public ItemStack createItem() {
         ItemStack item = this.item.clone();
-        ObservableCollection<OfflinePlayer> members = oteam.getMembers();
+        ObservableCollection<UuidPlayer> members = oteam.getMembers();
         item.setAmount(members.size());
         ItemStackBuilder isb = new ItemStackBuilder(item);
         if(members.isEmpty()) {
@@ -91,11 +91,11 @@ public class TeamSlot implements Slot {
             isb.addLore(Colorizer.asList(
                     "|g|Игроки в команде:"
             ));
-            Iterator<OfflinePlayer> iterator = members.iterator();
+            Iterator<UuidPlayer> iterator = members.iterator();
             int previewSize = 8;
             for (int i = 0; i < previewSize && iterator.hasNext(); i++) {
-                OfflinePlayer op = iterator.next();
-                String name = op.getName();
+                UuidPlayer up = iterator.next();
+                String name = up.getName();
                 isb.addLore(Colorizer.asList(
                         oteam.getColor() + "⬛ |w|" + name
                 ));

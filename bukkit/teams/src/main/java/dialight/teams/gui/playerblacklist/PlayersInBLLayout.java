@@ -67,8 +67,8 @@ public class PlayersInBLLayout extends NamedSetLayout<UuidPlayer, UUID> {
         update(proj.getOfflinelib().getUuidPlayer(player.getUniqueId()));
     }
 
-    private Slot buildSlot(UuidPlayer op) {
-        return new PlayerBlackListSlot(this.proj, op.getUuid());
+    private Slot buildSlot(UuidPlayer up) {
+        return new PlayerBlackListSlot(this.proj, up);
     }
 
 }

@@ -170,7 +170,7 @@ public class TeamRandomizerProject extends Project {
 
         int players_in_team = playersToRandomize.size() / teamsToRandomize.size();
         for (ObservableTeam team : teamsToRandomize) {
-            team.clear();
+            team.clearOfflines();
             for (int i = 0; i < players_in_team; i++) {
                 UUID uuid = playersToRandomize.remove(rnd.nextInt(playersToRandomize.size()));
                 UuidPlayer uuidPlayer = offlinelib.getUuidPlayer(uuid);

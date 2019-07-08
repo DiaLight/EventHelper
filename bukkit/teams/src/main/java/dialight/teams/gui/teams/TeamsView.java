@@ -12,6 +12,7 @@ import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageLayout<ObservableTeam>> {
@@ -19,6 +20,7 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageLayout<Obse
     private final Slot background;
     private final Slot backward = buildDefaultBackward(this);
     private final Slot forward = buildDefaultForward(this);
+    private final Slot tutorial;
 
     public TeamsView(TeamsGui gui, CachedPageLayout<ObservableTeam> layout) {
         super(gui, layout, "Команды");
@@ -78,8 +80,8 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageLayout<Obse
         Slot clearTeams = new StaticSlot(new ItemStackBuilder(Material.LAVA_BUCKET)
                 .displayName(Colorizer.apply("|a|Очистка"))
                 .addLore(Colorizer.asList(
-                        "|a|Shift|y|+|a|ЛКМ|y|: очистить все команды",
-                        "|a|Shift|y|+|a|ПКМ|y|: удалить все команды"
+                        "|a|Shift|y|+|a|ЛКМ|y|: удалить игроков из команд",
+                        "|a|Shift|y|+|a|ПКМ|y|: удалить команды"
                 ))
                 .build()) {
             @Override
@@ -91,7 +93,7 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageLayout<Obse
                         for (String name : proj.getTeamWhiteList()) {
                             ObservableTeam oteam = proj.get(name);
                             if(oteam == null) continue;
-                            oteam.getMembers().clear();
+                            oteam.clearOfflines();
                         }
                         break;
                     case RIGHT:
@@ -111,6 +113,38 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageLayout<Obse
         setBotPaneSlot(1, controlItems);
         setBotPaneSlot(7, teamWhiteListSlot);
         setBotPaneSlot(8, clearTeams);
+        tutorial = new StaticSlot(new ItemStackBuilder()
+                .let(isb -> {
+                    ItemStackBuilderBc.of(isb).stainedGlassPane(DyeColor.RED);
+                })
+                .displayName(Colorizer.apply("|a|Туториал"))
+                .addLore(Colorizer.asList(
+                        "|y|Для работы с командами,",
+                        "|y| добавьте их в белый список команд.",
+                        "|y|Белый список команд находится",
+                        "|y| внизу справа текущего гуи."
+                ))
+                .build());
+    }
+
+    @Override protected void renderContent() {
+        if(getLayout().isEmpty()) {
+            for (int x = 0; x < getWidth(); x++) {
+                for (int y = 0; y < getHeight(); y++) {
+                    ItemStack item = tutorial.createItem();
+                    getInventory().setItem(x + y * 9, item);
+                }
+            }
+        } else {
+            super.renderContent();
+        }
+    }
+
+    @Override protected Slot getLayoutSlot(int x, int y) {
+        if(getLayout().isEmpty()) {
+            return tutorial;
+        }
+        return super.getLayoutSlot(x, y);
     }
 
     @Override protected Slot createBotBackground(int x) {

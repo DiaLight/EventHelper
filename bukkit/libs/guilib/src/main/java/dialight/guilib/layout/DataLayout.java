@@ -29,8 +29,13 @@ public abstract class DataLayout<T> extends SlotLayout {
     public abstract boolean add(@NotNull T data);
     public abstract boolean remove(@NotNull T data);
     public abstract boolean update(@NotNull T data);
+    public abstract int getSize();
     public abstract void clear();
     @Nullable public abstract T remove(int x, int y);
     @Nullable public abstract T getData(int x, int y);
+
+    public boolean isEmpty() {
+        return getSize() == 0;
+    }
 
 }

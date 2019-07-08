@@ -64,7 +64,7 @@ public class CachedPageLayout<T> extends DataLayout<T> {
         return true;
     }
 
-    public int size() {
+    @Override public int getSize() {
         return slots.size();
     }
 

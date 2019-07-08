@@ -8,11 +8,10 @@ import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.observable.collection.ObservableCollection;
+import dialight.offlinelib.UuidPlayer;
 import dialight.teams.Teams;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -23,14 +22,12 @@ import java.util.UUID;
 public class PlayerBlackListSlot implements Slot {
 
     private final Teams proj;
-    private final UUID uuid;
-    @NotNull private final Server server;
+    private final UuidPlayer up;
     @NotNull private final Scoreboard scoreboard;
 
-    public PlayerBlackListSlot(Teams proj, UUID uuid) {
+    public PlayerBlackListSlot(Teams proj, UuidPlayer up) {
         this.proj = proj;
-        this.uuid = uuid;
-        this.server = proj.getPlugin().getServer();
+        this.up = up;
         this.scoreboard = proj.getPlugin().getServer().getScoreboardManager().getMainScoreboard();
     }
 
@@ -38,10 +35,10 @@ public class PlayerBlackListSlot implements Slot {
         ObservableCollection<UUID> filter = proj.getPlayerBlackList();
         switch (e.getEvent().getClick()) {
             case LEFT:
-                if(filter.contains(uuid)) {
-                    filter.remove(uuid);
+                if(filter.contains(up.getUuid())) {
+                    filter.remove(up.getUuid());
                 } else {
-                    filter.add(uuid);
+                    filter.add(up.getUuid());
                 }
                 break;
             case SHIFT_LEFT:
@@ -54,10 +51,9 @@ public class PlayerBlackListSlot implements Slot {
     }
 
     @NotNull @Override public ItemStack createItem() {
-        OfflinePlayer op = server.getOfflinePlayer(this.uuid);
-        Team team = scoreboard.getEntryTeam(op.getName());
-        boolean isOnline = op.isOnline();
-        boolean inFilter = proj.getPlayerBlackList().contains(this.uuid);
+        Team team = scoreboard.getEntryTeam(up.getName());
+        boolean isOnline = up.isOnline();
+        boolean inFilter = proj.getPlayerBlackList().contains(up.getUuid());
         ItemStackBuilder isb = new ItemStackBuilder();
         if(team != null) {
             ItemStackBuilderBc isbbc = ItemStackBuilderBc.of(isb);
@@ -91,9 +87,9 @@ public class PlayerBlackListSlot implements Slot {
             }
         }
         if (isOnline) {
-            isb.displayName(Colorizer.apply("|w|" + op.getName()));
+            isb.displayName(Colorizer.apply("|w|" + up.getName()));
         } else {
-            isb.displayName(Colorizer.apply("|w|" + op.getName() + " |r|(Офлайн)"));
+            isb.displayName(Colorizer.apply("|w|" + up.getName() + " |r|(Офлайн)"));
         }
         if (inFilter) {
             isb.addLore(Colorizer.apply("|a|ЛКМ|y|: убрать игрока из черного списка"));
@@ -103,7 +99,7 @@ public class PlayerBlackListSlot implements Slot {
         if(team != null) {
             isb.addLore(Colorizer.apply("|y|team: " + TeamBc.of(team).getColor() + "⬛ |w|" + team.getName()));
         }
-        isb.addLore(Colorizer.apply("|y|uuid: |w|" + op.getUniqueId()));
+        isb.addLore(Colorizer.apply("|y|uuid: |w|" + up.getUuid()));
         return isb.build();
     }
 

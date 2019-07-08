@@ -131,8 +131,8 @@ public class PlayersAllBLLayout extends NamedSetLayout<UuidPlayer, UUID> {
         }
     }
 
-    private Slot buildSlot(UuidPlayer op) {
-        return new PlayerBlackListSlot(this.proj, op.getUuid());
+    private Slot buildSlot(UuidPlayer up) {
+        return new PlayerBlackListSlot(this.proj, up);
     }
 
 }

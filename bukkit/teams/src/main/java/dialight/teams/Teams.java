@@ -11,6 +11,7 @@ import dialight.observable.collection.ObservableCollectionWrapper;
 import dialight.observable.map.ObservableMap;
 import dialight.observable.map.ObservableMapWrapper;
 import dialight.offlinelib.OfflineLibApi;
+import dialight.offlinelib.UuidPlayer;
 import dialight.teams.event.TeamEvent;
 import dialight.teams.gui.playerblacklist.PlayerBlackListGui;
 import dialight.teams.gui.whitelist.TeamWhiteListGui;
@@ -95,8 +96,11 @@ public class Teams extends Project {
     }
 
     public void update() {
-        List<OfflinePlayer> notInTeamToAdd = new ArrayList<>(offlinelib.getOffline());
-        List<OfflinePlayer> notInTeamToRemove = new ArrayList<>();
+        List<UuidPlayer> notInTeamToAdd = new ArrayList<>();
+        for (OfflinePlayer op : offlinelib.getOffline()) {
+            notInTeamToAdd.add(offlinelib.getUuidPlayer(op.getUniqueId()));
+        }
+        List<UuidPlayer> notInTeamToRemove = new ArrayList<>();
         Scoreboard sb = getPlugin().getServer().getScoreboardManager().getMainScoreboard();
         List<String> teamsToRemove = new ArrayList<>(teamsMap.keySet());
         for (Team team : sb.getTeams()) {
@@ -104,11 +108,15 @@ public class Teams extends Project {
             if(teamsMap.putIfAbsent(team.getName(), oteam) == null) {
                 for (String member : team.getEntries()) {
                     OfflinePlayer op = offlinelib.getOfflinePlayerByName(member);
+                    UuidPlayer up;
                     if(op != null) {
-                        oteam.onAddMember(op);
-                        notInTeamToRemove.add(op);
-                        notInTeamToAdd.remove(op);
+                        up = offlinelib.getUuidPlayer(op.getUniqueId());
+                    } else {
+                        up = offlinelib.createUuidNotPlayer(member);
                     }
+                    oteam.onAddMember(up);
+                    notInTeamToRemove.add(up);
+                    notInTeamToAdd.remove(up);
                 }
             }
             teamsToRemove.remove(team.getName());
@@ -237,9 +245,13 @@ public class Teams extends Project {
 //                System.out.println("ADD_MEMBERS " + event.getName() + " " + membersEvent.getMembers());
                 for (String member : membersEvent.getMembers()) {
                     OfflinePlayer op = offlinelib.getOfflinePlayerByName(member);
+                    UuidPlayer up;
                     if(op != null) {
-                        oteam.onAddMember(op);
+                        up = offlinelib.getUuidPlayer(op.getUniqueId());
+                    } else {
+                        up = offlinelib.createUuidNotPlayer(member);
                     }
+                    oteam.onAddMember(up);
                     for (BiConsumer<ObservableTeam, String> consumer : onMemberJoin) {
                         consumer.accept(oteam, member);
                     }
@@ -251,9 +263,13 @@ public class Teams extends Project {
 //                System.out.println("REMOVE_MEMBERS " + event.getName() + " " + membersEvent.getMembers());
                 for (String member : membersEvent.getMembers()) {
                     OfflinePlayer op = offlinelib.getOfflinePlayerByName(member);
-                    if (op != null) {
-                        oteam.onRemoveMember(op);
+                    UuidPlayer up;
+                    if(op != null) {
+                        up = offlinelib.getUuidPlayer(op.getUniqueId());
+                    } else {
+                        up = offlinelib.createUuidNotPlayer(member);
                     }
+                    oteam.onRemoveMember(up);
                     for (BiConsumer<ObservableTeam, String> consumer : onMemberLeave) {
                         consumer.accept(oteam, member);
                     }

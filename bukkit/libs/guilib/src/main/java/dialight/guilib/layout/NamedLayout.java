@@ -344,6 +344,14 @@ public class NamedLayout<T> extends DataLayout<T> {
         return data;
     }
 
+    @Override public int getSize() {
+        int size = 0;
+        for (NamedBlock<T> namedBlock : sorted.values()) {
+            size += namedBlock.relative.size();
+        }
+        return size;
+    }
+
     @NotNull public String buildColumnsHeader(int x, int width) {
         if(x < 0) return empty(width);
         if(x >= backed.size()) return empty(width);

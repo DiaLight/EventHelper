@@ -1,18 +1,18 @@
 package dialight.teams;
 
 import dialight.observable.collection.ObservableCollection;
+import dialight.offlinelib.UuidPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.scoreboard.Team;
 
 public interface ObservableTeam {
 
-    ObservableCollection<OfflinePlayer> getMembers();
+    ObservableCollection<UuidPlayer> getMembers();
 
     Team getTeam();
 
-    void clear();
+    void clearOfflines();
 
     String getName();
 

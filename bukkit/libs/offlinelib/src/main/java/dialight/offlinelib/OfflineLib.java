@@ -10,16 +10,15 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class OfflineLib extends Project {
 
     private final Map<UUID, OfflinePlayerEx> offlinePlayers = new HashMap<>();
+    private final Map<UUID, UuidNotPlayer> notPlayers = new HashMap<>();
 
     private OfflineLibListener listener;
     private OnlineObservable online;
@@ -94,5 +93,19 @@ public class OfflineLib extends Project {
             if(Objects.equals(op.getName(), name)) return op;
         }
         return null;
+    }
+
+    @Nullable public UuidPlayer getNotPlayer(UUID uuid) {
+        return notPlayers.get(uuid);
+    }
+
+    @NotNull public UuidPlayer getOrCreateNotPlayer(String name) {
+        UuidNotPlayer unp = new UuidNotPlayer(this, name);
+        notPlayers.put(unp.getUuid(), unp);
+        return unp;
+    }
+
+    public Collection<UuidPlayer> getNotPlayers() {
+        return (Collection) notPlayers.values();
     }
 }

@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 public class FixedLayout extends DataLayout<Slot> {
 
     private final Slot[][] slots;
+    private int size = 0;
 
     public FixedLayout(int width, int height) {
         this.slots = new Slot[width][height];
@@ -46,8 +47,15 @@ public class FixedLayout extends DataLayout<Slot> {
     public Slot setSlot(int x, int y, Slot slot) {
         Slot oldslot = slots[x][y];
         slots[x][y] = slot;
+
+        if(oldslot == null && slot != null) size++;
+        if(oldslot != null && slot == null) size--;
+
         fireUpdateSlot(x, y, slot);
         return oldslot;
     }
 
+    @Override public int getSize() {
+        return size;
+    }
 }

@@ -9,12 +9,12 @@ import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.extensions.NamedLayoutScroll9x5View;
+import dialight.offlinelib.UuidPlayer;
 import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
 import dialight.teleporter.SelectedPlayers;
 import dialight.teleporter.TeleporterApi;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.util.List;
@@ -64,7 +64,7 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
                     }
                     break;
                     case RIGHT: {
-                        getLayout().setNotCurTeamLayout();
+                        getLayout().setNotMembersLayout();
                     }
                     break;
                 }
@@ -87,22 +87,22 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
                     SelectedPlayers selected = teleporter.getSelectedPlayers(e.getPlayer().getUniqueId());
                     switch (e.getEvent().getClick()) {
                         case LEFT: {
-                            selected.addAllPlayers(oteam.getMembers());
+                            selected.addAllUuidPlayers(oteam.getMembers());
                         } break;
                         case SHIFT_LEFT: {
-                            List<OfflinePlayer> online = oteam.getMembers().stream()
-                                    .filter(OfflinePlayer::isOnline)
+                            List<UuidPlayer> online = oteam.getMembers().stream()
+                                    .filter(UuidPlayer::isOnline)
                                     .collect(Collectors.toList());
-                            selected.addAllPlayers(online);
+                            selected.addAllUuidPlayers(online);
                         } break;
                         case RIGHT: {
-                            selected.removeAllPlayers(oteam.getMembers());
+                            selected.removeAllUuidPlayers(oteam.getMembers());
                         } break;
                         case SHIFT_RIGHT: {
-                            List<OfflinePlayer> offline = oteam.getMembers().stream()
+                            List<UuidPlayer> offline = oteam.getMembers().stream()
                                     .filter(it -> !it.isOnline())
                                     .collect(Collectors.toList());
-                            selected.addAllPlayers(offline);
+                            selected.addAllUuidPlayers(offline);
                         } break;
                     }
                 }
@@ -113,7 +113,7 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
         Slot clearTeam = new StaticSlot(new ItemStackBuilder(Material.LAVA_BUCKET)
                 .displayName(Colorizer.apply("|a|Очистка"))
                 .addLore(Colorizer.asList(
-                        "|a|Shift|y|+|a|ЛКМ|y|: очистить команду"
+                        "|a|Shift|y|+|a|ЛКМ|y|: удалить игроков из команды"
                 ))
                 .build()) {
             @Override
@@ -122,7 +122,7 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
                     case LEFT:
                         break;
                     case SHIFT_LEFT:
-                        oteam.getMembers().clear();
+                        oteam.clearOfflines();
                         break;
                     case RIGHT:
                         break;

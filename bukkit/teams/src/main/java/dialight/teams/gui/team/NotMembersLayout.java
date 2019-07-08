@@ -6,6 +6,7 @@ import dialight.guilib.slot.Slot;
 import dialight.observable.collection.ObservableCollection;
 import dialight.offlinelib.OfflineObservable;
 import dialight.offlinelib.OnlineObservable;
+import dialight.offlinelib.UuidPlayer;
 import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
 import org.bukkit.OfflinePlayer;
@@ -14,26 +15,26 @@ import org.bukkit.entity.Player;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class NotMembersLayout extends NamedSetLayout<OfflinePlayer, UUID> {
+public class NotMembersLayout extends NamedSetLayout<UuidPlayer, UUID> {
 
     private final Teams proj;
     private final ObservableTeam oteam;
-    private final Consumer<OfflinePlayer> onMemberAdd = this::onMemberAdd;
-    private final Consumer<OfflinePlayer> onMemberRemove = this::onMemberRemove;
+    private final Consumer<UuidPlayer> onMemberAdd = this::onMemberAdd;
+    private final Consumer<UuidPlayer> onMemberRemove = this::onMemberRemove;
     private final Consumer<Player> onAddOnline = this::onAddOnline;
     private final Consumer<Player> onRemoveOnline = this::onRemoveOnline;
 
     public NotMembersLayout(Teams proj, ObservableTeam oteam) {
-        super(5, OfflinePlayer::getUniqueId);
+        super(5, UuidPlayer::getUuid);
         this.proj = proj;
         this.oteam = oteam;
 
-        setNameFunction(OfflinePlayer::getName);
+        setNameFunction(UuidPlayer::getName);
         setSlotFunction(this::buildSlot);
     }
 
     @Override public void onViewersNotEmpty() {
-        ObservableCollection<OfflinePlayer> members = oteam.getMembers();
+        ObservableCollection<UuidPlayer> members = oteam.getMembers();
         members.onAdd(onMemberAdd);
         members.onRemove(onMemberRemove);
 
@@ -43,14 +44,20 @@ public class NotMembersLayout extends NamedSetLayout<OfflinePlayer, UUID> {
 
         OfflineObservable offline = proj.getOfflinelib().getOffline();
         for (OfflinePlayer op : offline) {
-            if (!oteam.getMembers().contains(op)) {
-                add(op);
+            UuidPlayer up = proj.getOfflinelib().getUuidPlayer(op.getUniqueId());
+            if (!oteam.getMembers().contains(up)) {
+                add(up);
+            }
+        }
+        for (UuidPlayer unp : proj.getOfflinelib().getNotPlayers()) {
+            if (!oteam.getMembers().contains(unp)) {
+                add(unp);
             }
         }
     }
 
     @Override public void onViewersEmpty() {
-        ObservableCollection<OfflinePlayer> members = oteam.getMembers();
+        ObservableCollection<UuidPlayer> members = oteam.getMembers();
         members.unregisterOnAdd(onMemberAdd);
         members.unregisterOnRemove(onMemberRemove);
 
@@ -61,33 +68,33 @@ public class NotMembersLayout extends NamedSetLayout<OfflinePlayer, UUID> {
         proj.runTask(this::clear);
     }
 
-    private void dumpThrow(OfflinePlayer op, NamedLayout<OfflinePlayer> layout) {
+    private void dumpThrow(UuidPlayer up, NamedLayout<UuidPlayer> layout) {
         layout.dump();
-        throw new RuntimeException("Somethings wrong. " + op.getName() + " " + op.getUniqueId());
+        throw new RuntimeException("Somethings wrong. " + up.getName() + " " + up.getUuid());
     }
 
-    private void onMemberAdd(OfflinePlayer op) {
-        if(!remove(op)) dumpThrow(op, this);
+    private void onMemberAdd(UuidPlayer up) {
+        if(!remove(up)) dumpThrow(up, this);
     }
 
-    private void onMemberRemove(OfflinePlayer op) {
-        if(!add(op)) dumpThrow(op, this);
+    private void onMemberRemove(UuidPlayer up) {
+        if(!add(up)) dumpThrow(up, this);
     }
 
     private void onAddOnline(Player player) {
-        OfflinePlayer op = player;
-        boolean isMember = oteam.getMembers().contains(op);
-        update(op);
+        UuidPlayer up = proj.getOfflinelib().getUuidPlayer(player);
+        boolean isMember = oteam.getMembers().contains(up);
+        update(up);
     }
 
     private void onRemoveOnline(Player player) {
-        OfflinePlayer op = player;
-        boolean isMember = oteam.getMembers().contains(op);
-        update(op);
+        UuidPlayer up = proj.getOfflinelib().getUuidPlayer(player);
+        boolean isMember = oteam.getMembers().contains(up);
+        update(up);
     }
 
-    private Slot buildSlot(OfflinePlayer op) {
-        return new MemberSlot(this.proj, this.oteam, op.getUniqueId());
+    private Slot buildSlot(UuidPlayer up) {
+        return new MemberSlot(this.proj, this.oteam, up);
     }
 
 }

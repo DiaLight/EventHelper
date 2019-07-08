@@ -30,7 +30,6 @@ val parts = arrayOf(
     ":bukkit:teams",
     ":bukkit:randomizer",
     ":bukkit:autorespawn"
-//    ":bukkit:oldpvp",  // not ready yet
 //    ":bukkit:captain"
 )
 

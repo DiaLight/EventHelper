@@ -2,37 +2,38 @@ package dialight.teams;
 
 import dialight.observable.map.ObservableMap;
 import dialight.observable.map.ValuesImmutableObservable;
-import org.bukkit.OfflinePlayer;
+import dialight.offlinelib.UuidPlayer;
 import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class MembersObservable extends ValuesImmutableObservable<UUID, OfflinePlayer> {
+public class MembersObservable extends ValuesImmutableObservable<UUID, UuidPlayer> {
 
     private final Team team;
 
-    public MembersObservable(Team team, ObservableMap<UUID, OfflinePlayer> map) {
-        super(map, OfflinePlayer::getUniqueId);
+    public MembersObservable(Team team, ObservableMap<UUID, UuidPlayer> map) {
+        super(map, UuidPlayer::getUuid);
         this.team = team;
     }
 
-    @Override
-    public boolean add(OfflinePlayer element) {
+    @Override public boolean add(UuidPlayer element) {
         if(contains(element)) return false;
-        team.addEntry(element.getName());
+        String name = element.getName();
+        if(name == null) return false;
+        team.addEntry(name);
         return true;
     }
 
-    @Override
-    public boolean remove(Object element) {
+    @Override public boolean remove(Object element) {
         if(!contains(element)) return false;
-        team.removeEntry(((OfflinePlayer) element).getName());
+        String name = ((UuidPlayer) element).getName();
+        if(name == null) return false;
+        team.removeEntry(name);
         return true;
     }
 
-    @Override
-    public void clear() {
+    @Override public void clear() {
         for (String name : new ArrayList<>(team.getEntries())) {
             team.removeEntry(name);
         }

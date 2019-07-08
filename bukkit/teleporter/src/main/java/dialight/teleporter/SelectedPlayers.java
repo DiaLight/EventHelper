@@ -1,6 +1,7 @@
 package dialight.teleporter;
 
 import dialight.observable.collection.ObservableCollectionWrapper;
+import dialight.offlinelib.UuidPlayer;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
@@ -37,9 +38,21 @@ public class SelectedPlayers extends ObservableCollectionWrapper<UUID> {
         }
     }
 
+    public void addAllUuidPlayers(Collection<? extends UuidPlayer> ups) {
+        for (UuidPlayer up : ups) {
+            add(up.getUuid());
+        }
+    }
+
     public void removeAllPlayers(Collection<? extends OfflinePlayer> offline) {
         for (OfflinePlayer player : offline) {
             remove(player.getUniqueId());
+        }
+    }
+
+    public void removeAllUuidPlayers(Collection<? extends UuidPlayer> ups) {
+        for (UuidPlayer up : ups) {
+            remove(up.getUuid());
         }
     }
 }
