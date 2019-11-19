@@ -8,13 +8,13 @@ import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.page.Scroll9x5PageView;
 import org.bukkit.Material;
 
-public class TeamWhiteListView extends Scroll9x5PageView<TeamWhiteListGui, TeamWhiteListLayout> {
+public class TeamWhiteListView extends Scroll9x5PageView<TeamWhiteListGui, TeamWhiteListElement> {
 
     private final Slot background = buildDefaultBackground();
     private final Slot forward = buildDefaultForward(this);
     private final Slot backward = buildDefaultBackward(this);
 
-    public TeamWhiteListView(TeamWhiteListGui gui, TeamWhiteListLayout layout) {
+    public TeamWhiteListView(TeamWhiteListGui gui, TeamWhiteListElement layout) {
         super(gui, layout, "Белый список команд");
 
         Slot clear = new StaticSlot(new ItemStackBuilder(Material.LAVA_BUCKET)

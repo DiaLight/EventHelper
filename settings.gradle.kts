@@ -15,8 +15,6 @@ fun Settings.includeProjects(base: String, path: String) = file(path).listFiles(
     project(":$base:${dir.name}").projectDir = dir
 }
 
-include("sponge", "gradle")
-
 includeAll("sponge", "sponge/libs")
 includeProjects("sponge", "sponge")
 includeAll("sponge", "sponge/teams_controllers")

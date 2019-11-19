@@ -4,28 +4,30 @@ import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
-import dialight.teams.ObservableTeam;
+import dialight.observable.set.ObservableSet;
 import dialight.teams.Teams;
+import dialight.teams.observable.ObservableScoreboard;
+import dialight.teams.observable.ObservableTeam;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-
 public class TeamWhiteListSlot implements Slot {
 
     @NotNull private final Teams proj;
+    private final ObservableScoreboard scoreboard;
     private final String name;
 
-    public TeamWhiteListSlot(Teams proj, String name) {
+    public TeamWhiteListSlot(Teams proj, ObservableScoreboard scoreboard, String name) {
         this.proj = proj;
+        this.scoreboard = scoreboard;
         this.name = name;
     }
 
     @Override public void onClick(SlotClickEvent e) {
         switch (e.getEvent().getClick()) {
             case LEFT:
-                Collection<String> filter = proj.getTeamWhiteList();
+                ObservableSet<String> filter = proj.getTeamWhiteList();
                 if (filter.contains(name)) {
                     filter.remove(name);
                 } else {
@@ -43,7 +45,7 @@ public class TeamWhiteListSlot implements Slot {
 
     @NotNull @Override public ItemStack createItem() {
         boolean inFilter = proj.getTeamWhiteList().contains(name);
-        ObservableTeam oteam = proj.get(name);
+        ObservableTeam oteam = scoreboard.teamsByName().get(name);
         ItemStackBuilder isb = new ItemStackBuilder();
         if(oteam != null) {
             if (inFilter) {
@@ -51,7 +53,7 @@ public class TeamWhiteListSlot implements Slot {
             } else {
                 isb.reset(Material.LEATHER_CHESTPLATE);
             }
-            isb.displayName(oteam.getColor() + Colorizer.apply("⬛ |w|" + oteam.getName()));
+            isb.displayName(oteam.color().getValue() + Colorizer.apply("⬛ |w|" + oteam.getName()));
             isb.leatherArmorColor(oteam.getLeatherColor());
         } else {
             isb.reset(Material.ARMOR_STAND);

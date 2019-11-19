@@ -2,14 +2,14 @@ package dialight.teams.gui.playerblacklist;
 
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
-import dialight.guilib.layout.NamedLayout;
+import dialight.guilib.elements.NamedElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
-import dialight.guilib.view.extensions.NamedLayoutScroll9x5View;
+import dialight.guilib.view.extensions.NamedElementScroll9X5View;
 import org.bukkit.Material;
 
-public class PlayerBlackListView extends NamedLayoutScroll9x5View<PlayerBlackListGui, PlayerBlackListLayout> {
+public class PlayerBlackListView extends NamedElementScroll9X5View<PlayerBlackListGui, PlayerBlackListElement> {
 
     private final Slot background = buildDefaultBackground();
     private final Slot backward = buildDefaultBackward(this);
@@ -18,7 +18,7 @@ public class PlayerBlackListView extends NamedLayoutScroll9x5View<PlayerBlackLis
     private final Slot config;
 
 
-    public PlayerBlackListView(PlayerBlackListGui gui, PlayerBlackListLayout layout) {
+    public PlayerBlackListView(PlayerBlackListGui gui, PlayerBlackListElement layout) {
         super(gui, layout);
         selectView = new StaticSlot(new ItemStackBuilder(Material.BOOK)
                 .displayName("Выбор представления данных")
@@ -71,7 +71,7 @@ public class PlayerBlackListView extends NamedLayoutScroll9x5View<PlayerBlackLis
         this.setEmptyTitleReplace("Черный список игроков");
     }
 
-    @Override public NamedLayout getNamedLayout() {
+    @Override public NamedElement getNamedLayout() {
         return getLayout().getCurrent();
     }
 

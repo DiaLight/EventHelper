@@ -9,7 +9,7 @@ import java.util.HashSet;
 public abstract class Viewable {
 
     private final ObservableCollection<Player> viewers = new ObservableCollectionWrapper<>(new HashSet<>());
-    private final ObservableCollection<Player> immutableViewers = viewers.asImmutableCollectionObaervable();
+    private final ObservableCollection<Player> immutableViewers = viewers.asImmutableCollectionObservable();
 
     public final ObservableCollection<Player> getViewers() {
         return immutableViewers;

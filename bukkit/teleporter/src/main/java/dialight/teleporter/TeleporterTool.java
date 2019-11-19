@@ -5,9 +5,10 @@ import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
 import dialight.extensions.OfflinePlayerEx;
 import dialight.extensions.Utils;
-import dialight.guilib.layout.NamedLayout;
+import dialight.guilib.elements.NamedElement;
 import dialight.maingui.MainGuiTool;
 import dialight.offlinelib.OfflineEntity;
+import dialight.offlinelib.UuidPlayer;
 import dialight.toollib.Tool;
 import dialight.toollib.events.ToolInteractEvent;
 import org.bukkit.Location;
@@ -20,7 +21,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class TeleporterTool extends Tool {
 
@@ -36,7 +39,7 @@ public class TeleporterTool extends Tool {
                 .displayName(Colorizer.apply("|a|Телепорт игроков"))
                 .lore(Colorizer.asList(
                         "|w|Телепортация",
-                        "|a|ЛКМ|y|: телепортировать выбранных игроков",
+                        "|gr|[|a|Shift|y|+|gr|]|a|ЛКМ|y|: телепортировать выбранных игроков",
                         "|w|Выбор игроков",
                         "|a|ПКМ|y|: открыть редактор выбранных игроков",
                         "|a|ПКМ по игроку*|y|: выбрать игрока",
@@ -64,30 +67,28 @@ public class TeleporterTool extends Tool {
 
     @Override public void onClick(ToolInteractEvent e) {
         switch (e.getAction()) {
-            case LEFT_CLICK: if(!e.isSneaking()) {
+            case LEFT_CLICK: {
                 SelectedPlayers selected = proj.getSelectedPlayers(e.getPlayer().getUniqueId());
                 if(selected.isEmpty()) {
                     e.getPlayer().sendMessage(TeleporterMessages.noPlayersSelected);
                 } else {
                     Location loc = e.lookingAtLoc();
-                    List<OfflinePlayer> offline = new ArrayList<>();
-                    List<Player> online = new ArrayList<>();
-                    for (OfflinePlayer op : selected.toOfflinePlayers()) {
-                        proj.teleport(op, loc);
-                        if(op.isOnline()) {
-                            Player trg = (Player) op;
-                            online.add(trg);
+                    List<UuidPlayer> offline = new ArrayList<>();
+                    List<UuidPlayer> online = new ArrayList<>();
+                    for (UuidPlayer up : selected.toUuidPlayers()) {
+                        proj.teleport(up, loc);
+                        Player trg = up.getPlayer();
+                        if(trg != null) {
+                            online.add(up);
                             if(!trg.getUniqueId().equals(e.getPlayer().getUniqueId())) {
                                 trg.sendMessage(TeleporterMessages.YouHBTp(e.getPlayer().getName()));
                             }
                         } else {
-                            offline.add(op);
+                            offline.add(up);
                         }
                     }
                     e.getPlayer().sendMessage(TeleporterMessages.YouTp(online, offline));
                 }
-            } else {
-
             } break;
             case RIGHT_CLICK: if(!e.isSneaking()) {
                 Server srv = proj.getPlugin().getServer();
@@ -117,7 +118,7 @@ public class TeleporterTool extends Tool {
             } else {
                 SelectedPlayers selected = proj.getSelectedPlayers(e.getPlayer().getUniqueId());
                 selected.clear();
-                NamedLayout<OfflinePlayer> layout = proj.getGui().getOrCreateLayout(e.getPlayer()).getSelectedLayout();
+                NamedElement<UuidPlayer> layout = proj.getGui().getOrCreateLayout(e.getPlayer()).getSelectedLayout();
                 if(layout.getWidth() != 0) throw new RuntimeException("Somethings wrong");
                 e.getPlayer().sendMessage(TeleporterMessages.AllPlayersRemoved);
             } break;

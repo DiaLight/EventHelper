@@ -20,7 +20,7 @@ public class MainGuiCommand implements CommandExecutor {
             Player player = (Player) sender;
             this.proj.getGuilib().openGui(player, this.proj.getGui());
         }
-        return false;
+        return true;
     }
 
 }

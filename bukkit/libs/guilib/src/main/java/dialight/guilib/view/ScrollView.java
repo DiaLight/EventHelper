@@ -5,7 +5,7 @@ import dialight.extensions.Colorizer;
 import dialight.extensions.GuiUtils;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.gui.Gui;
-import dialight.guilib.layout.SlotLayout;
+import dialight.guilib.elements.SlotElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
@@ -15,7 +15,7 @@ import org.bukkit.event.inventory.ClickType;
 
 import java.util.List;
 
-public abstract class ScrollView<G extends Gui, L extends SlotLayout> extends View<G, L> {
+public abstract class ScrollView<G extends Gui, L extends SlotElement> extends View<G, L> {
 
     protected static final List<String> DEFAULT_BACKGROUND_LORE = Colorizer.asList(
             "|w|Навигация",

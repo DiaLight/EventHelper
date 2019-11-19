@@ -7,7 +7,8 @@ import dialight.guilib.slot.DynamicSlot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.observable.collection.ObservableCollection;
 import dialight.offlinelib.UuidPlayer;
-import dialight.teams.ObservableTeam;
+import dialight.teams.observable.ObservableScoreboard;
+import dialight.teams.observable.ObservableTeam;
 import dialight.teams.Teams;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -27,13 +28,22 @@ public class PlayerBlackListSlot extends DynamicSlot {
         this.proj = proj;
         this.scoreboard = proj.getPlugin().getServer().getScoreboardManager().getMainScoreboard();
         ObservableCollection<UUID> playerFilter = proj.getPlayerBlackList();
-        playerFilter.onAdd(this::update);
-        playerFilter.onRemove(this::update);
-        proj.onMemberJoin(this::update);
-        proj.onMemberLeave(this::update);
+        playerFilter.onAdd(this, this::update);
+        playerFilter.onRemove(this, this::update);
+        ObservableScoreboard scoreboard = proj.getScoreboardManager().getMainScoreboard();
+        scoreboard.teamsByMember().onPut(this, this::onMemberJoin);
+        scoreboard.teamsByMember().onRemove(this, this::onMemberLeave);
     }
 
-    private void update(ObservableTeam oteam, String name) {
+    private void onMemberJoin(UuidPlayer member, ObservableTeam team) {
+        updateLater(proj.getPlugin());
+    }
+
+    private void onMemberLeave(UuidPlayer member, ObservableTeam team) {
+        updateLater(proj.getPlugin());
+    }
+
+    @Deprecated private void update(ObservableTeam oteam, String name) {
         updateLater(proj.getPlugin());
     }
     private void update(UUID uuid) {

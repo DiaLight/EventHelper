@@ -1,6 +1,6 @@
 package dialight.guilib.view;
 
-import dialight.guilib.layout.SlotLayout;
+import dialight.guilib.elements.SlotElement;
 import dialight.guilib.gui.Gui;
 import dialight.guilib.slot.LocSlot;
 import dialight.guilib.slot.Slot;
@@ -14,7 +14,7 @@ public class Fixed9x6View extends View {
     private final int width;
     private final int height;
 
-    public Fixed9x6View(Gui gui, SlotLayout layout, String title) {
+    public Fixed9x6View(Gui gui, SlotElement layout, String title) {
         super(gui, layout, 9, 6, title);
         this.width = 9;
         this.height = 6;
@@ -44,7 +44,7 @@ public class Fixed9x6View extends View {
     }
 
     @Override public void refresh() {
-        SlotLayout layout = getLayout();
+        SlotElement layout = getLayout();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Slot slot = layout.getSlot(x, y);

@@ -1,7 +1,7 @@
 package dialight.maingui;
 
 import dialight.guilib.gui.Gui;
-import dialight.guilib.layout.HorizontalMultiLayout;
+import dialight.guilib.elements.HorizontalMultiElement;
 import dialight.guilib.view.View;
 import org.bukkit.entity.Player;
 
@@ -11,18 +11,18 @@ public class MainGui extends Gui {
 
     private final MainGuiProject proj;
 
-    private final ToolsLayout toolsDataFlow;
-    private final ModulesLayout modulesDataFlow;
-    private final HorizontalMultiLayout dataFlow;
+    private final ToolsElement toolsDataFlow;
+    private final ModulesElement modulesDataFlow;
+    private final HorizontalMultiElement dataFlow;
 
     private final MainGuiView view;
 
     public MainGui(MainGuiProject proj) {
         this.proj = proj;
 
-        toolsDataFlow = new ToolsLayout(proj);
-        modulesDataFlow = new ModulesLayout(proj);
-        dataFlow = new HorizontalMultiLayout(Arrays.asList(toolsDataFlow, modulesDataFlow));
+        toolsDataFlow = new ToolsElement(proj);
+        modulesDataFlow = new ModulesElement(proj);
+        dataFlow = new HorizontalMultiElement(Arrays.asList(toolsDataFlow, modulesDataFlow));
 
         this.view = new MainGuiView(this, dataFlow, "Event Helper");
     }

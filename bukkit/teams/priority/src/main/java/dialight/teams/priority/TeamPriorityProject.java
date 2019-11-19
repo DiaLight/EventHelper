@@ -15,6 +15,7 @@ public class TeamPriorityProject extends Project {
     private GuiLibApi guilib;
     private OfflineLibApi offlinelib;
     private TeamsApi teams;
+    private boolean running = false;
 
     public TeamPriorityProject(JavaPlugin plugin) {
         super(plugin);
@@ -26,6 +27,8 @@ public class TeamPriorityProject extends Project {
         offlinelib = eh.require("OfflineLib");
         teams = eh.require("Teams");
 
+//        teams.addControlItem(new TeamPrioritySlot(this));
+
     }
 
     @Override public void disable() {
@@ -36,4 +39,15 @@ public class TeamPriorityProject extends Project {
         return new TeamPriorityApi(this);
     }
 
+    public void start() {
+
+    }
+
+    public void stop() {
+
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
 }

@@ -3,27 +3,31 @@ package dialight.teams.gui.teams;
 import dialight.compatibility.ItemStackBuilderBc;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
-import dialight.guilib.layout.CachedPageLayout;
+import dialight.guilib.elements.CachedPageElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.page.Scroll9x5PageView;
-import dialight.teams.ObservableTeam;
+import dialight.offlinelib.UuidPlayer;
 import dialight.teams.Teams;
+import dialight.teams.observable.ObservableScoreboard;
+import dialight.teams.observable.ObservableTeam;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageLayout<ObservableTeam>> {
+public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageElement<ObservableTeam>> {
 
+    private final ObservableScoreboard scoreboard;
     private final Slot background;
     private final Slot backward = buildDefaultBackward(this);
     private final Slot forward = buildDefaultForward(this);
     private final Slot tutorial;
 
-    public TeamsView(TeamsGui gui, CachedPageLayout<ObservableTeam> layout) {
+    public TeamsView(TeamsGui gui, CachedPageElement<ObservableTeam> layout, ObservableScoreboard scoreboard) {
         super(gui, layout, "Команды");
+        this.scoreboard = scoreboard;
         Teams proj = getGui().getProj();
         PluginDescriptionFile desc = proj.getPlugin().getDescription();
         background = new StaticSlot(new ItemStackBuilder()
@@ -91,16 +95,16 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageLayout<Obse
                         break;
                     case SHIFT_LEFT:
                         for (String name : proj.getTeamWhiteList()) {
-                            ObservableTeam oteam = proj.get(name);
+                            ObservableTeam oteam = scoreboard.teamsByName().get(name);
                             if(oteam == null) continue;
-                            oteam.clearOfflines();
+                            oteam.getMembers().removeIf(UuidPlayer::isOffline);
                         }
                         break;
                     case RIGHT:
                         break;
                     case SHIFT_RIGHT:
                         for (String name : proj.getTeamWhiteList()) {
-                            ObservableTeam oteam = proj.get(name);
+                            ObservableTeam oteam = scoreboard.teamsByName().get(name);
                             if(oteam == null) continue;
                             oteam.getTeam().unregister();
                         }
@@ -108,9 +112,30 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageLayout<Obse
                 }
             }
         };
-        TeamWhiteListSlot teamWhiteListSlot = new TeamWhiteListSlot(proj);
+        TeamWhiteListSlot teamWhiteListSlot = new TeamWhiteListSlot(proj, scoreboard);
+
+//        Slot test = new StaticSlot(new ItemStackBuilder(Material.ARROW)
+//                .displayName(Colorizer.apply("|a|Тест"))
+//                .lore(Colorizer.asList(
+//                        "|a|ЛКМ|y|: тест1"
+//                ))
+//                .build()) {
+//            @Override
+//            public void onClick(SlotClickEvent e) {
+//                switch (e.getEvent().getClick()) {
+//                    case LEFT: {
+//                        ObservableScoreboard scoreboard = proj.getScoreboardManager().getMainScoreboard();
+//                        for (ObservableInjectTeam team : scoreboard.teamsByName().values()) {
+//                            System.out.println(team.getName());
+//                        }
+//                    } break;
+//                }
+//            }
+//        };
+
         setBotPaneSlot(0, addTeam);
         setBotPaneSlot(1, controlItems);
+//        setBotPaneSlot(3, test);
         setBotPaneSlot(7, teamWhiteListSlot);
         setBotPaneSlot(8, clearTeams);
         tutorial = new StaticSlot(new ItemStackBuilder()

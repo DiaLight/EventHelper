@@ -2,7 +2,7 @@ package dialight.teams.gui.team;
 
 import dialight.guilib.gui.Gui;
 import dialight.guilib.view.View;
-import dialight.teams.ObservableTeam;
+import dialight.teams.observable.ObservableTeam;
 import dialight.teams.Teams;
 import org.bukkit.entity.Player;
 
@@ -14,17 +14,17 @@ public class TeamGui extends Gui {
 
     private final Teams proj;
     private final ObservableTeam oteam;
-    private final Map<UUID, TeamLayout> layoutMap = new HashMap<>();
+    private final Map<UUID, TeamElement> layoutMap = new HashMap<>();
 
     public TeamGui(Teams proj, ObservableTeam oteam) {
         this.proj = proj;
         this.oteam = oteam;
     }
 
-    private TeamLayout getOrCreateLayout(Player player) {
-        TeamLayout state = layoutMap.get(player.getUniqueId());
+    private TeamElement getOrCreateLayout(Player player) {
+        TeamElement state = layoutMap.get(player.getUniqueId());
         if(state != null) return state;
-        state = new TeamLayout(proj, oteam);
+        state = new TeamElement(proj, oteam);
         layoutMap.put(player.getUniqueId(), state);
         return state;
     }

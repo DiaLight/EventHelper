@@ -9,10 +9,8 @@ public class TeamBc8 extends TeamBc {
         super(team);
     }
 
-    @Override
-    public ChatColor getColor() {
+    public static ChatColor parseColor(String prefix) {
         ChatColor color = ChatColor.WHITE;
-        String prefix = team.getPrefix();
         for (int i = prefix.length() - 1; i > -1; i--) {
             char c = prefix.charAt(i);
             ChatColor cur = ChatColor.getByChar(c);
@@ -24,6 +22,9 @@ public class TeamBc8 extends TeamBc {
             }
         }
         return color;
+    }
+    @Override public ChatColor getColor() {
+        return parseColor(team.getPrefix());
     }
 
     @Override

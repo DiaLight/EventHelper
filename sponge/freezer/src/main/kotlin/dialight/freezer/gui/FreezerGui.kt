@@ -1,24 +1,15 @@
 package dialight.freezer.gui
 
-import dialight.extensions.getOrNull
 import dialight.extensions.set
 import dialight.freezer.FreezerPlugin
 import dialight.freezer.events.FreezerEvent
-import dialight.guilib.Gui
-import dialight.guilib.View
-import dialight.guilib.simple.SimpleGui
-import dialight.guilib.snapshot.Snapshot
 import dialight.guilib.snapshot.SnapshotGui
-import jekarus.colorizer.Text_colorized
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.event.Listener
 import org.spongepowered.api.event.filter.cause.First
 import org.spongepowered.api.event.network.ClientConnectionEvent
-import org.spongepowered.api.item.inventory.Inventory
-import org.spongepowered.api.item.inventory.property.Identifiable
 import org.spongepowered.api.scheduler.Task
-import java.util.*
 
 class FreezerGui(val plugin: FreezerPlugin) : SnapshotGui<FreezerSnapshot>() {
 

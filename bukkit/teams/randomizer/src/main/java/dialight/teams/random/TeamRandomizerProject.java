@@ -8,14 +8,13 @@ import dialight.guilib.GuiLibApi;
 import dialight.maingui.MainGuiApi;
 import dialight.offlinelib.OfflineLibApi;
 import dialight.offlinelib.UuidPlayer;
-import dialight.teams.ObservableTeam;
 import dialight.teams.TeamsApi;
+import dialight.teams.observable.ObservableScoreboard;
+import dialight.teams.observable.ObservableTeam;
 import dialight.teams.random.gui.TeamRandomizerGui;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
@@ -72,17 +71,17 @@ public class TeamRandomizerProject extends Project {
 
 
     public void doFillRandomize(Player invoker) {
+        ObservableScoreboard scoreboard = teams.getScoreboardManager().getMainScoreboard();
         List<ObservableTeam> teamsToRandomize = new ArrayList<>();
         if (teams.getTeamWhiteList().isEmpty()) {
-            teamsToRandomize.addAll(teams.getTeams());
+            teamsToRandomize.addAll(scoreboard.teamsByName().values());
         } else {
             for (String name : teams.getTeamWhiteList()) {
-                ObservableTeam oteam = teams.get(name);
+                ObservableTeam oteam = scoreboard.teamsByName().get(name);
                 if(oteam != null) teamsToRandomize.add(oteam);
             }
         }
         List<UUID> playersToRandomize = new ArrayList<>();
-        Scoreboard scoreboard = getPlugin().getServer().getScoreboardManager().getMainScoreboard();
         List<UuidPlayer> uuidPlayers = new ArrayList<>();
         if (teams.isOfflineMode()) {
             for (OfflinePlayer offlinePlayer : getPlugin().getServer().getOfflinePlayers()) {
@@ -94,11 +93,10 @@ public class TeamRandomizerProject extends Project {
             }
         }
         for (UuidPlayer uuidPlayer : uuidPlayers) {
-            Team team = scoreboard.getEntryTeam(uuidPlayer.getName());
-            if(team == null) {
+            ObservableTeam oteam = scoreboard.teamsByMember().get(uuidPlayer);
+            if(oteam == null) {
                 playersToRandomize.add(uuidPlayer.getUuid());
             } else {
-                ObservableTeam oteam = teams.get(team.getName());
                 if(!teamsToRandomize.contains(oteam)) {
                     playersToRandomize.add(uuidPlayer.getUuid());
                 }
@@ -135,12 +133,13 @@ public class TeamRandomizerProject extends Project {
     }
 
     public void doRandomize(Player invoker) {
+        ObservableScoreboard scoreboard = teams.getScoreboardManager().getMainScoreboard();
         List<ObservableTeam> teamsToRandomize = new ArrayList<>();
         if (teams.getTeamWhiteList().isEmpty()) {
-            teamsToRandomize.addAll(teams.getTeams());
+            teamsToRandomize.addAll(scoreboard.teamsByName().values());
         } else {
             for (String name : teams.getTeamWhiteList()) {
-                ObservableTeam oteam = teams.get(name);
+                ObservableTeam oteam = scoreboard.teamsByName().get(name);
                 if(oteam != null) teamsToRandomize.add(oteam);
             }
         }
@@ -169,12 +168,12 @@ public class TeamRandomizerProject extends Project {
         invoker.sendMessage(Colorizer.apply("|y|Рандомизация: команды |w|" + teamsToRandomize.size() + "|y| игроки |w|" + playersToRandomize.size()));
 
         int players_in_team = playersToRandomize.size() / teamsToRandomize.size();
-        for (ObservableTeam team : teamsToRandomize) {
-            team.clearOfflines();
+        for (ObservableTeam oteam : teamsToRandomize) {
+            oteam.getMembers().removeIf(UuidPlayer::isOffline);
             for (int i = 0; i < players_in_team; i++) {
                 UUID uuid = playersToRandomize.remove(rnd.nextInt(playersToRandomize.size()));
                 UuidPlayer uuidPlayer = offlinelib.getUuidPlayer(uuid);
-                team.getTeam().addEntry(uuidPlayer.getName());
+                oteam.getTeam().addEntry(uuidPlayer.getName());
             }
         }
         LinkedList<ObservableTeam> teamsLeft = new LinkedList<>(teamsToRandomize);

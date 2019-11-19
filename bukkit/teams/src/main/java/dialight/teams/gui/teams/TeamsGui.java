@@ -2,11 +2,10 @@ package dialight.teams.gui.teams;
 
 import dialight.guilib.gui.Gui;
 import dialight.guilib.view.View;
-import dialight.observable.collection.ObservableCollection;
-import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
 import dialight.teams.gui.addteam.AddTeamGui;
 import dialight.teams.gui.team.TeamGui;
+import dialight.teams.observable.ObservableScoreboard;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,29 +16,29 @@ import java.util.Map;
 public class TeamsGui extends Gui {
 
     @NotNull private final Teams proj;
+    private final ObservableScoreboard scoreboard;
     private final AddTeamGui addTeamGui;
     private final TeamsView view;
-    private final TeamsLayout layout;
+    private final TeamsElement layout;
     private final Map<String, TeamGui> teamGuiMap = new HashMap<>();
 
-    public TeamsGui(Teams proj) {
+    public TeamsGui(Teams proj, ObservableScoreboard scoreboard) {
         this.proj = proj;
+        this.scoreboard = scoreboard;
         this.addTeamGui = new AddTeamGui(proj);
-        this.layout = new TeamsLayout(proj);
-        this.view = new TeamsView(this, layout);
+        this.layout = new TeamsElement(proj, scoreboard);
+        this.view = new TeamsView(this, layout, scoreboard);
 
-        ObservableCollection<? extends ObservableTeam> teams = proj.getTeamsInternal();
-
-        teams.onAdd(ot -> {
-            teamGuiMap.put(ot.getName(), new TeamGui(this.proj, ot));
+        scoreboard.teamsByName().onPut(this, (name, team) -> {
+            teamGuiMap.put(name, new TeamGui(this.proj, team));
         });
-        teams.onRemove(ot -> {
+        scoreboard.teamsByName().onRemove(this, (name, ot) -> {
             TeamGui teamGui = teamGuiMap.remove(ot.getName());
             for (Player viewer : teamGui.getViewers()) {
                 viewer.closeInventory();
             }
         });
-        teams.forEach(ot -> teamGuiMap.put(ot.getName(), new TeamGui(this.proj, ot)));
+        scoreboard.teamsByName().forEach((name, ot) -> teamGuiMap.put(ot.getName(), new TeamGui(this.proj, ot)));
     }
 
     @Override public View createView(Player player) {

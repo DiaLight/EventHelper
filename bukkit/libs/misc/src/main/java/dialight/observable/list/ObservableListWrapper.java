@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class ObservableListWrapper<E> extends ObservableList<E> implements List<E> {
+public class ObservableListWrapper<E> extends ObservableList<E> {
 
     private final List<E> list;
 

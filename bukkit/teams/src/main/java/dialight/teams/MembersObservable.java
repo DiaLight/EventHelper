@@ -38,4 +38,5 @@ public class MembersObservable extends ValuesImmutableObservable<UUID, UuidPlaye
             team.removeEntry(name);
         }
     }
+
 }

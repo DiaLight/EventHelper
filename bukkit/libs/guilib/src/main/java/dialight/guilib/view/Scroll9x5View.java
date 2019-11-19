@@ -1,7 +1,7 @@
 package dialight.guilib.view;
 
 import dialight.guilib.gui.Gui;
-import dialight.guilib.layout.SlotLayout;
+import dialight.guilib.elements.SlotElement;
 import dialight.guilib.slot.LocSlot;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotUsage;
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
  * _ - SlotLayout content
  *
  */
-public abstract class Scroll9x5View<G extends Gui, L extends SlotLayout> extends ScrollView<G, L> {
+public abstract class Scroll9x5View<G extends Gui, L extends SlotElement> extends ScrollView<G, L> {
 
     private final int width = 9;
     private final int height = 5;
@@ -95,7 +95,7 @@ public abstract class Scroll9x5View<G extends Gui, L extends SlotLayout> extends
         if(offset > limit) offset = limit;
     }
     protected void renderContent() {
-        SlotLayout layout = getLayout();
+        SlotElement layout = getLayout();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Slot slot = layout.getSlot(x + offset, y);

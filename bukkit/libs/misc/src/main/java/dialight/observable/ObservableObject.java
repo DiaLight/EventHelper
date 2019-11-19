@@ -5,23 +5,26 @@ import java.util.function.BiConsumer;
 
 public class ObservableObject<V> {
 
-    private V value;
-    private final Collection<BiConsumer<V, V>> onChange = new LinkedList();
+    protected V value;
+    private final Map<Object, BiConsumer<V, V>> onChange = new LinkedHashMap<>();
 
+    public ObservableObject() {
+        this.value = null;
+    }
     public ObservableObject(V value) {
         this.value = value;
     }
 
     protected void fireChange(V fr, V to) {
-        for(BiConsumer<V, V> op : onChange) op.accept(fr, to);
+        for(BiConsumer<V, V> op : onChange.values()) op.accept(fr, to);
     }
 
-    public ObservableObject<V> onChange(BiConsumer<V, V> op) {
-        onChange.add(op);
+    public ObservableObject<V> onChange(Object key, BiConsumer<V, V> op) {
+        onChange.put(key, op);
         return this;
     }
-    public ObservableObject<V> unregisterOnChange(BiConsumer<V, V> op) {
-        onChange.remove(op);
+    public ObservableObject<V> removeListeners(Object key) {
+        onChange.remove(key);
         return this;
     }
 
@@ -33,6 +36,10 @@ public class ObservableObject<V> {
         V oldValue = this.value;
         this.value = value;
         fireChange(oldValue, value);
+    }
+
+    @Override public String toString() {
+        return this.value.toString();
     }
 
 }

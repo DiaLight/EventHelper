@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class ObservableMapWrapper<K, V> extends ObservableMap<K, V> implements Map<K, V> {
+public class ObservableMapWrapper<K, V> extends ObservableMap<K, V> {
 
     private final Map<K, V> map;
 

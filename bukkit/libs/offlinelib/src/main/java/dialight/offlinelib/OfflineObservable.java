@@ -11,17 +11,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class OfflineObservable extends ObservableCollection<OfflinePlayer> implements Listener {
+public class OfflineObservable extends ObservableCollection<UuidPlayer> implements Listener {
 
     private final Server srv;
-    private final Map<UUID, OfflinePlayer> offlineMap = new HashMap<>();
+    private final Map<UUID, UuidPlayer> offlineMap = new HashMap<>();
     private final OfflineLib proj;
 
     public OfflineObservable(OfflineLib proj) {
         this.proj = proj;
         this.srv = proj.getPlugin().getServer();
         for (OfflinePlayer op : srv.getOfflinePlayers()) {
-            offlineMap.put(op.getUniqueId(), op);
+            UuidPlayer up = proj.getUuidPlayer(op.getUniqueId());
+            offlineMap.put(op.getUniqueId(), up);
         }
     }
 
@@ -37,7 +38,7 @@ public class OfflineObservable extends ObservableCollection<OfflinePlayer> imple
         return offlineMap.values().contains(o);
     }
 
-    @NotNull @Override public Iterator<OfflinePlayer> iterator() {
+    @NotNull @Override public Iterator<UuidPlayer> iterator() {
         return offlineMap.values().iterator();
     }
 
@@ -49,7 +50,7 @@ public class OfflineObservable extends ObservableCollection<OfflinePlayer> imple
         return offlineMap.values().toArray(a);
     }
 
-    @Override public boolean add(OfflinePlayer OfflinePlayer) {
+    @Override public boolean add(UuidPlayer up) {
         throw new IllegalArgumentException("OnlineObservable is immutable");
     }
 
@@ -61,7 +62,7 @@ public class OfflineObservable extends ObservableCollection<OfflinePlayer> imple
         return Arrays.asList(srv.getOfflinePlayers()).containsAll(c);
     }
 
-    @Override public boolean addAll(@NotNull Collection<? extends OfflinePlayer> c) {
+    @Override public boolean addAll(@NotNull Collection<? extends UuidPlayer> c) {
         throw new IllegalArgumentException("OnlineObservable is immutable");
     }
 
@@ -80,11 +81,11 @@ public class OfflineObservable extends ObservableCollection<OfflinePlayer> imple
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerJoin(PlayerJoinEvent e) {
         UUID uuid = e.getPlayer().getUniqueId();
-        OfflinePlayer op = offlineMap.get(uuid);
-        if(op != null) return;
-        op = srv.getOfflinePlayer(uuid);
-        offlineMap.put(uuid, op);
-        fireAdd(op);
+        UuidPlayer up = offlineMap.get(uuid);
+        if(up != null) return;
+        up = proj.getUuidPlayer(uuid);
+        offlineMap.put(uuid, up);
+        fireAdd(up);
     }
     
 }

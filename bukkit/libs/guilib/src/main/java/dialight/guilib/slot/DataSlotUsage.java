@@ -1,13 +1,13 @@
 package dialight.guilib.slot;
 
-import dialight.guilib.layout.DataLayout;
+import dialight.guilib.elements.DataElement;
 
 public class DataSlotUsage implements SlotUsage {
 
-    private final DataLayout layout;
+    private final DataElement layout;
     private final Object data;
 
-    public DataSlotUsage(DataLayout layout, Object data) {
+    public DataSlotUsage(DataElement layout, Object data) {
         this.layout = layout;
         this.data = data;
     }

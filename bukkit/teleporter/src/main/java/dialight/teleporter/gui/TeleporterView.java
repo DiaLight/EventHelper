@@ -3,15 +3,15 @@ package dialight.teleporter.gui;
 import dialight.compatibility.ItemStackBuilderBc;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
-import dialight.guilib.layout.NamedLayout;
+import dialight.guilib.elements.NamedElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
-import dialight.guilib.view.extensions.NamedLayoutScroll9x5View;
+import dialight.guilib.view.extensions.NamedElementScroll9X5View;
+import dialight.offlinelib.UuidPlayer;
 import dialight.teleporter.Teleporter;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
@@ -19,13 +19,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TeleporterView extends NamedLayoutScroll9x5View<TeleporterGui, TeleporterViewState> {
+public class TeleporterView extends NamedElementScroll9X5View<TeleporterGui, TeleporterViewState> {
 
     private final Slot background;
     private final Slot backward = buildDefaultBackward(this);
     private final Slot forward = buildDefaultForward(this);
-    private final Slot selectView;
-    private final Slot groupSelect;
 
     public TeleporterView(TeleporterGui gui, TeleporterViewState layout) {
         super(gui, layout);
@@ -38,7 +36,7 @@ public class TeleporterView extends NamedLayoutScroll9x5View<TeleporterGui, Tele
             }
 
             @NotNull @Override public ItemStack createItem() {
-                NamedLayout<OfflinePlayer> current = getLayout().getCurrent();
+                NamedElement<UuidPlayer> current = getLayout().getCurrent();
                 DyeColor color = DyeColor.LIGHT_BLUE;
                 if(current == getLayout().getSelectedLayout()) {
                     color = DyeColor.LIME;
@@ -60,12 +58,11 @@ public class TeleporterView extends NamedLayoutScroll9x5View<TeleporterGui, Tele
                         .build();
             }
         };
-        selectView = new StaticSlot(new ItemStackBuilder(Material.BOOK)
+        Slot selectView = new StaticSlot(new ItemStackBuilder(Material.BOOK)
                 .displayName("Выбор представления данных")
                 .lore(Colorizer.asList(
                         "|a|ЛКМ|y|: Все игроки",
                         "|a|ПКМ|y|: Выделенные",
-//                        "|a|Shift|y|+|a|ЛКМ|y|: ",
                         "|a|Shift|y|+|a|ПКМ|y|: Не выделенные"
                 ))
                 .build()) {
@@ -74,17 +71,20 @@ public class TeleporterView extends NamedLayoutScroll9x5View<TeleporterGui, Tele
                 switch (e.getEvent().getClick()) {
                     case LEFT: {
                         getLayout().setCurrent(getLayout().getAllLayout());
-                    } break;
+                    }
+                    break;
                     case RIGHT: {
                         getLayout().setCurrent(getLayout().getSelectedLayout());
-                    } break;
+                    }
+                    break;
                     case SHIFT_RIGHT: {
                         getLayout().setCurrent(getLayout().getUnselectedLayout());
-                    } break;
+                    }
+                    break;
                 }
             }
         };
-        groupSelect = new StaticSlot(new ItemStackBuilder(Material.STICK)
+        Slot groupSelect = new StaticSlot(new ItemStackBuilder(Material.STICK)
                 .displayName("Групповое выделение")
                 .lore(Colorizer.asList(
                         "|a|ЛКМ|y|: Выделить всех",
@@ -97,20 +97,24 @@ public class TeleporterView extends NamedLayoutScroll9x5View<TeleporterGui, Tele
             public void onClick(SlotClickEvent e) {
                 switch (e.getEvent().getClick()) {
                     case LEFT: {
-                        layout.getSelected().addAllPlayers(proj.getOfflinelib().getOffline());
-                    } break;
+                        layout.getSelected().addAllUuidPlayers(proj.getOfflinelib().getOffline());
+                    }
+                    break;
                     case SHIFT_LEFT: {
                         layout.getSelected().addAllPlayers(proj.getOfflinelib().getOnline());
-                    } break;
+                    }
+                    break;
                     case RIGHT: {
-                        layout.getSelected().removeAllPlayers(proj.getOfflinelib().getOffline());
-                    } break;
+                        layout.getSelected().removeAllUuidPlayers(proj.getOfflinelib().getOffline());
+                    }
+                    break;
                     case SHIFT_RIGHT: {
-                        List<OfflinePlayer> offline = proj.getOfflinelib().getOffline().stream()
+                        List<UuidPlayer> offline = proj.getOfflinelib().getOffline().stream()
                                 .filter(it -> !it.isOnline())
                                 .collect(Collectors.toList());
-                        layout.getSelected().addAllPlayers(offline);
-                    } break;
+                        layout.getSelected().addAllUuidPlayers(offline);
+                    }
+                    break;
                 }
             }
         };
@@ -124,7 +128,7 @@ public class TeleporterView extends NamedLayoutScroll9x5View<TeleporterGui, Tele
     }
 
     @Override
-    public NamedLayout getNamedLayout() {
+    public NamedElement getNamedLayout() {
         return getLayout().getCurrent();
     }
 

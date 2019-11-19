@@ -99,17 +99,16 @@ val fatJar_allInOne by tasks.creating(Jar::class) {
     outputs.upToDateWhen { false }  // update every time
 }
 val copyToServer_allInOne by tasks.creating(Copy::class) {
-    doFirst {
-        val libDirFile = File(libDir)
-        libDirFile.deleteRecursively()
-        libDirFile.mkdirs()
-    }
+//    doFirst {
+//        val libDirFile = File(libDir)
+//        libDirFile.deleteRecursively()
+//        libDirFile.mkdirs()
+//    }
     dependsOn(fatJar_allInOne)
     from(fatJar_allInOne)
     this.rename {
-        val dir = FilenameUtils.getFullPathNoEndSeparator(it)
         val name = FilenameUtils.getBaseName(it).split("-")[0]
-        return@rename "$dir/$name.jar"
+        return@rename "$name.jar"
     }
     into(libDir)
 //    outputs.upToDateWhen { false }  // update every time
@@ -120,9 +119,8 @@ val copyToServer_allInOne_update by tasks.creating {
         libDirs.forEach {
             copy {
                 this.rename {
-                    val dir = FilenameUtils.getFullPathNoEndSeparator(it)
                     val name = FilenameUtils.getBaseName(it).split("-")[0]
-                    return@rename "$dir/$name.jar"
+                    return@rename "$name.jar"
                 }
                 from(fatJar_allInOne)
                 into(it)
@@ -130,9 +128,7 @@ val copyToServer_allInOne_update by tasks.creating {
         }
         copy {
             this.rename {
-                val dir = FilenameUtils.getFullPathNoEndSeparator(it)
-                val name = FilenameUtils.getBaseName(it).split("-")[0]
-                return@rename "$dir/EventHelper-bukkit-1.8.X-build-$buildVersion.jar"
+                return@rename "EventHelper-bukkit-1.8.X-build-$buildVersion.jar"
             }
             val binDir = File("$buildDir/bin")
             binDir.deleteRecursively()
@@ -160,9 +156,8 @@ val copyToServer_splitted by tasks.creating(Copy::class) {
         exclude(jar.outputs.files.singleFile.name)
     }
     this.rename {
-        val dir = FilenameUtils.getFullPathNoEndSeparator(it)
         val name = FilenameUtils.getBaseName(it).split("-")[0]
-        return@rename "$dir/$name.jar"
+        return@rename "$name.jar"
     }
     into(libDir)
     outputs.upToDateWhen { false }  // update every time

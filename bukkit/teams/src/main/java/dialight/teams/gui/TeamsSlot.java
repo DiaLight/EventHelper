@@ -49,11 +49,11 @@ public class TeamsSlot implements Slot {
     @Override public void onClick(SlotClickEvent e) {
         switch (e.getEvent().getClick()) {
             case LEFT: {
-                proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
+                proj.getGuilib().openGui(e.getPlayer(), proj.getTeamsGui());
             } break;
             case RIGHT: {
                 PlayerInventoryBc.of(e.getPlayer().getInventory()).setItemInMainHand(proj.getTool().createItem());
-                proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
+                proj.getGuilib().openGui(e.getPlayer(), proj.getTeamsGui());
             } break;
             case SHIFT_RIGHT: {
                 ItemStack item = proj.getTool().createItem();

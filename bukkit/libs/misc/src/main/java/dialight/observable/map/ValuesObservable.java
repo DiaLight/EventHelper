@@ -5,21 +5,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class ValuesObservable<K, V> extends ObservableCollection<V> {
 
     private final ObservableMap<K, V> map;
     private final Function<V, K> getKey;
-    private final BiConsumer<K, V> forwardAdd = (k, v) -> this.fireAdd(v);
-    private final BiConsumer<K, V> forwardRemove = (k, v) -> this.fireRemove(v);
 
     public ValuesObservable(ObservableMap<K, V> map, Function<V, K> getKey) {
         this.map = map;
         this.getKey = getKey;
-        map.onPut(forwardAdd);
-        map.onRemove(forwardRemove);
+        map.onPut(this, (k, v) -> this.fireAdd(v));
+        map.onRemove(this, (k, v) -> this.fireRemove(v));
     }
 
     @Override

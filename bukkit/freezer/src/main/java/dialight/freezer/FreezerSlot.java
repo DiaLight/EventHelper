@@ -38,11 +38,11 @@ public class FreezerSlot implements Slot {
         Player player = e.getPlayer();
         switch (e.getEvent().getClick()) {
             case LEFT: {
-//                proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
+                proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
             } break;
             case RIGHT: {
                 PlayerInventoryBc.of(player.getInventory()).setItemInMainHand(proj.getTool().createItem());
-//                proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
+                proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
             } break;
             case SHIFT_RIGHT: {
                 ItemStack item = proj.getTool().createItem();

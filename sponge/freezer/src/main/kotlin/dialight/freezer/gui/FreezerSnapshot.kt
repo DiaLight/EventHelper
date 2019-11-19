@@ -10,12 +10,10 @@ import dialight.guilib.snapshot.PlayersSnapshot
 import dialight.guilib.snapshot.SortedPlayersPageBuilder
 import jekarus.colorizer.Text_colorized
 import jekarus.colorizer.Text_colorizedList
-import org.spongepowered.api.data.key.Keys
 import org.spongepowered.api.data.type.DyeColors
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.item.ItemTypes
-import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.property.Identifiable
 import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.text.Text

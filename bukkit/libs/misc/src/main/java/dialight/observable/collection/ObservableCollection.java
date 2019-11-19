@@ -1,18 +1,17 @@
 package dialight.observable.collection;
 
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public abstract class ObservableCollection<E> implements Collection<E> {
 
-    private final Collection<Consumer<E>> onAdd = new LinkedList<>();
-    private final Collection<Consumer<E>> onRemove = new LinkedList<>();
-
-    private int listenerCounter = 0;
+    private final Map<Object, Consumer<E>> onAdd = new LinkedHashMap<>();
+    private final Map<Object, Consumer<E>> onRemove = new LinkedHashMap<>();
 
     protected void fireAdd(E e) {
-        for(Consumer<E> op : onAdd) {
+        for(Consumer<E> op : onAdd.values()) {
             try {
                 op.accept(e);
             } catch (Exception ex) {
@@ -21,7 +20,7 @@ public abstract class ObservableCollection<E> implements Collection<E> {
         }
     }
     protected void fireRemove(E e) {
-        for(Consumer<E> op : onRemove) {
+        for(Consumer<E> op : onRemove.values()) {
             try {
                 op.accept(e);
             } catch (Exception ex) {
@@ -31,29 +30,23 @@ public abstract class ObservableCollection<E> implements Collection<E> {
     }
 
 
-    public ObservableCollection<E> onAdd(Consumer<E> op) {
-        onAdd.add(op);
+    public ObservableCollection<E> onAdd(Object key, Consumer<E> op) {
+        onAdd.put(key, op);
         return this;
     }
-    public ObservableCollection<E> onRemove(Consumer<E> op) {
-        onRemove.add(op);
-        return this;
-    }
-
-    public ObservableCollection<E> unregisterOnAdd(Consumer<E> op) {
-        onAdd.remove(op);
-        return this;
-    }
-    public ObservableCollection<E> unregisterOnRemove(Consumer<E> op) {
-        onRemove.remove(op);
+    public ObservableCollection<E> onRemove(Object key, Consumer<E> op) {
+        onRemove.put(key, op);
         return this;
     }
 
-    public ObservableCollection<E> asImmutableCollectionObaervable() {
+    public ObservableCollection<E> removeListeners(Object key) {
+        onAdd.remove(key);
+        onRemove.remove(key);
+        return this;
+    }
+
+    public ObservableCollection<E> asImmutableCollectionObservable() {
         return new ImmutableObservableCollection<>(this);
     }
-
-//    public abstract boolean add(E element);
-//    public abstract boolean remove(E element);
 
 }

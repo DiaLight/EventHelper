@@ -1,23 +1,23 @@
 package dialight.teleporter.gui;
 
-import dialight.guilib.layout.NamedLayout;
-import dialight.guilib.layout.ReplaceableLayout;
+import dialight.guilib.elements.NamedElement;
+import dialight.guilib.elements.ReplaceableElement;
+import dialight.offlinelib.UuidPlayer;
 import dialight.teleporter.SelectedPlayers;
 import dialight.teleporter.Teleporter;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
 
-public class TeleporterViewState extends ReplaceableLayout<NamedLayout<OfflinePlayer>> {
+public class TeleporterViewState extends ReplaceableElement<NamedElement<UuidPlayer>> {
 
-    public static void dumpThrow(OfflinePlayer op, NamedLayout<OfflinePlayer> layout) {
+    public static void dumpThrow(UuidPlayer up, NamedElement<UuidPlayer> layout) {
         layout.dump();
         throw new RuntimeException("Somethings wrong");
     }
 
-    private final SelectedLayout selectedLayout;
-    private final UnselectedLayout unselectedLayout;
-    private final AllLayout allLayout;
+    private final SelectedElement selectedLayout;
+    private final UnselectedElement unselectedLayout;
+    private final AllElement allLayout;
     @NotNull private final Teleporter proj;
     @NotNull private final Server server;
     @NotNull private final SelectedPlayers selected;
@@ -27,22 +27,22 @@ public class TeleporterViewState extends ReplaceableLayout<NamedLayout<OfflinePl
         this.server = proj.getPlugin().getServer();
         this.selected = selected;
 
-        selectedLayout = new SelectedLayout(proj, selected);
-        unselectedLayout = new UnselectedLayout(proj, selected);
-        allLayout = new AllLayout(proj, selected);
+        selectedLayout = new SelectedElement(proj, selected);
+        unselectedLayout = new UnselectedElement(proj, selected);
+        allLayout = new AllElement(proj, selected);
 
         setCurrent(allLayout);
     }
 
-    public NamedLayout<OfflinePlayer> getAllLayout() {
+    public NamedElement<UuidPlayer> getAllLayout() {
         return allLayout;
     }
 
-    public NamedLayout<OfflinePlayer> getUnselectedLayout() {
+    public NamedElement<UuidPlayer> getUnselectedLayout() {
         return unselectedLayout;
     }
 
-    public NamedLayout<OfflinePlayer> getSelectedLayout() {
+    public NamedElement<UuidPlayer> getSelectedLayout() {
         return selectedLayout;
     }
 

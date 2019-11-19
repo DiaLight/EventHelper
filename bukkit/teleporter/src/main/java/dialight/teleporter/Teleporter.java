@@ -3,15 +3,16 @@ package dialight.teleporter;
 import dialight.eventhelper.EventHelper;
 import dialight.eventhelper.project.Project;
 import dialight.eventhelper.project.ProjectApi;
-import dialight.extensions.OfflinePlayerEx;
+import dialight.extensions.PlayerEx;
 import dialight.guilib.GuiLibApi;
 import dialight.maingui.MainGuiApi;
 import dialight.offlinelib.OfflineLibApi;
+import dialight.offlinelib.UuidPlayer;
 import dialight.teleporter.gui.TeleporterGui;
 import dialight.teleporter.gui.TeleporterSlot;
 import dialight.toollib.ToolLibApi;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -84,28 +85,18 @@ public class Teleporter extends Project {
     @NotNull public SelectedPlayers getSelectedPlayers(UUID uuid) {
         SelectedPlayers selected = selectedMap.get(uuid);
         if(selected == null) {
-            selected = new SelectedPlayers(getPlugin().getServer());
+            selected = new SelectedPlayers(this);
             selectedMap.put(uuid, selected);
         }
         return selected;
     }
 
-    public void teleport(OfflinePlayer op, Location loc) {
-        OfflinePlayerEx opex = offlinelib.getOfflinePlayerEx(op.getUniqueId());
-        if(opex == null) throw new IllegalArgumentException("Player not found");
-        loc = loc.clone();
-        while (loc.getBlock().getType().isSolid()) {
-            loc.add(0, 1, 0);
-        }
-        Location oldLoc = opex.getLocation();
-        opex.setLocation(new Location(
-                loc.getWorld(),
-                loc.getX(),
-                loc.getY(),
-                loc.getZ(),
-                oldLoc.getYaw(),
-                oldLoc.getPitch()
-        ));
+
+    public void teleport(Player player, Location loc) {
+        PlayerEx.of(player).teleport(loc);
+    }
+    public boolean teleport(UuidPlayer up, Location loc) {
+        return up.teleport(loc);
     }
 
 }

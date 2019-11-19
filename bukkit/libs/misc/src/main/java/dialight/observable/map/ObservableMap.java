@@ -3,40 +3,45 @@ package dialight.observable.map;
 import dialight.function.A3Consumer;
 import dialight.observable.collection.ObservableCollection;
 
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public abstract class ObservableMap<K, V> implements Map<K, V> {
 
-    private final Collection<BiConsumer<K, V>> onPut = new LinkedList<>();
-    private final Collection<BiConsumer<K, V>> onRemove = new LinkedList<>();
-    private final Collection<A3Consumer<K, V, V>> onReplace = new LinkedList<>();
+    private final Map<Object, BiConsumer<K, V>> onPut = new LinkedHashMap<>();
+    private final Map<Object, BiConsumer<K, V>> onRemove = new LinkedHashMap<>();
+    private final Map<Object, A3Consumer<K, V, V>> onReplace = new LinkedHashMap<>();
 
 
     protected void firePut(K k, V v) {
-        for(BiConsumer<K, V> op : onPut) op.accept(k, v);
+        for(BiConsumer<K, V> op : onPut.values()) op.accept(k, v);
     }
     protected void fireRemove(K k, V v) {
-        for(BiConsumer<K, V> op : onRemove) op.accept(k, v);
+        for(BiConsumer<K, V> op : onRemove.values()) op.accept(k, v);
     }
     protected void fireReplace(K k, V oldValue, V newValue) {
-        for(A3Consumer<K, V, V> op : onReplace) op.apply(k, oldValue, newValue);
+        for(A3Consumer<K, V, V> op : onReplace.values()) op.apply(k, oldValue, newValue);
     }
 
+    public ObservableMap<K, V> onPut(Object key, BiConsumer<K, V> op) {
+        onPut.put(key, op);
+        return this;
+    }
+    public ObservableMap<K, V> onRemove(Object key, BiConsumer<K, V> op) {
+        onRemove.put(key, op);
+        return this;
+    }
+    public ObservableMap<K, V> onReplace(Object key, A3Consumer<K, V, V> op) {
+        onReplace.put(key, op);
+        return this;
+    }
 
-    public ObservableMap<K, V> onPut(BiConsumer<K, V> op) {
-        onPut.add(op);
-        return this;
-    }
-    public ObservableMap<K, V> onRemove(BiConsumer<K, V> op) {
-        onRemove.add(op);
-        return this;
-    }
-    public ObservableMap<K, V> onReplace(A3Consumer<K, V, V> op) {
-        onReplace.add(op);
+    public ObservableMap<K, V> removeListeners(Object key) {
+        onPut.remove(key);
+        onRemove.remove(key);
+        onReplace.remove(key);
         return this;
     }
 

@@ -61,7 +61,7 @@ public class TeamTool extends SubTool {
 
             } break;
             case RIGHT_CLICK: if(!e.isSneaking()) {
-                Gui teamGui = proj.getGui().teamGui(team.getName());
+                Gui teamGui = proj.getTeamsGui().teamGui(team.getName());
                 if(teamGui != null) {
                     proj.getGuilib().openGui(e.getPlayer(), teamGui);
                 }

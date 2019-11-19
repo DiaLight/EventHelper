@@ -5,13 +5,13 @@ import dialight.extensions.Colorizer;
 import dialight.extensions.GuiUtils;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.gui.Gui;
-import dialight.guilib.layout.SlotLayout;
+import dialight.guilib.elements.SlotElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.Scroll7x6View;
 
-public abstract class Scroll7x6PageView<G extends Gui, L extends SlotLayout> extends Scroll7x6View<G, L> {
+public abstract class Scroll7x6PageView<G extends Gui, L extends SlotElement> extends Scroll7x6View<G, L> {
 
     public Scroll7x6PageView(G gui, L layout, String title) {
         super(gui, layout, title);

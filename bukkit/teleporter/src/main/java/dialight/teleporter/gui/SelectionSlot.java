@@ -2,53 +2,44 @@ package dialight.teleporter.gui;
 
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
-import dialight.extensions.OfflinePlayerEx;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
-import dialight.offlinelib.OfflineLibApi;
+import dialight.offlinelib.UuidPlayer;
 import dialight.teleporter.SelectedPlayers;
 import dialight.teleporter.Teleporter;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Server;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.UUID;
 
 public class SelectionSlot implements Slot {
 
     @NotNull private final Teleporter proj;
-    @NotNull private final Server server;
     @NotNull private final SelectedPlayers selected;
-    @NotNull private final UUID uuid;
+    @NotNull private final UuidPlayer up;
 
-    public SelectionSlot(Teleporter proj, SelectedPlayers selected, UUID uuid) {
+    public SelectionSlot(Teleporter proj, SelectedPlayers selected, UuidPlayer up) {
         this.proj = proj;
-        this.server = proj.getPlugin().getServer();
         this.selected = selected;
-        this.uuid = uuid;
+        this.up = up;
     }
 
     @Override
     public void onClick(SlotClickEvent e) {
         switch (e.getEvent().getClick()) {
             case LEFT: {
-                if(selected.contains(uuid)) {
-                    selected.remove(uuid);
+                if(selected.contains(up.getUuid())) {
+                    selected.remove(up.getUuid());
                 } else {
-                    selected.add(uuid);
+                    selected.add(up.getUuid());
                 }
             } break;
 //                case RIGHT: {
 //                    event.player.sendMessage(DefMes.notImplementedYet)
 //                } break;
             case SHIFT_RIGHT: {
-                OfflineLibApi offlinelib = proj.getOfflinelib();
-                OfflinePlayerEx opex = offlinelib.getOfflinePlayerEx(uuid);
-                if(opex != null) {
-                    Location to = opex.getLocation();
+                Location to = up.getLocation();
+                if(to != null) {
                     proj.teleport(e.getPlayer(), to);
                 } else {
                     e.getPlayer().sendMessage(Colorizer.apply("|r|Игрок не найден"));
@@ -57,11 +48,9 @@ public class SelectionSlot implements Slot {
         }
     }
 
-    @Override
-    public ItemStack createItem() {
-        boolean isSelected = selected.contains(uuid);
-        OfflinePlayer op = server.getOfflinePlayer(this.uuid);
-        boolean isOnline = op.isOnline();
+    @Override public ItemStack createItem() {
+        boolean isSelected = selected.contains(up.getUuid());
+        boolean isOnline = up.isOnline();
         Material material;
         if (isSelected) {
 //            if(this.layout == unselectedLayout) throw new RuntimeException();
@@ -80,9 +69,9 @@ public class SelectionSlot implements Slot {
         }
         ItemStackBuilder isb = new ItemStackBuilder(material);
         if (isOnline) {
-            isb.displayName(op.getName());
+            isb.displayName(up.getName());
         } else {
-            isb.displayName(op.getName() + Colorizer.apply(" |r|(Офлайн)"));
+            isb.displayName(up.getName() + Colorizer.apply(" |r|(Офлайн)"));
         }
         if (isSelected) {
             isb.addLore(Colorizer.apply("|a|ЛКМ|y|: отменить выбор"));

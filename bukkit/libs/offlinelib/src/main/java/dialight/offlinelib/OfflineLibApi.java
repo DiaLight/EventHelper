@@ -22,19 +22,14 @@ public class OfflineLibApi implements ProjectApi {
     @Nullable public OfflinePlayer getOfflinePlayerByName(String name) {
         return proj.getOfflinePlayerByName(name);
     }
-    @Nullable public OfflinePlayerEx getOfflinePlayerEx(UUID uuid) {
-        return proj.getOrLoad(uuid);
-    }
 
     @NotNull public UuidPlayer getUuidPlayer(UUID uuid) {
-        UuidPlayer up = proj.getNotPlayer(uuid);
-        if(up != null) return up;
-        return new UuidPlayer(proj, uuid);
+        return proj.getUuidPlayer(uuid);
     }
     @NotNull public UuidPlayer getUuidPlayer(Player player) {
-        return new UuidPlayer(proj, player.getUniqueId());
+        return proj.getUuidPlayer(player.getUniqueId());
     }
-    @NotNull public UuidPlayer createUuidNotPlayer(String member) {
+    @NotNull public UuidPlayer getOrCreateNotPlayer(String member) {
         return proj.getOrCreateNotPlayer(member);
     }
 

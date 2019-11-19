@@ -10,7 +10,7 @@ import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.observable.collection.ObservableCollection;
 import dialight.offlinelib.UuidPlayer;
-import dialight.teams.ObservableTeam;
+import dialight.teams.observable.ObservableTeam;
 import dialight.teams.Teams;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -32,7 +32,7 @@ public class TeamSlot implements Slot {
                 .leatherArmorColor(oteam.getLeatherColor())
                 .hideAttributes(true)
                 .hideMiscellaneous(true)
-                .displayName(oteam.getColor() + Colorizer.apply("⬛ |w|" + oteam.getName()))
+                .displayName(oteam.color().getValue() + Colorizer.apply("⬛ |w|" + oteam.getName()))
                 .lore(Colorizer.asList(
                         "|a|ЛКМ|y|: открыть управление командой",
                         "|a|ПКМ|y|: получить инструмент в активный слот",
@@ -46,13 +46,13 @@ public class TeamSlot implements Slot {
     @Override public void onClick(SlotClickEvent e) {
         switch (e.getEvent().getClick()) {
             case LEFT: {
-                Gui teamGui = proj.getGui().teamGui(oteam.getName());
+                Gui teamGui = proj.getTeamsGui().teamGui(oteam.getName());
                 if (teamGui != null) {
                     proj.getGuilib().openGui(e.getPlayer(), teamGui);
                 }
             } break;
             case RIGHT: {
-                Gui teamGui = proj.getGui().teamGui(oteam.getName());
+                Gui teamGui = proj.getTeamsGui().teamGui(oteam.getName());
                 if (teamGui != null) {
                     proj.getGuilib().openGui(e.getPlayer(), teamGui);
                 }
@@ -97,7 +97,7 @@ public class TeamSlot implements Slot {
                 UuidPlayer up = iterator.next();
                 String name = up.getName();
                 isb.addLore(Colorizer.asList(
-                        oteam.getColor() + "⬛ |w|" + name
+                        oteam.color().getValue() + "⬛ |w|" + name
                 ));
             }
             if (members.size() > previewSize) {

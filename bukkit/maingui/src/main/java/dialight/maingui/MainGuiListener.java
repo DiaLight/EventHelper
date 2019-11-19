@@ -19,20 +19,20 @@ public class MainGuiListener implements Listener {
         public int count = 0;
         public long lastTime = 0;
 
-        public boolean add(int button) {
-            if(button2 == -1) {
-                button2 = button1;
+        public void press(int button) {
+            if(button == button1) {
+                reset();
                 button1 = button;
-                return true;
+                return;
             }
-            if(button == button2) return true;
-            if(button == button1) return true;
+            if(button == button2) {
+                count++;
+            }
             button2 = button1;
             button1 = button;
-            return false;
         }
 
-        public void clear() {
+        public void reset() {
             button1 = -1;
             button2 = -1;
             count = 0;
@@ -41,6 +41,10 @@ public class MainGuiListener implements Listener {
         public int min() {
             if(button1 < button2) return button1;
             return button2;
+        }
+
+        public boolean complete() {
+            return count >= 3;
         }
     }
 
@@ -66,30 +70,29 @@ public class MainGuiListener implements Listener {
         if(!player.isOp()) return;
         int button = e.getNewSlot();
         GetToolStatus status = getOrCreate(player.getUniqueId());
+        if(button != 0 && button != 2) {
+            status.reset();
+            return;
+        }
 
         long current = System.currentTimeMillis();
         long delta = current - status.lastTime;
         status.lastTime = current;
         if(delta > 500) {
-            status.clear();
-            status.add(button);
+            status.reset();
+            status.press(button);
             return;
         }
+        status.press(button);
 
-        if(!status.add(button)) {
-            status.clear();
-            status.add(button);
-            return;
-        }
-
-        status.count++;
-        if(status.count >= 3) {
-            status.count = 0;
+        if(status.complete()) {
             MainGuiTool tool = proj.getToollib().get(MainGuiTool.class);
             if(tool != null) {
+                player.sendMessage("Вы призвали эмеральд");
                 player.getInventory().setItem(status.min(), tool.createItem());
             }
-    }
+            status.reset();
+        }
     }
 
 }

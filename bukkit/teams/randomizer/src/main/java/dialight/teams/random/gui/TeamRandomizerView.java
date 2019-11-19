@@ -3,7 +3,7 @@ package dialight.teams.random.gui;
 import dialight.compatibility.ItemStackBuilderBc;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.gui.Gui;
-import dialight.guilib.layout.SlotLayout;
+import dialight.guilib.elements.SlotElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.Fixed9x6View;
@@ -18,7 +18,7 @@ public class TeamRandomizerView extends Fixed9x6View {
             .displayName(" ")
             .build());
 
-    public TeamRandomizerView(Gui gui, SlotLayout layout) {
+    public TeamRandomizerView(Gui gui, SlotElement layout) {
         super(gui, layout, "Рандомизатор команд");
     }
 

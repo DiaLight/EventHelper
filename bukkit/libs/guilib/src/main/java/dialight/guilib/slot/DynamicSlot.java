@@ -26,6 +26,7 @@ public abstract class DynamicSlot implements Slot {
     }
 
     public void updateLater(Plugin plugin) {
+        if(!plugin.isEnabled()) return;
         BukkitScheduler scheduler = plugin.getServer().getScheduler();
         if(scheduler.isQueued(updateTask)) return;
         updateTask = scheduler.runTask(plugin, this::update).getTaskId();

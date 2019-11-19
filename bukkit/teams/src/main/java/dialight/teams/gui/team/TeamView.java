@@ -4,14 +4,14 @@ import dialight.compatibility.ItemStackBuilderBc;
 import dialight.extensions.ColorConverter;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
-import dialight.guilib.layout.NamedLayout;
+import dialight.guilib.elements.NamedElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
-import dialight.guilib.view.extensions.NamedLayoutScroll9x5View;
+import dialight.guilib.view.extensions.NamedElementScroll9X5View;
 import dialight.offlinelib.UuidPlayer;
-import dialight.teams.ObservableTeam;
 import dialight.teams.Teams;
+import dialight.teams.observable.ObservableTeam;
 import dialight.teleporter.SelectedPlayers;
 import dialight.teleporter.TeleporterApi;
 import org.bukkit.Material;
@@ -20,23 +20,23 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
+public class TeamView extends NamedElementScroll9X5View<TeamGui, TeamElement> {
 
     private final Slot background;
     private final Slot backward = buildDefaultBackward(this);
     private final Slot forward = buildDefaultForward(this);
 
-    public TeamView(TeamGui gui, TeamLayout layout) {
+    public TeamView(TeamGui gui, TeamElement layout) {
         super(gui, layout);
         Teams proj = getGui().getProj();
         PluginDescriptionFile desc = proj.getPlugin().getDescription();
         ObservableTeam oteam = gui.getOteam();
         background = new StaticSlot(new ItemStackBuilder()
                 .let(builder -> {
-                    ItemStackBuilderBc.of(builder).stainedGlassPane(ColorConverter.toWoolColor(oteam.getColor()));
+                    ItemStackBuilderBc.of(builder).stainedGlassPane(ColorConverter.toWoolColor(oteam.color().getValue()));
                 })
                 .displayName(Colorizer.apply(
-                        "|g|- " + oteam.getColor() + "⬛ |w|" + oteam.getName()
+                        "|g|- " + oteam.color().getValue() + "⬛ |w|" + oteam.getName()
                 ))
                 .lore(Colorizer.asList(
                         "|y|display name: |w|" + oteam.getTeam().getDisplayName(),
@@ -122,7 +122,7 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
                     case LEFT:
                         break;
                     case SHIFT_LEFT:
-                        oteam.clearOfflines();
+                        oteam.getMembers().removeIf(UuidPlayer::isOffline);
                         break;
                     case RIGHT:
                         break;
@@ -143,7 +143,7 @@ public class TeamView extends NamedLayoutScroll9x5View<TeamGui, TeamLayout> {
     }
 
     @Override
-    public NamedLayout getNamedLayout() {
+    public NamedElement getNamedLayout() {
         return getLayout().getCurrent();
     }
 

@@ -8,12 +8,12 @@ import org.bukkit.entity.Player;
 public class PlayerBlackListGui extends Gui {
 
     private final Teams proj;
-    private final PlayerBlackListLayout layout;
+    private final PlayerBlackListElement layout;
     private final PlayerBlackListView view;
 
     public PlayerBlackListGui(Teams proj) {
         this.proj = proj;
-        this.layout = new PlayerBlackListLayout(proj);
+        this.layout = new PlayerBlackListElement(proj);
         this.view = new PlayerBlackListView(this, layout);
     }
 

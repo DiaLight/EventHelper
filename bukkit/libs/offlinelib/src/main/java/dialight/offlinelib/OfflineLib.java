@@ -38,12 +38,6 @@ public class OfflineLib extends Project {
         pm.registerEvents(listener, getPlugin());
         pm.registerEvents(online, getPlugin());
         pm.registerEvents(offline, getPlugin());
-
-//        for (OfflinePlayer op : getPlugin().getServer().getOfflinePlayers()) {
-//            UUID uuid = op.getUniqueId();
-//            OfflinePlayerEx opex = new OfflinePlayerEx(getPlugin().getServer(), uuid);
-//            offlinePlayers.put(uuid, opex);
-//        }
     }
 
     @Override
@@ -69,13 +63,14 @@ public class OfflineLib extends Project {
     @Nullable public OfflinePlayerEx getOrLoad(UUID uuid) {
         OfflinePlayerEx opex = offlinePlayers.get(uuid);
         if(opex != null) return opex;
-        opex = new OfflinePlayerEx(getPlugin().getServer(), uuid);
+        opex = OfflinePlayerEx.of(getPlugin().getServer(), uuid);
         if(!opex.load()) return null;
         offlinePlayers.put(uuid, opex);
         return opex;
     }
 
     @Nullable public OfflinePlayerEx getOfflinePlayerExByEntity(Entity entity) {
+        // TODO: parse specific entity player representation (Villager?)
         return null;
     }
 
@@ -97,6 +92,11 @@ public class OfflineLib extends Project {
 
     @Nullable public UuidPlayer getNotPlayer(UUID uuid) {
         return notPlayers.get(uuid);
+    }
+    @NotNull public UuidPlayer getUuidPlayer(UUID uuid) {
+        UuidPlayer up = getNotPlayer(uuid);
+        if(up != null) return up;
+        return new UuidPlayer(this, uuid);
     }
 
     @NotNull public UuidPlayer getOrCreateNotPlayer(String name) {

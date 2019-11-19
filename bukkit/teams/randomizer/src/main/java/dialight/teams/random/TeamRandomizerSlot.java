@@ -1,18 +1,16 @@
 package dialight.teams.random;
 
 import dialight.compatibility.ItemStackBuilderBc;
-import dialight.compatibility.TeamBc;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
 import dialight.guilib.slot.DynamicSlot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.observable.collection.ObservableCollection;
 import dialight.offlinelib.UuidPlayer;
-import dialight.teams.ObservableTeam;
+import dialight.teams.observable.ObservableScoreboard;
+import dialight.teams.observable.ObservableTeam;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -21,25 +19,27 @@ import java.util.UUID;
 public class TeamRandomizerSlot extends DynamicSlot {
 
     private final TeamRandomizerProject proj;
-    private final Scoreboard scoreboard;
+    private final ObservableScoreboard scoreboard;
 
     public TeamRandomizerSlot(TeamRandomizerProject proj) {
         this.proj = proj;
-        this.scoreboard = proj.getPlugin().getServer().getScoreboardManager().getMainScoreboard();
+        this.scoreboard = proj.getTeams().getScoreboardManager().getMainScoreboard();
         ObservableCollection<String> teamFilter = proj.getTeams().getTeamWhiteList();
-        teamFilter.onAdd(this::update);
-        teamFilter.onRemove(this::update);
+        teamFilter.onAdd(this, this::update);
+        teamFilter.onRemove(this, this::update);
         ObservableCollection<UUID> playerFilter = proj.getTeams().getPlayerBlackList();
-        playerFilter.onAdd(this::update);
-        playerFilter.onRemove(this::update);
-        proj.getTeams().onMemberJoin(this::update);
-        proj.getTeams().onMemberLeave(this::update);
+        playerFilter.onAdd(this, this::update);
+        playerFilter.onRemove(this, this::update);
+
+        ObservableScoreboard scoreboard = proj.getTeams().getScoreboardManager().getMainScoreboard();
+        scoreboard.teamsByMember().onPut(this, this::update);
+        scoreboard.teamsByMember().onRemove(this, this::update);
     }
 
     private void update(String name) {
         updateLater(proj.getPlugin());
     }
-    private void update(ObservableTeam oteam, String name) {
+    private void update(UuidPlayer up, ObservableTeam oteam) {
         updateLater(proj.getPlugin());
     }
     private void update(UUID uuid) {
@@ -86,10 +86,10 @@ public class TeamRandomizerSlot extends DynamicSlot {
                     "|g|Команды для рандомизации:"
             ));
             for (String name : proj.getTeams().getTeamWhiteList()) {
-                ObservableTeam team = proj.getTeams().get(name);
+                ObservableTeam team = scoreboard.teamsByName().get(name);
                 if(team != null) {
                     isb.addLore(Colorizer.asList(
-                            "|g|- " + team.getColor() + "⬛ |w|" + name
+                            "|g|- " + team.color().getValue() + "⬛ |w|" + name
                     ));
                 } else {
                     isb.addLore(Colorizer.asList(
@@ -113,15 +113,14 @@ public class TeamRandomizerSlot extends DynamicSlot {
             for (int i = 0; i < previewSize && iterator.hasNext(); i++) {
                 UUID uuid = iterator.next();
                 UuidPlayer uuidPlayer = proj.getOfflinelib().getUuidPlayer(uuid);
-                String name = uuidPlayer.getName();
-                Team team = scoreboard.getEntryTeam(name);
+                ObservableTeam team = scoreboard.teamsByMember().get(uuidPlayer);
                 if(team != null) {
                     isb.addLore(Colorizer.asList(
-                            "|g|- " + TeamBc.of(team).getColor() + "⬛ |w|" + name
+                            "|g|- " + team.color().getValue() + "⬛ |w|" + uuidPlayer.getName()
                     ));
                 } else {
                     isb.addLore(Colorizer.asList(
-                            "|g|- |w|" + name
+                            "|g|- |w|" + uuidPlayer.getName()
                     ));
                 }
             }

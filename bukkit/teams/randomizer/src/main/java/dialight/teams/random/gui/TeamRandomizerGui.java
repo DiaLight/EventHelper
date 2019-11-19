@@ -8,12 +8,12 @@ import org.bukkit.entity.Player;
 public class TeamRandomizerGui extends Gui {
 
     private final TeamRandomizerProject proj;
-    private final TeamRandomizerLayout layout;
+    private final TeamRandomizerElement layout;
     private final TeamRandomizerView view;
 
     public TeamRandomizerGui(TeamRandomizerProject proj) {
         this.proj = proj;
-        this.layout = new TeamRandomizerLayout(proj);
+        this.layout = new TeamRandomizerElement(proj);
         this.view = new TeamRandomizerView(this, this.layout);
     }
 

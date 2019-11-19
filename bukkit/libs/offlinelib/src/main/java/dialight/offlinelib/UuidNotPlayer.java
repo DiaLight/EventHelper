@@ -1,6 +1,5 @@
 package dialight.offlinelib;
 
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,10 +24,6 @@ public class UuidNotPlayer extends UuidPlayer {
     }
 
     @Nullable @Override public Player getPlayer() {
-        return null;
-    }
-
-    @Nullable @Override public OfflinePlayer getOfflinePlayer() {
         return null;
     }
 

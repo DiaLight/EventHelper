@@ -3,13 +3,13 @@ package dialight.maingui;
 import dialight.compatibility.ItemStackBuilderBc;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
-import dialight.guilib.layout.HorizontalMultiLayout;
+import dialight.guilib.elements.HorizontalMultiElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.page.Scroll7x6PageView;
 import org.bukkit.DyeColor;
 
-public class MainGuiView extends Scroll7x6PageView<MainGui, HorizontalMultiLayout> {
+public class MainGuiView extends Scroll7x6PageView<MainGui, HorizontalMultiElement> {
 
     private final Slot toolsBackground = new StaticSlot(new ItemStackBuilder()
             .let(builder -> {
@@ -27,7 +27,7 @@ public class MainGuiView extends Scroll7x6PageView<MainGui, HorizontalMultiLayou
     private final Slot backward = buildDefaultBackward(this);
     private final Slot forward = buildDefaultForward(this);
 
-    public MainGuiView(MainGui gui, HorizontalMultiLayout layout, String title) {
+    public MainGuiView(MainGui gui, HorizontalMultiElement layout, String title) {
         super(gui, layout, title);
     }
 

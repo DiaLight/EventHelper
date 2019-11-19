@@ -62,7 +62,7 @@ public class TeamsTool extends Tool {
 
             } break;
             case RIGHT_CLICK: if(!e.isSneaking()) {
-                proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
+                proj.getGuilib().openGui(e.getPlayer(), proj.getTeamsGui());
             } else {
 
             } break;

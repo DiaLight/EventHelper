@@ -1,7 +1,7 @@
 package dialight.guilib;
 
 import dialight.guilib.gui.Gui;
-import dialight.guilib.layout.SlotLayout;
+import dialight.guilib.elements.SlotElement;
 import dialight.guilib.slot.LocSlot;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
@@ -81,7 +81,7 @@ public class GuiListener implements Listener {
         if(view == null) return;
         Player player = (Player) e.getPlayer();
         Gui gui = view.getGui();
-        SlotLayout layout = view.getLayout();
+        SlotElement layout = view.getLayout();
 
         layout.subscribe(view);
         gui.fireOpenView(player);
@@ -101,7 +101,7 @@ public class GuiListener implements Listener {
         if(view == null) return;
         Player player = (Player) e.getPlayer();
         Gui gui = view.getGui();
-        SlotLayout layout = view.getLayout();
+        SlotElement layout = view.getLayout();
 
         gui.fireCloseView(player);
         layout.fireCloseView(player);

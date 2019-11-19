@@ -1,7 +1,7 @@
 package dialight.guilib.view;
 
 import dialight.guilib.gui.Gui;
-import dialight.guilib.layout.SlotLayout;
+import dialight.guilib.elements.SlotElement;
 import dialight.guilib.slot.LocSlot;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.Vec2i;
@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  * _ - SlotLayout content
  *
  */
-public abstract class Scroll7x6View<G extends Gui, L extends SlotLayout> extends ScrollView<G, L> {
+public abstract class Scroll7x6View<G extends Gui, L extends SlotElement> extends ScrollView<G, L> {
 
     private final int width = 7;
     private final int height = 6;
@@ -81,7 +81,7 @@ public abstract class Scroll7x6View<G extends Gui, L extends SlotLayout> extends
         int limit = calcLimit();
         if(offset > limit) offset = limit;
         updateViewPanels();
-        SlotLayout layout = getLayout();
+        SlotElement layout = getLayout();
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 Slot slot = layout.getSlot(x + offset, y);
@@ -123,7 +123,7 @@ public abstract class Scroll7x6View<G extends Gui, L extends SlotLayout> extends
         int y = index / 9;
         if(x == 0) return new LocSlot(null, leftPane[y]);
         if(x == 8) return new LocSlot(null, rightPane[y]);
-        SlotLayout layout = getLayout();
+        SlotElement layout = getLayout();
         Vec2i pos = new Vec2i(x - 1 + offset, y);
         Slot slot = layout.getSlot(pos.x, pos.y);
         if(slot == null) return null;

@@ -1,8 +1,8 @@
 package dialight.guilib.view;
 
 import dialight.guilib.gui.Gui;
-import dialight.guilib.layout.LayoutListener;
-import dialight.guilib.layout.SlotLayout;
+import dialight.guilib.UpdateListener;
+import dialight.guilib.elements.SlotElement;
 import dialight.guilib.slot.LocSlot;
 import dialight.nms.InventoryNms;
 import org.bukkit.Bukkit;
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 /**
  * Created by DiaLight on 09.06.2016.
  */
-public abstract class View<G extends Gui, L extends SlotLayout> implements InventoryHolder, LayoutListener {
+public abstract class View<G extends Gui, L extends SlotElement> implements InventoryHolder, UpdateListener {
 
     private final G gui;
     private final L layout;

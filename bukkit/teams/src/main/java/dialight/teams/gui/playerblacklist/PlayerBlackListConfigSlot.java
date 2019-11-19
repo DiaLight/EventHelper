@@ -15,7 +15,7 @@ public class PlayerBlackListConfigSlot extends DynamicSlot {
 
     public PlayerBlackListConfigSlot(Teams proj) {
         this.proj = proj;
-        proj.getOfflineMode().onChange(this::onChangeOfflineMode);
+        proj.getOfflineMode().onChange(this, this::onChangeOfflineMode);
     }
 
     private void onChangeOfflineMode(Boolean from, Boolean to) {

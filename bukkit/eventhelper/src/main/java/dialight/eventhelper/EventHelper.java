@@ -1,6 +1,7 @@
 package dialight.eventhelper;
 
 import dialight.eventhelper.project.ProjectApi;
+import dialight.patch.ScoreboardTeamPatch;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,6 +11,10 @@ import java.util.Map;
 
 public class EventHelper extends JavaPlugin {
 
+    static {
+        ScoreboardTeamPatch.of().patch();
+    }
+
     private final Map<String, ProjectApi> projects = new HashMap<>();
 
     protected void loadBuiltin() {}
@@ -18,7 +23,6 @@ public class EventHelper extends JavaPlugin {
 
     @Override
     public void onLoad() {
-
         loadBuiltin();
 
     }

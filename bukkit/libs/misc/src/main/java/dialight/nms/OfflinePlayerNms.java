@@ -1,7 +1,7 @@
 package dialight.nms;
 
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Server;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -33,9 +33,9 @@ public class OfflinePlayerNms {
             throw new RuntimeException(e);
         }
     }
-    @Nullable public static NBTTagCompoundNms getData(UUID uuid) {
+    @Nullable public static NBTTagCompoundNms getData(Server server, UUID uuid) {
         try {
-            File worldFolder = Bukkit.getServer().getWorlds().get(0).getWorldFolder();
+            File worldFolder = server.getWorlds().get(0).getWorldFolder();
             File playerdata = new File(worldFolder, "playerdata");
             if(!playerdata.exists()) playerdata.mkdirs();
             File datfile = new File(playerdata, uuid + ".dat");
@@ -47,9 +47,9 @@ public class OfflinePlayerNms {
         return null;
     }
 
-    public static void setData(UUID uuid, NBTTagCompoundNms nbt) {
+    public static void setData(Server server, UUID uuid, NBTTagCompoundNms nbt) {
         try {
-            File worldFolder = Bukkit.getServer().getWorlds().get(0).getWorldFolder();
+            File worldFolder = server.getWorlds().get(0).getWorldFolder();
             File playerdata = new File(worldFolder, "playerdata");
             if(!playerdata.exists()) playerdata.mkdirs();
             File tmpfile = new File(playerdata, uuid + ".dat.tmp");

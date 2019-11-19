@@ -4,12 +4,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
-public class ObservableCollectionWrapper<E> extends ObservableCollection<E> implements Collection<E> {
+public class ObservableCollectionWrapper<E> extends ObservableCollection<E> {
 
-    private final Collection<E> collection;
+    protected final Collection<E> collection;
 
     public ObservableCollectionWrapper(Collection<E> collection) {
         this.collection = collection;
@@ -49,8 +48,7 @@ public class ObservableCollectionWrapper<E> extends ObservableCollection<E> impl
     }
 
 
-    @NotNull
-    @Override public Iterator<E> iterator() {
+    @NotNull @Override public Iterator<E> iterator() {
         return new Iterator<E>() {
             private final Iterator<E> inner = collection.iterator();
             private E lastElement = null;

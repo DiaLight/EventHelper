@@ -9,12 +9,12 @@ import org.bukkit.entity.Player;
 public class ControlGui extends Gui {
 
     private final Teams proj;
-    private final ControlLayout layout;
+    private final ControlElement layout;
     private final ControlView view;
 
     public ControlGui(Teams proj) {
         this.proj = proj;
-        this.layout = new ControlLayout(proj);
+        this.layout = new ControlElement(proj);
         this.view = new ControlView(this, layout);
     }
 

@@ -3,7 +3,7 @@
 Useful tool to help event masters with theirs job
 
 Проект EventHelper пишется как набор связанных друг с другом плагинов.
-Каждый релиз представляет собой набор этих плгаинов и собрку "все в одном", где все плагины проекта помещены в один jar архив.
+Каждый релиз представляет собой набор этих плагинов и сборку "все в одном", где все плагины проекта помещены в один jar архив.
 
 Для работы с EventHelper вам достаточно поместить сборку "все в одном" в папку `mods` сервера.
 
@@ -13,7 +13,7 @@ Useful tool to help event masters with theirs job
 Формат релиза:
 `EventHelper-<plugin>-<MC Server platform>-<MC Server version>-<EventHelper version>.jar`
 
-Собрка "все в одном" соответственно имеет следующее название:
+Сборка "все в одном" соответственно имеет следующее название:
 `EventHelper-all-<MC Server platform>-<MC Server version>-<EventHelper version>.jar`
 
 <details>

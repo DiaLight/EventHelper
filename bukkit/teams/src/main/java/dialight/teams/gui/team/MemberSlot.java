@@ -4,13 +4,12 @@ import dialight.compatibility.TeamBc;
 import dialight.extensions.ColorConverter;
 import dialight.extensions.Colorizer;
 import dialight.extensions.ItemStackBuilder;
-import dialight.extensions.OfflinePlayerEx;
+import dialight.extensions.PlayerEx;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.observable.collection.ObservableCollection;
-import dialight.offlinelib.OfflineLibApi;
 import dialight.offlinelib.UuidPlayer;
-import dialight.teams.ObservableTeam;
+import dialight.teams.observable.ObservableTeam;
 import dialight.teams.Teams;
 import dialight.teleporter.TeleporterApi;
 import org.bukkit.Location;
@@ -51,11 +50,9 @@ public class MemberSlot implements Slot {
             case SHIFT_RIGHT:
                 TeleporterApi teleporter = proj.getTeleporter();
                 if (teleporter != null) {
-                    OfflineLibApi offlinelib = proj.getOfflinelib();
-                    OfflinePlayerEx opex = offlinelib.getOfflinePlayerEx(up.getUuid());
-                    if(opex != null) {
-                        Location to = opex.getLocation();
-                        teleporter.teleport(e.getPlayer(), to);
+                    Location to = up.getLocation();
+                    if(to != null) {
+                        PlayerEx.of(e.getPlayer()).teleport(to);
                     } else {
                         e.getPlayer().sendMessage(Colorizer.apply("|r|Игрок не найден"));
                     }
