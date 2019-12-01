@@ -1,14 +1,14 @@
 package dialight.offlinelib;
 
 import dialight.eventhelper.project.ProjectApi;
-import dialight.extensions.OfflinePlayerEx;
+import dialight.misc.player.PlayerEngine;
+import dialight.misc.player.UuidPlayer;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.UUID;
 
 public class OfflineLibApi implements ProjectApi {
@@ -23,18 +23,24 @@ public class OfflineLibApi implements ProjectApi {
         return proj.getOfflinePlayerByName(name);
     }
 
+    @Deprecated
     @NotNull public UuidPlayer getUuidPlayer(UUID uuid) {
         return proj.getUuidPlayer(uuid);
     }
+    @Deprecated
     @NotNull public UuidPlayer getUuidPlayer(Player player) {
         return proj.getUuidPlayer(player.getUniqueId());
     }
-    @NotNull public UuidPlayer getOrCreateNotPlayer(String member) {
-        return proj.getOrCreateNotPlayer(member);
+    @Deprecated
+    @NotNull public UuidPlayer getUuidPlayer(String name) {
+        return proj.getUuidPlayer(name);
+    }
+    public PlayerEngine getPlayerEngine() {
+        return proj.getPlayerEngine();
     }
 
-    @Nullable public OfflinePlayerEx getOfflinePlayerExByEntity(Entity entity) {
-        return proj.getOfflinePlayerExByEntity(entity);
+    @Nullable public UuidPlayer getUuidPlayerExByEntity(Entity entity) {
+        return proj.getUuidPlayerExByEntity(entity);
     }
 
     public OnlineObservable getOnline() {
@@ -45,7 +51,4 @@ public class OfflineLibApi implements ProjectApi {
         return proj.getOffline();
     }
 
-    public Collection<UuidPlayer> getNotPlayers() {
-        return proj.getNotPlayers();
-    }
 }

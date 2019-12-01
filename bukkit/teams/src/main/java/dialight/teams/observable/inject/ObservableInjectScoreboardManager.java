@@ -5,7 +5,7 @@ import dialight.inject.ScoreboardManagerInject;
 import dialight.observable.map.ObservableMap;
 import dialight.observable.map.ObservableMapWrapper;
 import dialight.offlinelib.OfflineLibApi;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.observable.ObservableScoreboard;
 import dialight.teams.observable.ObservableScoreboardManager;
 import org.bukkit.entity.Player;
@@ -32,7 +32,7 @@ public class ObservableInjectScoreboardManager implements ObservableScoreboardMa
         this.offlinelib = offlinelib;
         this.inject = ScoreboardManagerInject.of(scoreboardManager);
         this.mainScoreboard = new ObservableInjectScoreboard(offlinelib, scoreboardManager.getMainScoreboard(), "main");
-        this.mainScoreboardHandle = ScoreboardInject.of(mainScoreboard.getScoreboard()).getHandle();
+        this.mainScoreboardHandle = ScoreboardInject.of(mainScoreboard.asBukkit()).getHandle();
         byName.put(this.mainScoreboard.getId(), this.mainScoreboard);
     }
 

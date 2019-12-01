@@ -1,7 +1,8 @@
 package dialight.maingui;
 
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.compatibility.PlayerInventoryBc;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.toollib.Tool;
 import dialight.toollib.events.ToolInteractEvent;
 import org.bukkit.Material;
@@ -42,6 +43,10 @@ public class MainGuiTool extends Tool {
                 if(proj.getGuilib().openLast(e.getPlayer()) == null) {
                     proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
                 }
+            } break;
+            case DROP: {
+                PlayerInventoryBc.of(e.getPlayer().getInventory()).setItemInMainHand(null);
+                proj.getGuilib().clearStory(e.getPlayer());
             } break;
         }
     }

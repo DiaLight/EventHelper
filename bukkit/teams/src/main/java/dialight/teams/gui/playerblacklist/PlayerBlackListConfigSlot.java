@@ -1,7 +1,7 @@
 package dialight.teams.gui.playerblacklist;
 
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.slot.DynamicSlot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.teams.Teams;

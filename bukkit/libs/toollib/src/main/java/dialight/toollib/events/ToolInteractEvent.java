@@ -1,7 +1,7 @@
 package dialight.toollib.events;
 
 import dialight.compatibility.LocationBc;
-import dialight.extensions.Utils;
+import dialight.misc.Utils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

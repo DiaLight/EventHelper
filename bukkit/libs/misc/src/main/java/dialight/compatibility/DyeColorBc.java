@@ -8,7 +8,7 @@ import java.lang.reflect.Constructor;
 public abstract class DyeColorBc {
 
     private static final Constructor<? extends DyeColorBc> constructor =
-            ReflectionUtils.findCompatibleClass(DyeColorBc.class);
+            ReflectionUtils.findCompatibleConstructor(DyeColorBc.class);
 
     public static final DyeColor LIGHT_GRAY = of().lightGray();
 

@@ -2,7 +2,7 @@ package dialight.teams.gui.team;
 
 import dialight.guilib.elements.NamedElement;
 import dialight.guilib.elements.ReplaceableElement;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.observable.ObservableTeam;
 import dialight.teams.Teams;
 

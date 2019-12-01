@@ -1,7 +1,7 @@
 package dialight.eventhelper.project;
 
 import dialight.eventhelper.EventHelper;
-import dialight.extensions.Colorizer;
+import dialight.misc.Colorizer;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;

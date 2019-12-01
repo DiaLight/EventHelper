@@ -1,5 +1,6 @@
 package dialight.compatibility;
 
+import dialight.misc.Colorizer;
 import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.Team;
 
@@ -10,18 +11,31 @@ public class TeamBc8 extends TeamBc {
     }
 
     public static ChatColor parseColor(String prefix) {
-        ChatColor color = ChatColor.WHITE;
-        for (int i = prefix.length() - 1; i > -1; i--) {
-            char c = prefix.charAt(i);
-            ChatColor cur = ChatColor.getByChar(c);
-            if (cur == null) continue;
-            // Once we find a color or reset we can stop searching
-            if (cur.isColor() || cur.equals(ChatColor.RESET)) {
-                color = cur;
-                break;
+        char lastChar = ' ';
+        for (int i = prefix.length() - 1; i >= 0; i--) {
+            char curChar = prefix.charAt(i);
+            if(curChar == ChatColor.COLOR_CHAR) {
+                ChatColor color = ChatColor.getByChar(lastChar);
+                if (color != null) {
+                    if (color.isColor() || color.equals(ChatColor.RESET)) return color;
+                }
             }
+            lastChar = curChar;
         }
-        return color;
+        return ChatColor.WHITE;
+    }
+    public static String rstripColor(String prefix) {
+        int endIndex = prefix.length();
+        while(endIndex >= 2) {
+            char colorChar = prefix.charAt(endIndex - 2);
+            if(colorChar != ChatColor.COLOR_CHAR) break;
+            endIndex -= 2;
+        }
+        return prefix.substring(0, endIndex);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(rstripColor(Colorizer.apply("|g|cool|y|: |r||gr|")));
     }
     @Override public ChatColor getColor() {
         return parseColor(team.getPrefix());

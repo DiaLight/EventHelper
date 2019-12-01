@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class ObservableSetWrapper<E> extends ObservableSet<E> {
 
-    private final Set<E> set;
+    protected final Set<E> set;
 
     public ObservableSetWrapper(Set<E> set) {
         this.set = set;
@@ -27,11 +27,13 @@ public class ObservableSetWrapper<E> extends ObservableSet<E> {
     }
 
     @Override public boolean addAll(Collection<? extends E> elements) {
+        boolean anyAdded = false;
         for (E e : elements) {
-            set.add(e);
-            fireAdd(e);
+            if(add(e)) {
+                anyAdded = true;
+            }
         }
-        return true;
+        return anyAdded;
     }
 
     @SuppressWarnings("UNCHECKED_CAST")

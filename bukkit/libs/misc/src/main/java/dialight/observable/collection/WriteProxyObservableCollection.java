@@ -50,4 +50,10 @@ public class WriteProxyObservableCollection<V> extends ObservableCollectionWrapp
         return this.fireProxyRemove((V) element);
     }
 
+    @Override public void clear() {
+        for (V e : collection) {
+            remove(e);
+        }
+    }
+
 }

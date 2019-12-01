@@ -1,9 +1,6 @@
 package dialight.freezer.gui;
 
 import dialight.compatibility.ItemStackBuilderBc;
-import dialight.extensions.ActionInvoker;
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
 import dialight.freezer.Freezer;
 import dialight.freezer.Frozen;
 import dialight.guilib.elements.NamedElement;
@@ -11,13 +8,19 @@ import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.extensions.NamedElementScroll9X5View;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.ActionInvoker;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
+import dialight.misc.player.UuidPlayer;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FreezerView extends NamedElementScroll9X5View<FreezerGui, FreezerViewState> {
 
@@ -95,30 +98,35 @@ public class FreezerView extends NamedElementScroll9X5View<FreezerGui, FreezerVi
                 .build()) {
             @Override
             public void onClick(SlotClickEvent e) {
+                ActionInvoker invoker = new ActionInvoker(proj.getOfflineLib().getUuidPlayer(e.getPlayer()));
                 switch (e.getEvent().getClick()) {
                     case LEFT: {
-                        for (UuidPlayer player : proj.getOfflinelib().getOffline()) {
-                            proj.register(new Frozen(player, player.getLocation(), new ActionInvoker(e.getPlayer()), "freeze all players"));
+                        List<Frozen> toFreeze = new ArrayList<>();
+                        for (UuidPlayer player : proj.getOfflineLib().getOffline()) {
+                            toFreeze.add(new Frozen(player, player.getLocation(), invoker, "freeze all players"));
                         }
+                        proj.register(toFreeze);
                     }
                     break;
                     case SHIFT_LEFT: {
-                        for (Player player : proj.getOfflinelib().getOnline()) {
-                            proj.register(new Frozen(proj.getOfflinelib().getUuidPlayer(player), player.getLocation(), new ActionInvoker(e.getPlayer()), "freeze online players"));
+                        List<Frozen> toFreeze = new ArrayList<>();
+                        for (Player player : proj.getOfflineLib().getOnline()) {
+                            toFreeze.add(new Frozen(proj.getOfflineLib().getUuidPlayer(player), player.getLocation(), invoker, "freeze online players"));
                         }
+                        proj.register(toFreeze);
                     }
                     break;
                     case RIGHT: {
-                        for (UuidPlayer player : proj.getOfflinelib().getOffline()) {
-                            proj.unregister(player);
-                        }
+                        proj.unregisterAll(invoker);
                     }
                     break;
                     case SHIFT_RIGHT: {
-                        for (UuidPlayer player : proj.getOfflinelib().getOffline()) {
+                        List<Frozen> toFreeze = new ArrayList<>();
+                        for (UuidPlayer player : proj.getOfflineLib().getOffline()) {
                             if (player.isOnline()) continue;
-                            proj.register(new Frozen(player, player.getLocation(), new ActionInvoker(e.getPlayer()), "freeze online players"));
+                            toFreeze.add(new Frozen(player, player.getLocation(), invoker, "freeze online players"));
                         }
+                        proj.register(toFreeze);
                     }
                     break;
                 }

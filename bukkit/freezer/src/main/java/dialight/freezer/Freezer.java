@@ -7,19 +7,22 @@ import dialight.extensions.PlayerEx;
 import dialight.freezer.gui.FreezerGui;
 import dialight.guilib.GuiLibApi;
 import dialight.maingui.MainGuiApi;
+import dialight.misc.ActionInvoker;
+import dialight.misc.player.UuidPlayer;
 import dialight.observable.collection.ObservableCollection;
 import dialight.observable.map.ObservableMap;
 import dialight.observable.map.ObservableMapWrapper;
 import dialight.offlinelib.OfflineLibApi;
-import dialight.offlinelib.UuidPlayer;
 import dialight.toollib.ToolLibApi;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 public class Freezer extends Project {
@@ -71,10 +74,9 @@ public class Freezer extends Project {
             if (frozen.isSelf()) {
                 frozen.sendMessage(FreezerMessages.selfFreeze);
             } else {
-                frozen.getInvoker().sendMessage(FreezerMessages.youFreezed(frozen.getTarget()));
-                OfflinePlayer player = frozen.getInvoker().getPlayer();
-                if(player != null) {
-                    frozen.sendMessage(FreezerMessages.youHbFreezed(player));
+                UuidPlayer up = frozen.getInvoker().getPlayer();
+                if(up != null) {
+                    frozen.sendMessage(FreezerMessages.youHbFreezed(up));
                 } else {
                     Plugin plugin = frozen.getInvoker().getPlugin();
                     if (plugin != null) {
@@ -95,10 +97,9 @@ public class Freezer extends Project {
             if (frozen.isSelf()) {
                 frozen.sendMessage(FreezerMessages.selfUnfreeze);
             } else {
-                frozen.getInvoker().sendMessage(FreezerMessages.youUnfreezed(frozen.getTarget()));
-                OfflinePlayer player = frozen.getInvoker().getPlayer();
-                if(player != null) {
-                    frozen.sendMessage(FreezerMessages.youHbUnfreezed(player));
+                UuidPlayer up = frozen.getInvoker().getPlayer();
+                if(up != null) {
+                    frozen.sendMessage(FreezerMessages.youHbUnfreezed(up));
                 } else {
                     Plugin plugin = frozen.getInvoker().getPlugin();
                     if (plugin != null) {
@@ -110,6 +111,7 @@ public class Freezer extends Project {
                 }
             }
             freezeFlayers.removeFly(frozen.getTarget());
+            frozen.resetState();
             if(frozenMap.size() == 0) {
                 freezerListener.disable();
                 freezeFlayers.disable();
@@ -136,7 +138,7 @@ public class Freezer extends Project {
         return toollib;
     }
 
-    public OfflineLibApi getOfflinelib() {
+    public OfflineLibApi getOfflineLib() {
         return offlinelib;
     }
 
@@ -148,18 +150,55 @@ public class Freezer extends Project {
         return tool;
     }
 
-    public void register(Frozen frozen) {
-        frozenMap.put(frozen.getTarget(), frozen);
+    public FreezeFlayers getFreezeFlayers() {
+        return freezeFlayers;
     }
 
-    public Frozen unregister(UUID uuid) {
-        return unregister(offlinelib.getUuidPlayer(uuid));
+    public void register(Frozen frozen) {
+        frozenMap.put(frozen.getTarget(), frozen);
+        frozen.getInvoker().sendMessage(FreezerMessages.youFreezed(frozen.getTarget()));
     }
-    public Frozen unregister(UuidPlayer player) {
+    public void register(Collection<Frozen> frozens) {
+        ActionInvoker invoker = null;
+        List<UuidPlayer> online = new ArrayList<>();
+        List<UuidPlayer> offline = new ArrayList<>();
+        for (Frozen frozen : frozens) {
+            if(invoker == null) invoker = frozen.getInvoker();
+            frozenMap.put(frozen.getTarget(), frozen);
+            if (frozen.getTarget().isOnline()) {
+                online.add(frozen.getTarget());
+            } else {
+                offline.add(frozen.getTarget());
+            }
+        }
+        if(invoker != null) invoker.sendMessage(FreezerMessages.youFreezed(online, offline));
+    }
+    public void unregisterAll(ActionInvoker invoker) {
+        frozenMap.clear();
+        invoker.sendMessage(FreezerMessages.unfreezeAll);
+    }
+
+    public Frozen unregister(ActionInvoker invoker, UuidPlayer player) {
         Frozen frozen = frozenMap.remove(player);
         Vector velocity = frozen.getVelocity();
         if(velocity != null) player.setVelocity(velocity);
+        invoker.sendMessage(FreezerMessages.youUnfreezed(player));
         return frozen;
+    }
+    public void unregister(ActionInvoker invoker, Collection<UuidPlayer> targets) {
+        List<UuidPlayer> online = new ArrayList<>();
+        List<UuidPlayer> offline = new ArrayList<>();
+        for (UuidPlayer target : targets) {
+            Frozen frozen = frozenMap.remove(target);
+            Vector velocity = frozen.getVelocity();
+            if(velocity != null) target.setVelocity(velocity);
+            if (target.isOnline()) {
+                online.add(target);
+            } else {
+                offline.add(target);
+            }
+        }
+        invoker.sendMessage(FreezerMessages.youUnfreezed(online, offline));
     }
 
     public Frozen get(UUID uuid) {
@@ -176,4 +215,5 @@ public class Freezer extends Project {
     public FreezerGui getGui() {
         return gui;
     }
+
 }

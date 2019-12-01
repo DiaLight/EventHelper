@@ -11,8 +11,10 @@ import java.util.Map;
 
 public class EventHelper extends JavaPlugin {
 
+    private static boolean patched = false;
+
     static {
-        ScoreboardTeamPatch.of().patch();
+        patched = ScoreboardTeamPatch.of().patch();
     }
 
     private final Map<String, ProjectApi> projects = new HashMap<>();
@@ -24,21 +26,26 @@ public class EventHelper extends JavaPlugin {
     @Override
     public void onLoad() {
         loadBuiltin();
-
+        if(!patched) {
+            getServer().getConsoleSender().sendMessage("EventHelper ERROR: unable to patch server classes. Please, restart server");
+            getServer().shutdown();
+        }
     }
 
     @Override
     public void onEnable() {
-
-        enableBuiltin();
-
+        try {
+            enableBuiltin();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            getServer().getConsoleSender().sendMessage("EventHelper ERROR: unknown startup error. Please, restart server");
+            getServer().shutdown();
+        }
     }
 
     @Override
     public void onDisable() {
-
         disableBuiltin();
-
     }
 
     public void register(String name, ProjectApi project) {

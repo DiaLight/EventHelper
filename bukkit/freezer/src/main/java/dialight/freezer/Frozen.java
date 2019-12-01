@@ -1,9 +1,8 @@
 package dialight.freezer;
 
-import dialight.extensions.ActionInvoker;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.ActionInvoker;
+import dialight.misc.player.UuidPlayer;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -14,6 +13,7 @@ public class Frozen {
     private Location location;
     private final ActionInvoker invoker;
     private final String reason;
+    private final boolean flyState;
 
     public Frozen(UuidPlayer target, Location location, ActionInvoker invoker, String reason) {
         this.target = target;
@@ -28,6 +28,7 @@ public class Frozen {
         this.velocity = target.getVelocity();
         this.invoker = invoker;
         this.reason = reason;
+        this.flyState = target.isFlying();
     }
 
     public UuidPlayer getTarget() {
@@ -62,9 +63,13 @@ public class Frozen {
     }
 
     public boolean isSelf() {
-        OfflinePlayer invoker = this.invoker.getPlayer();
+        UuidPlayer invoker = this.invoker.getPlayer();
         if(invoker == null) return false;
-        return invoker.getUniqueId().equals(target.getUuid());
+        return invoker.getUuid().equals(target.getUuid());
+    }
+
+    public void resetState() {
+        target.setFlying(this.flyState);
     }
 
 }

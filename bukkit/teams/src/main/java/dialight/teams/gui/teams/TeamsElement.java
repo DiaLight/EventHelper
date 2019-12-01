@@ -3,7 +3,7 @@ package dialight.teams.gui.teams;
 import dialight.guilib.indexcache.SparkIndexCache;
 import dialight.guilib.elements.CachedPageElement;
 import dialight.guilib.slot.Slot;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.Teams;
 import dialight.teams.observable.ObservableScoreboard;
 import dialight.teams.observable.ObservableTeam;

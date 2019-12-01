@@ -1,18 +1,18 @@
 package dialight.teams.random.gui;
 
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.elements.FixedElement;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
-import dialight.teams.random.TeamRandomizerProject;
+import dialight.teams.random.SortByRandom;
 import org.bukkit.Material;
 
 public class TeamRandomizerElement extends FixedElement {
 
-    private final TeamRandomizerProject proj;
+    private final SortByRandom proj;
 
-    public TeamRandomizerElement(TeamRandomizerProject proj) {
+    public TeamRandomizerElement(SortByRandom proj) {
         super(9, 6);
         this.proj = proj;
 

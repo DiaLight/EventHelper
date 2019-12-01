@@ -1,18 +1,17 @@
 package dialight.teams.gui.team;
 
 import dialight.compatibility.TeamBc;
-import dialight.extensions.ColorConverter;
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.ColorConverter;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.extensions.PlayerEx;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.observable.collection.ObservableCollection;
-import dialight.offlinelib.UuidPlayer;
-import dialight.teams.observable.ObservableTeam;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.Teams;
+import dialight.teams.observable.ObservableTeam;
 import dialight.teleporter.TeleporterApi;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Scoreboard;
@@ -50,12 +49,7 @@ public class MemberSlot implements Slot {
             case SHIFT_RIGHT:
                 TeleporterApi teleporter = proj.getTeleporter();
                 if (teleporter != null) {
-                    Location to = up.getLocation();
-                    if(to != null) {
-                        PlayerEx.of(e.getPlayer()).teleport(to);
-                    } else {
-                        e.getPlayer().sendMessage(Colorizer.apply("|r|Игрок не найден"));
-                    }
+                    PlayerEx.of(e.getPlayer()).teleport(up.getLocation());
                 }
                 break;
         }

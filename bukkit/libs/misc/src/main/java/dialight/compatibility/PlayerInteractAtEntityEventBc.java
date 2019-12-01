@@ -9,7 +9,7 @@ import java.lang.reflect.Constructor;
 public abstract class PlayerInteractAtEntityEventBc {
 
     private static final Constructor<? extends PlayerInteractAtEntityEventBc> constructor =
-            ReflectionUtils.findCompatibleClass(PlayerInteractAtEntityEventBc.class, PlayerInteractAtEntityEvent.class);
+            ReflectionUtils.findCompatibleConstructor(PlayerInteractAtEntityEventBc.class, PlayerInteractAtEntityEvent.class);
 
     protected final PlayerInteractAtEntityEvent event;
 

@@ -7,7 +7,7 @@ import java.lang.reflect.Constructor;
 public abstract class ScoreboardTeamPatch {
 
     private static final Constructor<? extends ScoreboardTeamPatch> constructor =
-            ReflectionUtils.findCompatibleClass(ScoreboardTeamPatch.class);
+            ReflectionUtils.findCompatibleConstructor(ScoreboardTeamPatch.class);
 
     public abstract boolean patch();
 

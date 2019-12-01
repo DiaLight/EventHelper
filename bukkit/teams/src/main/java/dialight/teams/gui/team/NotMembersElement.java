@@ -6,7 +6,7 @@ import dialight.guilib.slot.Slot;
 import dialight.observable.collection.ObservableCollection;
 import dialight.offlinelib.OfflineObservable;
 import dialight.offlinelib.OnlineObservable;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.Teams;
 import dialight.teams.observable.ObservableTeam;
 import org.bukkit.entity.Player;
@@ -40,11 +40,6 @@ public class NotMembersElement extends NamedSetElement<UuidPlayer, UUID> {
         for (UuidPlayer up : offline) {
             if (!oteam.getMembers().contains(up)) {
                 add(up);
-            }
-        }
-        for (UuidPlayer unp : proj.getOfflinelib().getNotPlayers()) {
-            if (!oteam.getMembers().contains(unp)) {
-                add(unp);
             }
         }
     }

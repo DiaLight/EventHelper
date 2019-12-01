@@ -1,7 +1,7 @@
 package dialight.maingui;
 
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.indexcache.SparkIndexCache;
 import dialight.guilib.elements.CachedPageElement;
 import dialight.guilib.slot.Slot;

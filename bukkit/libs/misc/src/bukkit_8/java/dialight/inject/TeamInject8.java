@@ -105,11 +105,8 @@ public class TeamInject8 extends TeamInject {
         setCanSeeFriendlyInvisibles_api.onProxyChange(this, (prev, value) -> getNms().setCanSeeFriendlyInvisibles(value));
         setNameTagVisibility_api.onProxyChange(this, (prev, value) -> getNms().setNameTagVisibility(bukkitToNotch(value)));
         setCollisionRule_api.onProxyChange(this, (prev, value) -> getNms().b(bukkitToNotch(value)));
-        color_api.onProxyChange(this, (prev, value) -> getNms().setPrefix(getNms().getPrefix() + value.toString()));
-        setPrefix.onChange(this, (prev, value) -> {
-            ChatColor newColor = TeamBc8.parseColor(getNms().getPrefix());
-            if(color.getValue() != newColor) color.setValue(newColor);
-        });
+        color_api.onProxyChange(this, (prev, value) -> getNms().setPrefix(TeamBc8.rstripColor(getNms().getPrefix()) + value.toString()));
+        setPrefix.onChange(this, (prev, value) -> color.setValue(TeamBc8.parseColor(value)));
     }
 
     @Override public Object getHandle() {

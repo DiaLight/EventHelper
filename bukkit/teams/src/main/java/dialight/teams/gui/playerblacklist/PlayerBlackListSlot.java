@@ -2,13 +2,13 @@ package dialight.teams.gui.playerblacklist;
 
 import dialight.compatibility.ItemStackBuilderBc;
 import dialight.compatibility.TeamBc;
-import dialight.extensions.ColorConverter;
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.ColorConverter;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
-import dialight.observable.collection.ObservableCollection;
-import dialight.offlinelib.UuidPlayer;
+import dialight.observable.set.ObservableSet;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.Teams;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -32,7 +32,7 @@ public class PlayerBlackListSlot implements Slot {
     }
 
     @Override public void onClick(SlotClickEvent e) {
-        ObservableCollection<UUID> filter = proj.getPlayerBlackList();
+        ObservableSet<UUID> filter = proj.getPlayerBlackList();
         switch (e.getEvent().getClick()) {
             case LEFT:
                 if(filter.contains(up.getUuid())) {

@@ -1,14 +1,14 @@
 package dialight.teleporter.gui;
 
 import dialight.compatibility.ItemStackBuilderBc;
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.elements.NamedElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.extensions.NamedElementScroll9X5View;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teleporter.Teleporter;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;

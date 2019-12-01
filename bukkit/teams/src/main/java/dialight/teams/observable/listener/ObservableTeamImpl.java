@@ -4,7 +4,7 @@ import dialight.observable.ObservableObject;
 import dialight.observable.set.ObservableSet;
 import dialight.observable.set.ObservableSetWrapper;
 import dialight.observable.set.WriteProxyObservableSet;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.observable.ObservableTeam;
 import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.NameTagVisibility;

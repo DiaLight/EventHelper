@@ -19,6 +19,10 @@ val join = listOf<String>()
 configureProject(join, deps)
 
 val bcs = mapOf(
+    "bukkit_U" to mapOf(
+        "api" to "org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT",
+        "provided" to "org.bukkit:bukkit:1.8.8-R0.1-SNAPSHOT"
+    ),
     "bukkit_8" to mapOf(
         "api" to "org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT",
         "provided" to "org.bukkit:bukkit:1.8.8-R0.1-SNAPSHOT",
@@ -81,9 +85,9 @@ dependencies {
         val implementation = configurations["${it.key}Implementation"]
         val compile = configurations["${it.key}Compile"]
         val compileOnly = configurations["${it.key}CompileOnly"]
-        compileOnly(it.value["provided"]!!)
-        compileOnly(it.value["jar"]!!)
-        implementation(it.value["api"]!!)
+        it.value["provided"]?.let { compileOnly(it) }
+        it.value["jar"]?.let { compileOnly(it) }
+        it.value["api"]?.let { implementation(it) }
         implementation("org.jetbrains:annotations:13.0")
         compile(sourceSets["main"].output)
     }

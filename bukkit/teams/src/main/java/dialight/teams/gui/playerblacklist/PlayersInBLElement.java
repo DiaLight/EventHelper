@@ -2,9 +2,9 @@ package dialight.teams.gui.playerblacklist;
 
 import dialight.guilib.elements.NamedSetElement;
 import dialight.guilib.slot.Slot;
-import dialight.observable.collection.ObservableCollection;
+import dialight.observable.set.ObservableSet;
 import dialight.offlinelib.OnlineObservable;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.Teams;
 import org.bukkit.entity.Player;
 
@@ -23,7 +23,7 @@ public class PlayersInBLElement extends NamedSetElement<UuidPlayer, UUID> {
     }
 
     @Override public void onViewersNotEmpty() {
-        ObservableCollection<UUID> filter = proj.getPlayerBlackList();
+        ObservableSet<UUID> filter = proj.getPlayerBlackList();
         filter.onAdd(this, this::onAdd);
         filter.onRemove(this, this::onRemove);
 
@@ -35,7 +35,7 @@ public class PlayersInBLElement extends NamedSetElement<UuidPlayer, UUID> {
     }
 
     @Override public void onViewersEmpty() {
-        ObservableCollection<UUID> filter = proj.getPlayerBlackList();
+        ObservableSet<UUID> filter = proj.getPlayerBlackList();
         filter.removeListeners(this);
 
         OnlineObservable online = proj.getOfflinelib().getOnline();

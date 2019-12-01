@@ -1,6 +1,6 @@
 package dialight.guilib;
 
-import dialight.extensions.Colorizer;
+import dialight.misc.Colorizer;
 
 /**
  * Created by DiaLight on 17.06.2016.

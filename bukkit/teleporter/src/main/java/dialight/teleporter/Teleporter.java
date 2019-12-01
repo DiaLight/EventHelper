@@ -7,7 +7,6 @@ import dialight.extensions.PlayerEx;
 import dialight.guilib.GuiLibApi;
 import dialight.maingui.MainGuiApi;
 import dialight.offlinelib.OfflineLibApi;
-import dialight.offlinelib.UuidPlayer;
 import dialight.teleporter.gui.TeleporterGui;
 import dialight.teleporter.gui.TeleporterSlot;
 import dialight.toollib.ToolLibApi;
@@ -91,12 +90,8 @@ public class Teleporter extends Project {
         return selected;
     }
 
-
     public void teleport(Player player, Location loc) {
         PlayerEx.of(player).teleport(loc);
-    }
-    public boolean teleport(UuidPlayer up, Location loc) {
-        return up.teleport(loc);
     }
 
 }

@@ -1,6 +1,6 @@
 package dialight.freezer;
 
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -45,12 +45,12 @@ public class FreezeFlayers implements Listener {
         up.setFlying(true);
     }
 
+    public boolean isFlyingMode(GameMode gm) {
+        return gm == GameMode.CREATIVE || gm == GameMode.SPECTATOR;
+    }
     public void removeFly(UuidPlayer up) {
         flyers.remove(up.getUuid());
-        Player player = up.getPlayer();
-        if(player != null) {
-            if(player.getGameMode() == GameMode.CREATIVE) return;
-        }
+        if(isFlyingMode(up.getGameMode())) return;
         up.setAllowFlight(false);
         up.setFlying(false);
     }
@@ -58,7 +58,7 @@ public class FreezeFlayers implements Listener {
     @EventHandler public void onJoin(PlayerJoinEvent e) {
         Player trg = e.getPlayer();
         if(trg.isOp()) return;
-        if(trg.getGameMode() == GameMode.CREATIVE) return;
+        if(isFlyingMode(trg.getGameMode())) return;
         if(flyers.containsKey(trg.getUniqueId())) {
             trg.setAllowFlight(true);
             trg.setFlying(true);
@@ -69,7 +69,7 @@ public class FreezeFlayers implements Listener {
     }
     @EventHandler public void onToggleFly(PlayerToggleFlightEvent e) {
         if(e.getPlayer().isOp()) return;
-        if(e.getPlayer().getGameMode() == GameMode.CREATIVE) return;
+        if(isFlyingMode(e.getPlayer().getGameMode())) return;
         if(!e.isFlying()) {
             if(flyers.containsKey(e.getPlayer().getUniqueId())) {
                 e.setCancelled(true);
@@ -79,7 +79,7 @@ public class FreezeFlayers implements Listener {
     @EventHandler public void onPluginDisable(PluginDisableEvent e) {
         if(!e.getPlugin().getName().equals(plugin.getName())) return;
         for (UuidPlayer up : flyers.values()) {
-            if(up.getGameMode() == GameMode.CREATIVE) continue;
+            if(isFlyingMode(up.getGameMode())) continue;
             up.setAllowFlight(false);
             up.setFlying(false);
         }

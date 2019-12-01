@@ -7,36 +7,45 @@ import dialight.maingui.MainGuiProject;
 import dialight.modulelib.ModuleLib;
 import dialight.offlinelib.OfflineLib;
 import dialight.teams.Teams;
-import dialight.teams.random.TeamRandomizerProject;
+import dialight.teams.captain.SortByCaptain;
+import dialight.teams.random.SortByRandom;
 import dialight.teleporter.Teleporter;
 import dialight.toollib.ToolLib;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class EventHelperBuiltin extends EventHelper {
 
     private final Map<String, Project> builtinProjects = new HashMap<>();
+    private final List<String> inLoadOrder = new ArrayList<>();
+
+    private void registerProj(String name, Project proj) {
+        builtinProjects.put(name, proj);
+        register(name, proj.getApi());
+        inLoadOrder.add(name);
+    }
 
     @Override protected void loadBuiltin() {
-        builtinProjects.put("GuiLib", new GuiLib(this));
-        builtinProjects.put("ToolLib", new ToolLib(this));
-        builtinProjects.put("ModuleLib", new ModuleLib(this));
-        builtinProjects.put("OfflineLib", new OfflineLib(this));
-        builtinProjects.put("MainGui", new MainGuiProject(this));
-        builtinProjects.put("Teleporter", new Teleporter(this));
-        builtinProjects.put("Freezer", new Freezer(this));
-//        builtinProjects.put("AutoRespawn", new AutoRespawn(this));
-        builtinProjects.put("Teams", new Teams(this));
-        builtinProjects.put("TeamRandomizer", new TeamRandomizerProject(this));
-        for(Map.Entry<String, Project> pair : builtinProjects.entrySet()) {
-            register(pair.getKey(), pair.getValue().getApi());
-        }
+        registerProj("GuiLib", new GuiLib(this));
+        registerProj("ToolLib", new ToolLib(this));
+        registerProj("ModuleLib", new ModuleLib(this));
+        registerProj("OfflineLib", new OfflineLib(this));
+        registerProj("MainGui", new MainGuiProject(this));
+        registerProj("Teleporter", new Teleporter(this));
+        registerProj("Freezer", new Freezer(this));
+//        registerProj("AutoRespawn", new AutoRespawn(this));
+        registerProj("Teams", new Teams(this));
+        registerProj("SortByRandom", new SortByRandom(this));
+        registerProj("SortByCaptain", new SortByCaptain(this));
+//        registerProj("SortByPriority", new SortByPriority(this));
     }
 
     @Override protected void enableBuiltin() {
-        for(Project proj : builtinProjects.values()) {
-            proj.enable(this);
+        for (String name : inLoadOrder) {
+            builtinProjects.get(name).enable(this);
         }
     }
 

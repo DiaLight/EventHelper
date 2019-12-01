@@ -1,20 +1,17 @@
 package dialight.teleporter;
 
 import dialight.compatibility.PlayerInventoryBc;
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
-import dialight.extensions.OfflinePlayerEx;
-import dialight.extensions.Utils;
+import dialight.extensions.LocationEx;
 import dialight.guilib.elements.NamedElement;
 import dialight.maingui.MainGuiTool;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
+import dialight.misc.player.UuidPlayer;
 import dialight.offlinelib.OfflineEntity;
-import dialight.offlinelib.UuidPlayer;
 import dialight.toollib.Tool;
 import dialight.toollib.events.ToolInteractEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Server;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -53,14 +50,14 @@ public class TeleporterTool extends Tool {
                 .build();
     }
 
-    private void toggleSelect(Player player, OfflinePlayer op) {
+    private void toggleSelect(Player player, UuidPlayer up) {
         SelectedPlayers selected = proj.getSelectedPlayers(player.getUniqueId());
-        if (selected.contains(op.getUniqueId())) {
-            selected.remove(op.getUniqueId());
-            player.sendMessage(TeleporterMessages.unselected(Collections.singletonList(op)));
+        if (selected.contains(up.getUuid())) {
+            selected.remove(up.getUuid());
+            player.sendMessage(TeleporterMessages.unselected(Collections.singletonList(up)));
         } else {
-            selected.add(op.getUniqueId());
-            player.sendMessage(TeleporterMessages.selected(Collections.singletonList(op)));
+            selected.add(up.getUuid());
+            player.sendMessage(TeleporterMessages.selected(Collections.singletonList(up)));
         }
         selected.sendStatus(player);
     }
@@ -76,7 +73,7 @@ public class TeleporterTool extends Tool {
                     List<UuidPlayer> offline = new ArrayList<>();
                     List<UuidPlayer> online = new ArrayList<>();
                     for (UuidPlayer up : selected.toUuidPlayers()) {
-                        proj.teleport(up, loc);
+                        up.teleport(loc);
                         Player trg = up.getPlayer();
                         if(trg != null) {
                             online.add(up);
@@ -91,26 +88,24 @@ public class TeleporterTool extends Tool {
                 }
             } break;
             case RIGHT_CLICK: if(!e.isSneaking()) {
-                Server srv = proj.getPlugin().getServer();
                 if (e.getTarget() == ToolInteractEvent.Target.ENTITY) {
                     ToolInteractEvent.Entity eevent = (ToolInteractEvent.Entity) e;
                     if (eevent.getEntity().getType() == EntityType.PLAYER) {
-                        OfflinePlayer op = srv.getOfflinePlayer(((Player) eevent.getEntity()).getUniqueId());
-                        toggleSelect(e.getPlayer(), op);
+                        UuidPlayer up = proj.getOfflinelib().getUuidPlayer((Player) eevent.getEntity());
+                        toggleSelect(e.getPlayer(), up);
                     }
                 } else {
-                    Entity p2 = Utils.getEnByDirection(e.getPlayer(), 20.0, 1.5, EntityType.PLAYER, OfflineEntity.TYPE);
+                    Entity p2 = LocationEx.of(e.getPlayer().getEyeLocation()).getEnByDirection(20.0, 1.5, EntityType.PLAYER, OfflineEntity.TYPE);
                     if (p2 == null) {
                         proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
                     } else {
                         if(p2.getType() == EntityType.PLAYER) {
-                            OfflinePlayer op = srv.getOfflinePlayer(((Player) p2).getUniqueId());
-                            toggleSelect(e.getPlayer(), op);
+                            UuidPlayer up = proj.getOfflinelib().getUuidPlayer((Player) p2);
+                            toggleSelect(e.getPlayer(), up);
                         } else if(p2.getType() == OfflineEntity.TYPE) {
-                            OfflinePlayerEx opex = proj.getOfflinelib().getOfflinePlayerExByEntity(p2);
-                            if(opex != null) {
-                                OfflinePlayer op = srv.getOfflinePlayer(opex.getUniqueId());
-                                toggleSelect(e.getPlayer(), op);
+                            UuidPlayer up = proj.getOfflinelib().getUuidPlayerExByEntity(p2);
+                            if(up != null) {
+                                toggleSelect(e.getPlayer(), up);
                             }
                         }
                     }

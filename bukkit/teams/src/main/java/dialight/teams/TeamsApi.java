@@ -3,9 +3,11 @@ package dialight.teams;
 import dialight.eventhelper.project.ProjectApi;
 import dialight.guilib.slot.Slot;
 import dialight.observable.ObservableObject;
-import dialight.observable.collection.ObservableCollection;
+import dialight.observable.set.ObservableSet;
 import dialight.teams.observable.ObservableScoreboardManager;
+import org.bukkit.Location;
 
+import java.util.Map;
 import java.util.UUID;
 
 public class TeamsApi implements ProjectApi {
@@ -21,14 +23,14 @@ public class TeamsApi implements ProjectApi {
     }
 
     public void addControlItem(Slot slot) {
-        proj.getControlGui().addControlItem(slot);
+        proj.getSortGui().addControlItem(slot);
     }
 
-    public ObservableCollection<String> getTeamWhiteList() {
+    public ObservableSet<String> getTeamWhiteList() {
         return proj.getTeamWhiteList();
     }
 
-    public ObservableCollection<UUID> getPlayerBlackList() {
+    public ObservableSet<UUID> getPlayerBlackList() {
         return proj.getPlayerBlackList();
     }
 
@@ -40,6 +42,10 @@ public class TeamsApi implements ProjectApi {
     }
     public void setOfflineMode(boolean offlineMode) {
         proj.setOfflineMode(offlineMode);
+    }
+
+    public Map<String, Location> getTeamEntryPoints() {
+        return proj.getTeamEntryPoints();
     }
 
 }

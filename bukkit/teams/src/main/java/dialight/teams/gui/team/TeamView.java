@@ -1,15 +1,15 @@
 package dialight.teams.gui.team;
 
 import dialight.compatibility.ItemStackBuilderBc;
-import dialight.extensions.ColorConverter;
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.ColorConverter;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.elements.NamedElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.extensions.NamedElementScroll9X5View;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.Teams;
 import dialight.teams.observable.ObservableTeam;
 import dialight.teleporter.SelectedPlayers;
@@ -113,16 +113,18 @@ public class TeamView extends NamedElementScroll9X5View<TeamGui, TeamElement> {
         Slot clearTeam = new StaticSlot(new ItemStackBuilder(Material.LAVA_BUCKET)
                 .displayName(Colorizer.apply("|a|Очистка"))
                 .addLore(Colorizer.asList(
-                        "|a|Shift|y|+|a|ЛКМ|y|: удалить игроков из команды"
+                        "|a|ЛКМ|y|: удалит оффлайн игроков из команды",
+                        "|a|Shift|y|+|a|ЛКМ|y|: удалить всех игроков из команды"
                 ))
                 .build()) {
             @Override
             public void onClick(SlotClickEvent e) {
                 switch (e.getEvent().getClick()) {
                     case LEFT:
+                        oteam.getMembers().removeIf(UuidPlayer::isOffline);
                         break;
                     case SHIFT_LEFT:
-                        oteam.getMembers().removeIf(UuidPlayer::isOffline);
+                        oteam.getMembers().clear();
                         break;
                     case RIGHT:
                         break;

@@ -1,11 +1,12 @@
 package dialight.teams.observable;
 
-import dialight.extensions.ColorConverter;
+import dialight.misc.ColorConverter;
 import dialight.observable.ObservableObject;
 import dialight.observable.set.ObservableSet;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.DyeColor;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Team;
 
@@ -25,6 +26,9 @@ public abstract class ObservableTeam {
 
     public Color getLeatherColor() {
         return ColorConverter.toLeatherColor(color().getValue());
+    }
+    public DyeColor getDyeColor() {
+        return ColorConverter.toWoolColor(color().getValue());
     }
     public Team getTeam() {
         return team;
@@ -53,4 +57,5 @@ public abstract class ObservableTeam {
     @Override public int hashCode() {
         return name.hashCode();
     }
+
 }

@@ -5,7 +5,7 @@ import dialight.guilib.gui.Gui;
 import dialight.guilib.elements.NamedElement;
 import dialight.guilib.elements.SlotElement;
 import dialight.guilib.view.Scroll9x5View;
-import dialight.nms.InventoryNms;
+import dialight.fake.InventoryFk;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -92,7 +92,7 @@ public abstract class NamedElementScroll9X5View<G extends Gui, L extends SlotEle
             } else {
                 playerTitle = asciiTitle;
             }
-            InventoryNms.sendInventoryTitle(viewer, getInventory(), playerTitle);
+            InventoryFk.sendInventoryTitle(viewer, getInventory(), playerTitle);
         }
     }
 

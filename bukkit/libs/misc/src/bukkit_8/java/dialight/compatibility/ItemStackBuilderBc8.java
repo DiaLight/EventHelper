@@ -1,6 +1,6 @@
 package dialight.compatibility;
 
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.ItemStackBuilder;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 

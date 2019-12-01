@@ -1,5 +1,6 @@
 package dialight.offlinelib;
 
+import dialight.misc.player.UuidPlayer;
 import dialight.observable.collection.ObservableCollection;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;

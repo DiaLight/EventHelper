@@ -63,6 +63,11 @@ public class FreezerListener implements Listener {
         if(frozen == null) return;
         if(!blockMoved(e.getFrom(), e.getTo())) return;
         PlayerEx.of(trg).teleport(frozen.getLocation());
+        if(frozen.getLocation().clone().add(0, -1, 0).getBlock().getType().isBlock()) {
+            proj.getFreezeFlayers().removeFly(frozen.getTarget());
+        } else {
+            proj.getFreezeFlayers().setFly(frozen.getTarget());
+        }
     }
 
     private boolean blockMoved(Location f, Location t) {

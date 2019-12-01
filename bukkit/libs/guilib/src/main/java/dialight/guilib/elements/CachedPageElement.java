@@ -51,9 +51,10 @@ public class CachedPageElement<T> extends DataElement<T> {
     }
 
     @Override public boolean add(@NotNull T data) {
+        Slot slot = slotFunction.apply(data);
+        if(slot == null) return false;
         int index = slots.size();
         Vec2i loc = getLoc(index);
-        Slot slot = slotFunction.apply(data);
         BackedSlot<T> backedSlot = new BackedSlot<>(this, slot, data);
         slots.add(backedSlot);
         slot.attached(backedSlot);

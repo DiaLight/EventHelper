@@ -1,9 +1,9 @@
 package dialight.guilib.view.page;
 
 import dialight.compatibility.ItemStackBuilderBc;
-import dialight.extensions.Colorizer;
-import dialight.extensions.GuiUtils;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.Colorizer;
+import dialight.misc.GuiUtils;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.gui.Gui;
 import dialight.guilib.elements.SlotElement;
 import dialight.guilib.slot.Slot;

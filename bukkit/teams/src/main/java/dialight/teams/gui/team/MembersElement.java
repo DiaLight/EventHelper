@@ -5,7 +5,7 @@ import dialight.guilib.elements.NamedSetElement;
 import dialight.guilib.slot.Slot;
 import dialight.observable.collection.ObservableCollection;
 import dialight.offlinelib.OnlineObservable;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.Teams;
 import dialight.teams.observable.ObservableTeam;
 import org.bukkit.entity.Player;

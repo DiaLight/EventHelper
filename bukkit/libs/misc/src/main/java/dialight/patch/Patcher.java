@@ -30,7 +30,16 @@ public class Patcher {
             }
             defineClass.invoke(classLoader, className, bytes, 0, bytes.length, new CodeSource(resource, (Certificate[]) null));
             return true;
-        } catch (NoSuchMethodException | IOException | IllegalAccessException | InvocationTargetException e) {
+        } catch (InvocationTargetException e) {
+            Throwable err = e.getTargetException();
+            if(err instanceof LinkageError) {
+                if (!err.getMessage().contains("duplicate class definition")) {
+                    err.printStackTrace();
+                }
+            } else {
+                e.printStackTrace();
+            }
+        } catch (NoSuchMethodException | IOException | IllegalAccessException e) {
             e.printStackTrace();
         }
         return false;

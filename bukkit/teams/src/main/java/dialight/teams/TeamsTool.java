@@ -2,8 +2,8 @@ package dialight.teams;
 
 import dialight.compatibility.ItemStackBuilderBc;
 import dialight.compatibility.PlayerInventoryBc;
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.maingui.MainGuiTool;
 import dialight.toollib.Tool;
 import dialight.toollib.events.ToolInteractEvent;

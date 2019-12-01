@@ -6,7 +6,7 @@ import dialight.observable.set.ObservableSet;
 import dialight.observable.set.ObservableSetWrapper;
 import dialight.observable.set.WriteProxyObservableSet;
 import dialight.offlinelib.OfflineLibApi;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.observable.ObservableTeam;
 import org.bukkit.ChatColor;
 import org.bukkit.scoreboard.NameTagVisibility;
@@ -32,23 +32,22 @@ public class ObservableInjectTeam extends ObservableTeam {
         String name = element.getName();
         if(name == null) return false;
         team.addEntry(name);
-        return true;
+        return team.hasEntry(name);
     }
 
     public boolean removeMember(UuidPlayer element) {
         if(!this.members.contains(element)) return false;
         String name = element.getName();
         if(name == null) return false;
-        team.removeEntry(name);
-        return true;
+        return team.removeEntry(name);
     }
 
     private void onAddMember(String member) {
-        members.add(offlinelib.getOrCreateNotPlayer(member));
+        members.add(offlinelib.getUuidPlayer(member));
     }
 
     private void onRemoveMember(String member) {
-        members.remove(offlinelib.getOrCreateNotPlayer(member));
+        members.remove(offlinelib.getUuidPlayer(member));
     }
 
     public void inject() {
@@ -99,5 +98,8 @@ public class ObservableInjectTeam extends ObservableTeam {
         return inject.color();
     }
 
+    public Team asBukkit() {
+        return inject.asBukkit();
+    }
 
 }

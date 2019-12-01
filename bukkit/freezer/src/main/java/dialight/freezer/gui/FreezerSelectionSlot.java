@@ -1,14 +1,14 @@
 package dialight.freezer.gui;
 
-import dialight.extensions.ActionInvoker;
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.ActionInvoker;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.extensions.PlayerEx;
 import dialight.freezer.Freezer;
 import dialight.freezer.Frozen;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -26,12 +26,13 @@ public class FreezerSelectionSlot implements Slot {
 
     @Override
     public void onClick(SlotClickEvent e) {
+        ActionInvoker invoker = new ActionInvoker(proj.getOfflineLib().getUuidPlayer(e.getPlayer()));
         switch (e.getEvent().getClick()) {
             case LEFT: {
                 if(proj.get(up) != null) {
-                    proj.unregister(up);
+                    proj.unregister(invoker, up);
                 } else {
-                    proj.register(new Frozen(up, up.getLocation(), new ActionInvoker(e.getPlayer()), "gui select"));
+                    proj.register(new Frozen(this.up, this.up.getLocation(), invoker, "gui select"));
                 }
             } break;
             case SHIFT_RIGHT: {

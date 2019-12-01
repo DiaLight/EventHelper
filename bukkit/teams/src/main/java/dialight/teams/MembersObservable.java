@@ -2,7 +2,7 @@ package dialight.teams;
 
 import dialight.observable.map.ObservableMap;
 import dialight.observable.map.ValuesImmutableObservable;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;

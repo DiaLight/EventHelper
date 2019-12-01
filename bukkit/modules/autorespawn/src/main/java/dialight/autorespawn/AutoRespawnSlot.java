@@ -1,7 +1,7 @@
 package dialight.autorespawn;
 
 import dialight.compatibility.ItemStackBuilderBc;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import org.bukkit.DyeColor;

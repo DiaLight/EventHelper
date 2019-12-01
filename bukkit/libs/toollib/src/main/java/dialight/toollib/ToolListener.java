@@ -98,6 +98,7 @@ public class ToolListener implements Listener {
         ToolInteractEvent toolEvent = new ToolInteractEvent.Entity(player, item, e.getEntity(), ToolInteractEvent.Action.LEFT_CLICK);
         tool.onClick(toolEvent);
         if (toolEvent.isCancelled()) e.setCancelled(true);
+        interactEntity = true;
     }
 
 //    @EventHandler
@@ -139,8 +140,10 @@ public class ToolListener implements Listener {
         Tool tool = identifyTool(item);
         if (tool == null) return;
         ToolInteractEvent toolEvent = new ToolInteractEvent.Entity(player, item, e.getItemDrop(), ToolInteractEvent.Action.DROP);
+        toolEvent.setCancelled(false);
         tool.onClick(toolEvent);
-        if (toolEvent.isCancelled()) e.getItemDrop().remove();
+        e.getItemDrop().remove();
+        if (toolEvent.isCancelled()) e.setCancelled(true);
     }
 
 

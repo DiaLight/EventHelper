@@ -1,16 +1,23 @@
 package dialight.nms;
 
-import dialight.extensions.packet.ChannelPacketHandler;
-import dialight.extensions.packet.PacketHandler;
+import dialight.misc.packet.ChannelPacketHandler;
+import dialight.misc.packet.PacketHandler;
 import io.netty.channel.Channel;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.NoSuchElementException;
 
-public class PlayerNms {
+public abstract class PlayerNms {
+
+    private static final Constructor<? extends PlayerNms> constructor;
+    private static Method m_createNbt;
 
     private static Class<?> EntityPlayer_class;
     private static Class<?> NetworkManager_class;
@@ -20,6 +27,14 @@ public class PlayerNms {
     private static Field f_NetworkManager_channel;
 
     static {
+        Class<? extends PlayerNms> clazz = ReflectionUtils.findCompatibleClass(PlayerNms.class);
+        try {
+            constructor = clazz.getConstructor(Player.class);
+            m_createNbt = clazz.getDeclaredMethod("createNbt", World.class, GameProfileNms.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         EntityPlayer_class = ReflectionUtils.getNMSClass("EntityPlayer");
         f_EntityPlayer_playerConnection = ReflectionUtils.getField(EntityPlayer_class, "playerConnection");
 
@@ -30,7 +45,7 @@ public class PlayerNms {
         f_NetworkManager_channel = ReflectionUtils.getField(NetworkManager_class, "channel");
     }
 
-    private final Player player;
+    protected final Player player;
 
     public PlayerNms(Player player) {
         this.player = player;
@@ -76,9 +91,24 @@ public class PlayerNms {
         return (Channel) ReflectionUtils.getFieldValue(f_NetworkManager_channel, getNetworkManager());
     }
 
+    public abstract void sendPacket(Object packet);
+
+    public Player getPlayer() {
+        return player;
+    }
+
+
+    public static NbtTagCompoundNms createNbt(org.bukkit.World world, GameProfileNms gameProfile) {
+        try {
+            return (NbtTagCompoundNms) m_createNbt.invoke(null, world, gameProfile);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     public static PlayerNms of(Player player) {
-        return new PlayerNms(player);
-//        return ReflectionUtils.newInstance(constructor, player);
+        return ReflectionUtils.newInstance(constructor, player);
     }
 
 }

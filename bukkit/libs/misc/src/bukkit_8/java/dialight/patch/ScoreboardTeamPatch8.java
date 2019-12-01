@@ -3,12 +3,16 @@ package dialight.patch;
 import dialight.nms.ReflectionUtils;
 import dialight.patch.asm.ClassNodeEx;
 import dialight.patch.asm.InsnListEx;
+import org.bukkit.Bukkit;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
+import java.net.URLClassLoader;
 import java.util.NoSuchElementException;
 
 public class ScoreboardTeamPatch8 extends ScoreboardTeamPatch {
+
+    public static String CLASS_NAME = "net.minecraft.server." + ReflectionUtils.SERVER_VERSION + ".ScoreboardTeam";
 
     private void patch_setDisplayName(ClassNodeEx node) throws NoSuchMethodException {
         node.fields.add(new FieldNode(Opcodes.ACC_PUBLIC, "eh_setDisplayName", "Ljava/util/function/Consumer;", "Ljava/util/function/Consumer<Ljava/lang/String;>;", null));
@@ -238,8 +242,18 @@ public class ScoreboardTeamPatch8 extends ScoreboardTeamPatch {
     }
 
     @Override public boolean patch() {
-        boolean success = Patcher.loadPatchClass("net.minecraft.server." + ReflectionUtils.SERVER_VERSION + ".ScoreboardTeam", this::patch);
-        if(!success) throw new RuntimeException("can't patch");
+        boolean success = Patcher.loadPatchClass(CLASS_NAME, this::patch);
+        if(!success) {
+            URLClassLoader classLoader = (URLClassLoader) Bukkit.getServer().getClass().getClassLoader();
+            try {
+                Class<?> cl_ScoreboardTeam = Class.forName(CLASS_NAME, false, classLoader);
+                cl_ScoreboardTeam.getDeclaredField("eh_patched");
+                success = true;
+            } catch (NoSuchFieldException ignore) {
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
         return success;
     }
 

@@ -1,11 +1,10 @@
 package dialight.teleporter;
 
-import dialight.extensions.Colorizer;
-import dialight.offlinelib.UuidPlayer;
-import org.bukkit.OfflinePlayer;
+import dialight.misc.Colorizer;
+import dialight.misc.MessagesUtils;
+import dialight.misc.player.UuidPlayer;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -19,23 +18,6 @@ public class TeleporterMessages {
         return pluginPrefix + Colorizer.apply("|w|" + name + " |g|телепортировал вас");
     }
 
-    private static String players(Collection<? extends UuidPlayer> players) {
-        int visible = 3;
-        if(players.size() <= visible) return Colorizer.apply(players.stream().map(UuidPlayer::getName).collect(Collectors.joining("|g|, |w|")));
-        StringBuilder sb = new StringBuilder();
-        Iterator<? extends UuidPlayer> it = players.iterator();
-        for (int i = 0; i < visible; i++) {
-            if(i != 0) sb.append("|g|, |w|");
-            UuidPlayer next = it.next();
-            sb.append(next.getName());
-        }
-        sb.append("|g| и еще |w|");
-        int left = players.size() - visible;
-        sb.append(left);
-        if(left == 1) sb.append("|g| игрок");
-        else sb.append("|g| игроки");
-        return Colorizer.apply(sb.toString());
-    }
     public static String YouTp(Collection<UuidPlayer> online, Collection<UuidPlayer> offline) {
         StringBuilder sb = new StringBuilder();
         sb.append(pluginPrefix);
@@ -48,7 +30,7 @@ public class TeleporterMessages {
             } else {
                 if (offline.isEmpty()) sb.append(Colorizer.apply("|g|Телепортированы |w|"));
                 else sb.append(Colorizer.apply("|g|Телепортированы онлайн-игроки |w|"));
-                sb.append(players(online));
+                sb.append(MessagesUtils.players(online));
             }
         }
         if(!offline.isEmpty()) {
@@ -60,7 +42,7 @@ public class TeleporterMessages {
             } else {
                 if(online.isEmpty()) sb.append(Colorizer.apply("|g|Телепортированы офлайн-игроки |w|"));
                 else sb.append(Colorizer.apply("|g| и офлайн-игроки |w|"));
-                sb.append(players(offline));
+                sb.append(MessagesUtils.players(offline));
             }
         }
         return sb.toString();
@@ -71,21 +53,21 @@ public class TeleporterMessages {
     public static String noPlayersSelected = pluginPrefix + Colorizer.apply("|r|Некого телепортировать!");
     public static String AllPlayersRemoved = pluginPrefix + Colorizer.apply("|g|Список игроков очищен!");
 
-    public static String unselected(List<OfflinePlayer> offline) {
+    public static String unselected(List<UuidPlayer> offline) {
         if (offline.size() == 1) {
-            OfflinePlayer op = offline.get(0);
-            return pluginPrefix + Colorizer.apply("|y|Удалён: |w|" + op.getName());
+            UuidPlayer up = offline.get(0);
+            return pluginPrefix + Colorizer.apply("|y|Удалён: |w|" + up.getName());
         }
-        List<String> offlineNames = offline.stream().map(OfflinePlayer::getName).collect(Collectors.toList());
+        List<String> offlineNames = offline.stream().map(UuidPlayer::getName).collect(Collectors.toList());
         return pluginPrefix + Colorizer.apply("|y|Удалены: |w|") + offlineNames;
     }
 
-    public static String selected(List<OfflinePlayer> offline) {
+    public static String selected(List<UuidPlayer> offline) {
         if (offline.size() == 1) {
-            OfflinePlayer op = offline.get(0);
-            return pluginPrefix + Colorizer.apply("|y|Добавлен: |w|" + op.getName());
+            UuidPlayer up = offline.get(0);
+            return pluginPrefix + Colorizer.apply("|y|Добавлен: |w|" + up.getName());
         }
-        List<String> offlineNames = offline.stream().map(OfflinePlayer::getName).collect(Collectors.toList());
+        List<String> offlineNames = offline.stream().map(UuidPlayer::getName).collect(Collectors.toList());
         return pluginPrefix + Colorizer.apply("|y|Добавлены: |w|") + offlineNames;
     }
 

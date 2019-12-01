@@ -45,7 +45,7 @@ public abstract class ObservableCollection<E> implements Collection<E> {
         return this;
     }
 
-    public ObservableCollection<E> asImmutableCollectionObservable() {
+    public ObservableCollection<E> asImmutable() {
         return new ImmutableObservableCollection<>(this);
     }
 

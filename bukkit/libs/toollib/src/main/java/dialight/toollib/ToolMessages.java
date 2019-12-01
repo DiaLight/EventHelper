@@ -1,6 +1,6 @@
 package dialight.toollib;
 
-import dialight.extensions.Colorizer;
+import dialight.misc.Colorizer;
 
 public class ToolMessages {
 

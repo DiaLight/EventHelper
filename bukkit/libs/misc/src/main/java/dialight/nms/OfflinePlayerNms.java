@@ -1,24 +1,21 @@
 package dialight.nms;
 
 import org.bukkit.OfflinePlayer;
-import org.bukkit.Server;
+import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
 public class OfflinePlayerNms {
 
-    private static final Class<?> CraftOfflinePlayer_class = ReflectionUtils.getCraftbukkitClass("CraftOfflinePlayer");
+    private static final Class<?> CraftOfflinePlayer_class = ReflectionUtils.getOBCClass("CraftOfflinePlayer");
 
     // Reflection cache
     private static Method m_CraftOfflinePlayer_getData;
 
-    public static NBTTagCompoundNms getData_old(OfflinePlayer op) {
+    public static NbtTagCompoundNms getData_old(OfflinePlayer op) {
         try {
             Class<? extends OfflinePlayer> clazz = op.getClass();
             if (!CraftOfflinePlayer_class.isAssignableFrom(clazz)) throw new ClassCastException("class CraftOfflinePlayer is not assignable from " + clazz);
@@ -28,28 +25,61 @@ public class OfflinePlayerNms {
             }
             Object data = m_CraftOfflinePlayer_getData.invoke(op);
             if(data == null) return null;
-            return new NBTTagCompoundNms(data);
+            return NbtTagCompoundNms.of(data);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    @Nullable public static NBTTagCompoundNms getData(Server server, UUID uuid) {
+    /*private final CraftInventory converter = new CraftInventory(null);
+
+    public ItemStack[] getInventoryContents(UUID uuid) {
+        val p = server.getPlayer(uuid);
+        if (p != null) return p.getInventory().getContents();
+        val nbtManager = (ServerNBTManager) MinecraftServer.getServer().getWorldServer(0).dataManager;
+        val data = nbtManager.getPlayerData(uuid.toString());
+        if (data == null) return null;
+        val nbt = data.getList("Inventory", 10);
+        if (nbt == null) return null;
+        val virtual = new PlayerInventory(null);
+        virtual.b(nbt);
+        return converter.asCraftMirror(virtual.getContents());
+    }
+
+    public boolean setContents(UUID uuid, ItemStack[] contents) {
+        val p = server.getPlayer(uuid);
+        if (p != null) {
+            p.getInventory().setContents(contents);
+            return true;
+        }
+        val nbtManager = (ServerNBTManager) MinecraftServer.getServer().getWorldServer(0).dataManager;
+        val data = nbtManager.getPlayerData(uuid.toString());
+        if (data == null) return false;
+        val _inventory = new PlayerInventory(null);
+        val inventory = new CraftInventory(_inventory);
+        inventory.setContents(contents);
+        data.set("Inventory", _inventory.a(new NBTTagList()));
+        try (val out = new FileOutputStream(new File(nbtManager.getPlayerDir(), uuid + ".dat"))) {
+            NBTCompressedStreamTools.a(data, out);
+        }
+        return true;
+    }*/
+    @Nullable public static NbtTagCompoundNms getData(World world, UUID uuid) {
         try {
-            File worldFolder = server.getWorlds().get(0).getWorldFolder();
+            File worldFolder = world.getWorldFolder();
             File playerdata = new File(worldFolder, "playerdata");
             if(!playerdata.exists()) playerdata.mkdirs();
             File datfile = new File(playerdata, uuid + ".dat");
             if(!datfile.exists()) return null;
-            return NBTTagCompoundNms.deserialize(new FileInputStream(datfile));
-        } catch (FileNotFoundException e) {
+            return NbtTagCompoundNms.deserialize(new FileInputStream(datfile));
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static void setData(Server server, UUID uuid, NBTTagCompoundNms nbt) {
+    public static void setData(World world, UUID uuid, NbtTagCompoundNms nbt) {
         try {
-            File worldFolder = server.getWorlds().get(0).getWorldFolder();
+            File worldFolder = world.getWorldFolder();
             File playerdata = new File(worldFolder, "playerdata");
             if(!playerdata.exists()) playerdata.mkdirs();
             File tmpfile = new File(playerdata, uuid + ".dat.tmp");
@@ -57,7 +87,7 @@ public class OfflinePlayerNms {
             nbt.serialize(new FileOutputStream(tmpfile));
             if (datfile.exists()) datfile.delete();
             tmpfile.renameTo(datfile);
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

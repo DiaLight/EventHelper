@@ -1,7 +1,7 @@
 package dialight.teams.random.gui;
 
 import dialight.compatibility.ItemStackBuilderBc;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.gui.Gui;
 import dialight.guilib.elements.SlotElement;
 import dialight.guilib.slot.Slot;

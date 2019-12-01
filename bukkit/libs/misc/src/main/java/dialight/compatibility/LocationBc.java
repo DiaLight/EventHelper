@@ -8,7 +8,7 @@ import java.lang.reflect.Constructor;
 public abstract class LocationBc {
 
     private static final Constructor<? extends LocationBc> constructor =
-            ReflectionUtils.findCompatibleClass(LocationBc.class, Location.class);
+            ReflectionUtils.findCompatibleConstructor(LocationBc.class, Location.class);
 
     protected final Location location;
 

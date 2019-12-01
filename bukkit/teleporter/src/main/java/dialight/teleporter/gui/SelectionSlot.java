@@ -1,13 +1,12 @@
 package dialight.teleporter.gui;
 
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teleporter.SelectedPlayers;
 import dialight.teleporter.Teleporter;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -24,8 +23,7 @@ public class SelectionSlot implements Slot {
         this.up = up;
     }
 
-    @Override
-    public void onClick(SlotClickEvent e) {
+    @Override public void onClick(SlotClickEvent e) {
         switch (e.getEvent().getClick()) {
             case LEFT: {
                 if(selected.contains(up.getUuid())) {
@@ -38,12 +36,7 @@ public class SelectionSlot implements Slot {
 //                    event.player.sendMessage(DefMes.notImplementedYet)
 //                } break;
             case SHIFT_RIGHT: {
-                Location to = up.getLocation();
-                if(to != null) {
-                    proj.teleport(e.getPlayer(), to);
-                } else {
-                    e.getPlayer().sendMessage(Colorizer.apply("|r|Игрок не найден"));
-                }
+                proj.teleport(e.getPlayer(), up.getLocation());
             } break;
         }
     }

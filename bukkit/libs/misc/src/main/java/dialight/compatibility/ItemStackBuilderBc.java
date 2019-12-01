@@ -1,6 +1,6 @@
 package dialight.compatibility;
 
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.ItemStackBuilder;
 import dialight.nms.ReflectionUtils;
 import org.bukkit.DyeColor;
 
@@ -9,7 +9,7 @@ import java.lang.reflect.Constructor;
 public abstract class ItemStackBuilderBc {
 
     private static final Constructor<? extends ItemStackBuilderBc> constructor =
-            ReflectionUtils.findCompatibleClass(ItemStackBuilderBc.class, ItemStackBuilder.class);
+            ReflectionUtils.findCompatibleConstructor(ItemStackBuilderBc.class, ItemStackBuilder.class);
 
     protected final ItemStackBuilder builder;
 

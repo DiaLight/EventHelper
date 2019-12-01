@@ -4,7 +4,7 @@ import dialight.guilib.elements.NamedSetElement;
 import dialight.guilib.slot.Slot;
 import dialight.offlinelib.OfflineObservable;
 import dialight.offlinelib.OnlineObservable;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teleporter.SelectedPlayers;
 import dialight.teleporter.Teleporter;
 import org.bukkit.entity.Player;

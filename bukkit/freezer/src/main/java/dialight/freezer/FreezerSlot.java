@@ -1,9 +1,9 @@
 package dialight.freezer;
 
 import dialight.compatibility.PlayerInventoryBc;
-import dialight.extensions.Colorizer;
+import dialight.misc.Colorizer;
 import dialight.extensions.InventoryEx;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import org.bukkit.Material;

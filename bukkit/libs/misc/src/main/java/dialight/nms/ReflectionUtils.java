@@ -43,6 +43,13 @@ public class ReflectionUtils {
         return Integer.parseInt(name.split("\\.")[0]);
     }
 
+    @Nullable public static Class<?> getNMSClassOrNull(String name) {
+        try {
+            return Class.forName("net.minecraft.server." + SERVER_VERSION + "." + name);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
     @NotNull public static Class<?> getNMSClass(String name) {
         try {
             return Class.forName("net.minecraft.server." + SERVER_VERSION + "." + name);
@@ -51,7 +58,7 @@ public class ReflectionUtils {
         }
     }
 
-    @NotNull public static Class<?> getCraftbukkitClass(String name) {
+    @NotNull public static Class<?> getOBCClass(String name) {
         try {
             return Class.forName("org.bukkit.craftbukkit." + SERVER_VERSION + "." + name);
         } catch (ClassNotFoundException e) {
@@ -334,7 +341,17 @@ public class ReflectionUtils {
         throw new NoSuchMethodError(method);
     }
 
-    @NotNull public static <T> Constructor<? extends T> findCompatibleClass(Class<T> clazz, Class<?>... args) {
+    @NotNull public static <T> Class<? extends T> findCompatibleClass(Class<T> clazz) {
+        for (int minor = ReflectionUtils.MINOR_VERSION; minor >= 5; minor--) {
+            final String classPath = clazz.getName() + minor;
+            try {
+                return  (Class<? extends T>) Class.forName(classPath);
+            } catch (ClassNotFoundException ignore) {}
+        }
+        throw new RuntimeException("Unsupported version");
+    }
+
+    @NotNull public static <T> Constructor<? extends T> findCompatibleConstructor(Class<T> clazz, Class<?>... args) {
         for (int minor = ReflectionUtils.MINOR_VERSION; minor >= 5; minor--) {
             final String classPath = clazz.getName() + minor;
             try {

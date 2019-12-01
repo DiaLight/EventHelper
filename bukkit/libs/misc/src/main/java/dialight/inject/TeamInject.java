@@ -12,7 +12,7 @@ import java.lang.reflect.Constructor;
 public abstract class TeamInject {
 
     private static final Constructor<? extends TeamInject> constructor =
-            ReflectionUtils.findCompatibleClass(TeamInject.class, Team.class);
+            ReflectionUtils.findCompatibleConstructor(TeamInject.class, Team.class);
 
     protected final Team team;
 
@@ -46,5 +46,9 @@ public abstract class TeamInject {
     public abstract ObservableObject<NameTagVisibility> collisionRule();
 
     public abstract ObservableObject<ChatColor> color();
+
+    public Team asBukkit() {
+        return team;
+    }
 
 }

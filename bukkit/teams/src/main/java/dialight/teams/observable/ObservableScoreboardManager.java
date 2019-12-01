@@ -1,7 +1,7 @@
 package dialight.teams.observable;
 
 import dialight.observable.map.ObservableMap;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.observable.inject.ObservableInjectScoreboard;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

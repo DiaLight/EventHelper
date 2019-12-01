@@ -34,8 +34,13 @@ public class ObservableObject<V> {
 
     public void setValue(V value) {
         V oldValue = this.value;
+        if(Objects.equals(value, oldValue)) return;
         this.value = value;
         fireChange(oldValue, value);
+    }
+
+    public ObservableObject<V> asImmutable() {
+        return new ImmutableObservableObject<>(this);
     }
 
     @Override public String toString() {

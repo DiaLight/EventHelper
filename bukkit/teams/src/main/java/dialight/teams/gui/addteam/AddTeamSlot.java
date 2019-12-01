@@ -1,9 +1,9 @@
 package dialight.teams.gui.addteam;
 
 import dialight.compatibility.TeamBc;
-import dialight.extensions.ColorConverter;
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.ColorConverter;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.teams.Teams;

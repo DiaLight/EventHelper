@@ -3,7 +3,7 @@ package dialight.freezer.gui;
 import dialight.freezer.Freezer;
 import dialight.guilib.elements.NamedElement;
 import dialight.guilib.elements.ReplaceableElement;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 
 public class FreezerViewState extends ReplaceableElement<NamedElement<UuidPlayer>> {
 

@@ -2,7 +2,7 @@ package dialight.teleporter.gui;
 
 import dialight.guilib.elements.NamedElement;
 import dialight.guilib.elements.ReplaceableElement;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teleporter.SelectedPlayers;
 import dialight.teleporter.Teleporter;
 import org.bukkit.Server;

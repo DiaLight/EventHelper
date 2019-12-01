@@ -2,7 +2,7 @@ package dialight.teleporter;
 
 import dialight.observable.collection.ObservableCollectionWrapper;
 import dialight.offlinelib.OfflineLibApi;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;

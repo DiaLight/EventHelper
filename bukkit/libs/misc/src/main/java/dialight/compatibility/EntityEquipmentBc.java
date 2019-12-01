@@ -9,7 +9,7 @@ import java.lang.reflect.Constructor;
 public abstract class EntityEquipmentBc {
 
     private static final Constructor<? extends EntityEquipmentBc> constructor =
-            ReflectionUtils.findCompatibleClass(EntityEquipmentBc.class, EntityEquipment.class);
+            ReflectionUtils.findCompatibleConstructor(EntityEquipmentBc.class, EntityEquipment.class);
 
     protected final EntityEquipment equipment;
 

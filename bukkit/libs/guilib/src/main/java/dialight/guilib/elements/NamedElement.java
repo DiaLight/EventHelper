@@ -198,6 +198,8 @@ public class NamedElement<T> extends DataElement<T> {
     }
 
     @Override public boolean add(@NotNull T data) {
+        Slot slot = slotFunction.apply(data);
+        if(slot == null) return false;
         char c = extractChar(nameFunction.apply(data));
         NamedBlock<T> block = sorted.get(c);
         if(block == null) {
@@ -217,7 +219,7 @@ public class NamedElement<T> extends DataElement<T> {
 
             backedSlot = column[tail.y];
             backedSlot.c = c;
-            backedSlot.slot = slotFunction.apply(data);
+            backedSlot.slot = slot;
             backedSlot.usage = new DataSlotUsage(this, data);
             backedSlot.slot.attached(backedSlot.usage);
             block.add(backedSlot);
@@ -229,7 +231,7 @@ public class NamedElement<T> extends DataElement<T> {
 
             backedSlot = column[tail.y];
             backedSlot.c = c;
-            backedSlot.slot = slotFunction.apply(data);
+            backedSlot.slot = slot;
             backedSlot.usage = new DataSlotUsage(this, data);
             backedSlot.slot.attached(backedSlot.usage);
             block.add(backedSlot);

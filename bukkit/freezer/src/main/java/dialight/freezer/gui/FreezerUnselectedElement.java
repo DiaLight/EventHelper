@@ -6,7 +6,7 @@ import dialight.guilib.elements.NamedSetElement;
 import dialight.guilib.slot.Slot;
 import dialight.offlinelib.OfflineObservable;
 import dialight.offlinelib.OnlineObservable;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -28,26 +28,26 @@ public class FreezerUnselectedElement extends NamedSetElement<UuidPlayer, UUID> 
     @Override public void onViewersNotEmpty() {
         for (OfflinePlayer op : Bukkit.getOfflinePlayers()) {
             if(proj.get(op.getUniqueId()) != null) continue;
-            UuidPlayer up = proj.getOfflinelib().getUuidPlayer(op.getUniqueId());
+            UuidPlayer up = proj.getOfflineLib().getUuidPlayer(op.getUniqueId());
             this.add(up);
         }
 
         proj.getFrozens().onAdd(this, this::onSelect);
         proj.getFrozens().onRemove(this, this::onUnselect);
 
-        OnlineObservable online = proj.getOfflinelib().getOnline();
+        OnlineObservable online = proj.getOfflineLib().getOnline();
         online.onAdd(this, this::onAddOnline);
         online.onRemove(this, this::onRemoveOnline);
 
-        OfflineObservable offline = proj.getOfflinelib().getOffline();
+        OfflineObservable offline = proj.getOfflineLib().getOffline();
         offline.onAdd(this, this::onAddOffline);
         offline.onRemove(this, this::onRemoveOffline);
     }
 
     @Override public void onViewersEmpty() {
         proj.getFrozens().removeListeners(this);
-        proj.getOfflinelib().getOnline().removeListeners(this);
-        proj.getOfflinelib().getOffline().removeListeners(this);
+        proj.getOfflineLib().getOnline().removeListeners(this);
+        proj.getOfflineLib().getOffline().removeListeners(this);
 
         proj.runTask(this::clear);
     }
@@ -59,7 +59,7 @@ public class FreezerUnselectedElement extends NamedSetElement<UuidPlayer, UUID> 
         if(!add(frozen.getTarget())) FreezerViewState.dumpThrow(frozen.getTarget(), this);
     }
     private void onAddOnline(Player player) {
-        UuidPlayer up = proj.getOfflinelib().getUuidPlayer(player);
+        UuidPlayer up = proj.getOfflineLib().getUuidPlayer(player);
         if(proj.get(up) != null) {
             if(update(up)) FreezerViewState.dumpThrow(up, this);
         } else {
@@ -67,7 +67,7 @@ public class FreezerUnselectedElement extends NamedSetElement<UuidPlayer, UUID> 
         }
     }
     private void onRemoveOnline(Player player) {
-        UuidPlayer up = proj.getOfflinelib().getUuidPlayer(player);
+        UuidPlayer up = proj.getOfflineLib().getUuidPlayer(player);
         if(proj.get(up) != null) {
             if(update(up)) FreezerViewState.dumpThrow(up, this);
         } else {

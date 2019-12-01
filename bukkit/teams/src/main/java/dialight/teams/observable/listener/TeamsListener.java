@@ -1,8 +1,8 @@
 package dialight.teams.observable.listener;
 
-import dialight.extensions.packet.BroadcastPacketListener;
-import dialight.extensions.packet.PacketEvent;
-import dialight.extensions.packet.protocol.PacketOutTeam;
+import dialight.misc.packet.BroadcastPacketListener;
+import dialight.misc.packet.PacketEvent;
+import dialight.misc.packet.protocol.PacketOutTeam;
 import dialight.guilib.Viewable;
 import dialight.teams.Teams;
 import dialight.teams.ViewableTeamObserver;

@@ -1,8 +1,8 @@
 package dialight.maingui;
 
 import dialight.compatibility.ItemStackBuilderBc;
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.elements.HorizontalMultiElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.StaticSlot;

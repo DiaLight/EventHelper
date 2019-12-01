@@ -9,7 +9,7 @@ import java.lang.reflect.Constructor;
 public abstract class TeamBc {
 
     private static final Constructor<? extends TeamBc> constructor =
-            ReflectionUtils.findCompatibleClass(TeamBc.class, Team.class);
+            ReflectionUtils.findCompatibleConstructor(TeamBc.class, Team.class);
 
     protected final Team team;
 

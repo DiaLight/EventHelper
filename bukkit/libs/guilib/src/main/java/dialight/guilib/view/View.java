@@ -4,7 +4,7 @@ import dialight.guilib.gui.Gui;
 import dialight.guilib.UpdateListener;
 import dialight.guilib.elements.SlotElement;
 import dialight.guilib.slot.LocSlot;
-import dialight.nms.InventoryNms;
+import dialight.fake.InventoryFk;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -64,7 +64,7 @@ public abstract class View<G extends Gui, L extends SlotElement> implements Inve
         for (HumanEntity viewer : getInventory().getViewers()) {
             if(!(viewer instanceof Player)) continue;
             Player player = (Player) viewer;
-            InventoryNms.sendInventoryTitle(player, inventory, title);
+            InventoryFk.sendInventoryTitle(player, inventory, title);
         }
     }
 

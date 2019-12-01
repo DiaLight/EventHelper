@@ -88,7 +88,7 @@ public class MainGuiListener implements Listener {
         if(status.complete()) {
             MainGuiTool tool = proj.getToollib().get(MainGuiTool.class);
             if(tool != null) {
-                player.sendMessage("Вы призвали эмеральд");
+                player.sendMessage(MainGuiMessages.toolSummoned);
                 player.getInventory().setItem(status.min(), tool.createItem());
             }
             status.reset();

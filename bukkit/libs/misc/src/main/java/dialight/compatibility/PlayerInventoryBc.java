@@ -9,7 +9,7 @@ import java.lang.reflect.Constructor;
 public abstract class PlayerInventoryBc {
 
     private static final Constructor<? extends PlayerInventoryBc> constructor =
-            ReflectionUtils.findCompatibleClass(PlayerInventoryBc.class, PlayerInventory.class);
+            ReflectionUtils.findCompatibleConstructor(PlayerInventoryBc.class, PlayerInventory.class);
 
     protected final PlayerInventory inventory;
 

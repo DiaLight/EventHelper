@@ -3,7 +3,7 @@ package dialight.teams.observable.listener;
 import dialight.observable.collection.ObservableCollection;
 import dialight.observable.map.ObservableMap;
 import dialight.observable.map.ObservableMapWrapper;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.observable.ObservableTeam;
 import dialight.teams.Teams;
 import dialight.teams.event.TeamEvent;
@@ -83,7 +83,7 @@ public class TeamsListenerObserver implements TeamHandler {
                     if(op != null) {
                         up = proj.getOfflinelib().getUuidPlayer(op.getUniqueId());
                     } else {
-                        up = proj.getOfflinelib().getOrCreateNotPlayer(member);
+                        up = proj.getOfflinelib().getUuidPlayer(member);
                     }
                     oteam.addMember(up);
 //                    notInTeamToRemove.add(up);
@@ -129,7 +129,7 @@ public class TeamsListenerObserver implements TeamHandler {
                     if(op != null) {
                         up = proj.getOfflinelib().getUuidPlayer(op.getUniqueId());
                     } else {
-                        up = proj.getOfflinelib().getOrCreateNotPlayer(member);
+                        up = proj.getOfflinelib().getUuidPlayer(member);
                     }
                     oteam.addMember(up);
                     for (BiConsumer<ObservableTeam, String> consumer : onMemberJoin) {
@@ -147,7 +147,7 @@ public class TeamsListenerObserver implements TeamHandler {
                     if(op != null) {
                         up = proj.getOfflinelib().getUuidPlayer(op.getUniqueId());
                     } else {
-                        up = proj.getOfflinelib().getOrCreateNotPlayer(member);
+                        up = proj.getOfflinelib().getUuidPlayer(member);
                     }
                     oteam.removeMember(up);
                     for (BiConsumer<ObservableTeam, String> consumer : onMemberLeave) {

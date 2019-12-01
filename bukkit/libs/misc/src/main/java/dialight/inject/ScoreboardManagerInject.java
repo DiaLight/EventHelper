@@ -12,7 +12,7 @@ import java.lang.reflect.Constructor;
 public abstract class ScoreboardManagerInject {
 
     private static final Constructor<? extends ScoreboardManagerInject> constructor =
-            ReflectionUtils.findCompatibleClass(ScoreboardManagerInject.class, ScoreboardManager.class);
+            ReflectionUtils.findCompatibleConstructor(ScoreboardManagerInject.class, ScoreboardManager.class);
 
     protected final ScoreboardManager scoreboardManager;
 

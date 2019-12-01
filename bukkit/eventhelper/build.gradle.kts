@@ -28,9 +28,10 @@ val parts = arrayOf(
     ":bukkit:teleporter",
     ":bukkit:freezer",
     ":bukkit:teams",
+    ":bukkit:autorespawn",
     ":bukkit:randomizer",
-    ":bukkit:autorespawn"
-//    ":bukkit:captain"
+    ":bukkit:captain",
+    ":bukkit:priority"
 )
 
 val deps = listOf<String>()

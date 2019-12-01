@@ -2,14 +2,14 @@ package dialight.teams.gui.teams;
 
 
 import dialight.compatibility.PlayerInventoryBc;
-import dialight.extensions.Colorizer;
+import dialight.misc.Colorizer;
 import dialight.extensions.InventoryEx;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.gui.Gui;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.observable.collection.ObservableCollection;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.observable.ObservableTeam;
 import dialight.teams.Teams;
 import org.bukkit.Material;

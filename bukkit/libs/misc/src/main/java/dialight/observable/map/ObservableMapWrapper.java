@@ -9,7 +9,7 @@ import java.util.Set;
 
 public class ObservableMapWrapper<K, V> extends ObservableMap<K, V> {
 
-    private final Map<K, V> map;
+    protected final Map<K, V> map;
 
     public ObservableMapWrapper(Map<K, V> map) {
         this.map = map;

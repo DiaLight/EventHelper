@@ -1,20 +1,23 @@
 package dialight.teams;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dialight.eventhelper.EventHelper;
 import dialight.eventhelper.project.Project;
 import dialight.eventhelper.project.ProjectApi;
+import dialight.extensions.ServerEx;
 import dialight.guilib.GuiLibApi;
 import dialight.maingui.MainGuiApi;
 import dialight.observable.ObservableObject;
-import dialight.observable.collection.ObservableCollection;
-import dialight.observable.collection.ObservableCollectionWrapper;
 import dialight.observable.set.ObservableSet;
 import dialight.observable.set.ObservableSetWrapper;
 import dialight.offlinelib.OfflineLibApi;
 import dialight.teams.gui.TeamsLobbyGui;
 import dialight.teams.gui.TeamsSlot;
-import dialight.teams.gui.control.ControlGui;
 import dialight.teams.gui.playerblacklist.PlayerBlackListGui;
+import dialight.teams.gui.sort.SortGui;
 import dialight.teams.gui.teams.TeamsGui;
 import dialight.teams.gui.whitelist.TeamWhiteListGui;
 import dialight.teams.observable.ObservableScoreboardManager;
@@ -22,10 +25,17 @@ import dialight.teams.observable.ObservableTeam;
 import dialight.teams.observable.inject.ObservableInjectScoreboardManager;
 import dialight.teleporter.TeleporterApi;
 import dialight.toollib.ToolLibApi;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -39,14 +49,15 @@ public class Teams extends Project {
 
     private TeamsTool tool;
     private TeamsLobbyGui lobbyGui;
-    private ControlGui controlGui;
+    private SortGui sortGui;
     private TeamsGui teamsGui;
     private TeamWhiteListGui teamWhiteListGui;
     private PlayerBlackListGui playerBlackListGui;
 
     private final ObservableSet<String> teamWhiteList = new ObservableSetWrapper<>();
-    private final ObservableCollection<UUID> playerBlackList = new ObservableCollectionWrapper<>(new HashSet<>());
+    private final ObservableSet<UUID> playerBlackList = new ObservableSetWrapper<>(new HashSet<>());
     private final ObservableObject<Boolean> offlineMode = new ObservableObject<>(false);
+    private final Map<String, Location> teamEntryPoints = new HashMap<>();
 
     private ObservableScoreboardManager scoreboardManager;
 
@@ -66,7 +77,7 @@ public class Teams extends Project {
 
         tool = new TeamsTool(this);
         lobbyGui = new TeamsLobbyGui(this);
-        controlGui = new ControlGui(this);
+        sortGui = new SortGui(this);
         teamsGui = new TeamsGui(this, scoreboardManager.getMainScoreboard());
         teamWhiteListGui = new TeamWhiteListGui(this, scoreboardManager.getMainScoreboard());
         playerBlackListGui = new PlayerBlackListGui(this);
@@ -74,6 +85,39 @@ public class Teams extends Project {
         maingui.registerToolItem(TeamsTool.ID, new TeamsSlot(this));
         toollib.register(tool);
 
+        // load config
+        World mainWorld = ServerEx.of(getPlugin().getServer()).getMainWorld();
+        File file = new File(mainWorld.getWorldFolder(), "map.json");
+        if(file.exists()) {
+            JsonParser parser = new JsonParser();
+            try(FileReader reader = new FileReader(file)) {
+                JsonObject tree = parser.parse(reader).getAsJsonObject();
+                readMapConfig(tree);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void readMapConfig(JsonObject tree) {
+        JsonElement helper = tree.get("EventHelper");
+        if (helper == null) return;
+        JsonObject eventHelper = helper.getAsJsonObject();
+        if (eventHelper == null) return;
+        JsonObject teams = eventHelper.get("teams").getAsJsonObject();
+        if (teams == null) return;
+        World mainWorld = ServerEx.of(getPlugin().getServer()).getMainWorld();
+        for (Map.Entry<String, JsonElement> entry : teams.entrySet()) {
+            String teamName = entry.getKey();
+            JsonObject team = entry.getValue().getAsJsonObject();
+            JsonArray entryLoc = team.getAsJsonArray("entry");
+            if(entryLoc != null && entryLoc.size() == 3) {
+                double x = entryLoc.get(0).getAsDouble();
+                double y = entryLoc.get(1).getAsDouble();
+                double z = entryLoc.get(2).getAsDouble();
+                teamEntryPoints.put(teamName, new Location(mainWorld, x, y, z));
+            }
+            teamWhiteList.add(teamName);
+        }
     }
 
     @Override public void disable() {
@@ -111,8 +155,8 @@ public class Teams extends Project {
         return teleporter;
     }
 
-    public ControlGui getControlGui() {
-        return controlGui;
+    public SortGui getSortGui() {
+        return sortGui;
     }
 
     public TeamsGui getTeamsGui() {
@@ -143,7 +187,7 @@ public class Teams extends Project {
         return teamWhiteList;
     }
 
-    public ObservableCollection<UUID> getPlayerBlackList() {
+    public ObservableSet<UUID> getPlayerBlackList() {
         return playerBlackList;
     }
 
@@ -155,6 +199,10 @@ public class Teams extends Project {
     }
     public void setOfflineMode(boolean offlineMode) {
         this.offlineMode.setValue(offlineMode);
+    }
+
+    public Map<String, Location> getTeamEntryPoints() {
+        return teamEntryPoints;
     }
 
 }

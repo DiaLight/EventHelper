@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 public abstract class WorldBc {
 
     private static final Constructor<? extends WorldBc> constructor =
-            ReflectionUtils.findCompatibleClass(WorldBc.class, World.class);
+            ReflectionUtils.findCompatibleConstructor(WorldBc.class, World.class);
 
     protected final World world;
 

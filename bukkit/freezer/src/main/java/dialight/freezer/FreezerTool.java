@@ -3,8 +3,11 @@ package dialight.freezer;
 import dialight.compatibility.PlayerInventoryBc;
 import dialight.extensions.*;
 import dialight.maingui.MainGuiTool;
+import dialight.misc.ActionInvoker;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.offlinelib.OfflineEntity;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.toollib.Tool;
 import dialight.toollib.events.ToolInteractEvent;
 import org.bukkit.Material;
@@ -41,12 +44,12 @@ public class FreezerTool extends Tool {
                 .build();
     }
 
-    private void toggleFreeze(Player invoker, UuidPlayer target) {
+    private void toggleFreeze(ActionInvoker invoker, UuidPlayer target) {
         Frozen frozen = proj.get(target);
         if(frozen == null) {
-            proj.register(new Frozen(target, target.getLocation(), new ActionInvoker(invoker), "freezer tool action"));
+            proj.register(new Frozen(target, target.getLocation(), invoker, "freezer tool action"));
         } else {
-            proj.unregister(target);
+            proj.unregister(invoker, target);
         }
     }
 
@@ -59,24 +62,25 @@ public class FreezerTool extends Tool {
 
             } break;
             case RIGHT_CLICK: if(!e.isSneaking()) {
+                ActionInvoker invoker = new ActionInvoker(proj.getOfflineLib().getUuidPlayer(e.getPlayer()));
                 if (e.getTarget() == ToolInteractEvent.Target.ENTITY) {
                     ToolInteractEvent.Entity eevent = (ToolInteractEvent.Entity) e;
                     if (eevent.getEntity().getType() == EntityType.PLAYER) {
                         Player target = (Player) eevent.getEntity();
-                        toggleFreeze(e.getPlayer(), proj.getOfflinelib().getUuidPlayer(target));
+                        toggleFreeze(invoker, proj.getOfflineLib().getUuidPlayer(target));
                     }
                 } else {
-                    Entity p2 = Utils.getEnByDirection(e.getPlayer(), 20.0, 1.5, EntityType.PLAYER, OfflineEntity.TYPE);
+                    Entity p2 = LocationEx.of(e.getPlayer().getEyeLocation()).getEnByDirection(20.0, 1.5, EntityType.PLAYER, OfflineEntity.TYPE);
                     if (p2 == null) {
                         proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
                     } else {
                         if(p2.getType() == EntityType.PLAYER) {
                             Player target = (Player) p2;
-                            toggleFreeze(e.getPlayer(), proj.getOfflinelib().getUuidPlayer(target));
+                            toggleFreeze(invoker, proj.getOfflineLib().getUuidPlayer(target));
                         } else if(p2.getType() == OfflineEntity.TYPE) {
-                            OfflinePlayerEx opex = proj.getOfflinelib().getOfflinePlayerExByEntity(p2);
-                            if(opex != null) {
-                                toggleFreeze(e.getPlayer(), proj.getOfflinelib().getUuidPlayer(opex.getUniqueId()));
+                            UuidPlayer up = proj.getOfflineLib().getUuidPlayerExByEntity(p2);
+                            if(up != null) {
+                                toggleFreeze(invoker, up);
                             }
                         }
                     }

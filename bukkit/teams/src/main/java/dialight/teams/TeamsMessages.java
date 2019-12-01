@@ -1,7 +1,7 @@
 package dialight.teams;
 
 import dialight.compatibility.TeamBc;
-import dialight.extensions.Colorizer;
+import dialight.misc.Colorizer;
 import org.bukkit.scoreboard.Team;
 
 public class TeamsMessages {

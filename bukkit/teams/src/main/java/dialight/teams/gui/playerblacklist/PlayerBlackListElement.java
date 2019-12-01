@@ -2,7 +2,7 @@ package dialight.teams.gui.playerblacklist;
 
 import dialight.guilib.elements.NamedElement;
 import dialight.guilib.elements.ReplaceableElement;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.Teams;
 
 public class PlayerBlackListElement extends ReplaceableElement<NamedElement<UuidPlayer>> {

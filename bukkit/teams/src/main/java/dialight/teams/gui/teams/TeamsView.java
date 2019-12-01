@@ -1,14 +1,14 @@
 package dialight.teams.gui.teams;
 
 import dialight.compatibility.ItemStackBuilderBc;
-import dialight.extensions.Colorizer;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.elements.CachedPageElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.page.Scroll9x5PageView;
-import dialight.offlinelib.UuidPlayer;
+import dialight.misc.player.UuidPlayer;
 import dialight.teams.Teams;
 import dialight.teams.observable.ObservableScoreboard;
 import dialight.teams.observable.ObservableTeam;
@@ -70,7 +70,7 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageElement<Obs
             public void onClick(SlotClickEvent e) {
                 switch (e.getEvent().getClick()) {
                     case LEFT:
-                        proj.getGuilib().openGui(e.getPlayer(), proj.getControlGui());
+                        proj.getGuilib().openGui(e.getPlayer(), proj.getSortGui());
                         break;
                     case SHIFT_LEFT:
                         break;
@@ -84,8 +84,8 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageElement<Obs
         Slot clearTeams = new StaticSlot(new ItemStackBuilder(Material.LAVA_BUCKET)
                 .displayName(Colorizer.apply("|a|Очистка"))
                 .addLore(Colorizer.asList(
-                        "|a|Shift|y|+|a|ЛКМ|y|: удалить игроков из команд",
-                        "|a|Shift|y|+|a|ПКМ|y|: удалить команды"
+                        "|a|Shift|y|+|a|ЛКМ|y|: удалить игроков из команд"
+//                        "|a|Shift|y|+|a|ПКМ|y|: удалить команды"
                 ))
                 .build()) {
             @Override
@@ -102,40 +102,20 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageElement<Obs
                         break;
                     case RIGHT:
                         break;
-                    case SHIFT_RIGHT:
-                        for (String name : proj.getTeamWhiteList()) {
-                            ObservableTeam oteam = scoreboard.teamsByName().get(name);
-                            if(oteam == null) continue;
-                            oteam.getTeam().unregister();
-                        }
-                        break;
+//                    case SHIFT_RIGHT:
+//                        for (String name : proj.getTeamWhiteList()) {
+//                            ObservableTeam oteam = scoreboard.teamsByName().get(name);
+//                            if(oteam == null) continue;
+//                            oteam.getTeam().unregister();
+//                        }
+//                        break;
                 }
             }
         };
         TeamWhiteListSlot teamWhiteListSlot = new TeamWhiteListSlot(proj, scoreboard);
 
-//        Slot test = new StaticSlot(new ItemStackBuilder(Material.ARROW)
-//                .displayName(Colorizer.apply("|a|Тест"))
-//                .lore(Colorizer.asList(
-//                        "|a|ЛКМ|y|: тест1"
-//                ))
-//                .build()) {
-//            @Override
-//            public void onClick(SlotClickEvent e) {
-//                switch (e.getEvent().getClick()) {
-//                    case LEFT: {
-//                        ObservableScoreboard scoreboard = proj.getScoreboardManager().getMainScoreboard();
-//                        for (ObservableInjectTeam team : scoreboard.teamsByName().values()) {
-//                            System.out.println(team.getName());
-//                        }
-//                    } break;
-//                }
-//            }
-//        };
-
         setBotPaneSlot(0, addTeam);
         setBotPaneSlot(1, controlItems);
-//        setBotPaneSlot(3, test);
         setBotPaneSlot(7, teamWhiteListSlot);
         setBotPaneSlot(8, clearTeams);
         tutorial = new StaticSlot(new ItemStackBuilder()

@@ -1,12 +1,13 @@
 package dialight.guilib;
 
+import dialight.misc.Colorizer;
 import dialight.guilib.gui.Gui;
 import dialight.guilib.elements.SlotElement;
 import dialight.guilib.slot.LocSlot;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.view.View;
-import dialight.nms.InventoryNms;
+import dialight.fake.InventoryFk;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -48,7 +49,12 @@ public class GuiListener implements Listener {
             if(e.getClick() == ClickType.MIDDLE) {
                 proj.openPrev(player);
             }
-            view.onOutsideClick(player, e.getClick());
+            try {
+                view.onOutsideClick(player, e.getClick());
+            } catch (Throwable ex) {
+                ex.printStackTrace();
+                player.sendMessage(Colorizer.apply("|r|Error while handle outside click: " + ex.getMessage()));
+            }
             return;
         }
         view = View.getView(e.getClickedInventory());
@@ -69,7 +75,12 @@ public class GuiListener implements Listener {
             return;
         } else {
             Slot slot = lslot.getSlot();
-            slot.onClick(new SlotClickEvent(lslot.getLayoutPos(), slot, player, e));
+            try {
+                slot.onClick(new SlotClickEvent(lslot.getLayoutPos(), slot, player, e));
+            } catch (Throwable ex) {
+                ex.printStackTrace();
+                player.sendMessage(Colorizer.apply("|r|Error while handle click: " + ex.getMessage()));
+            }
         }
         e.setCancelled(true);
     }
@@ -91,7 +102,7 @@ public class GuiListener implements Listener {
         proj.getUsageRegistry().onOpenGui(player, gui);
 //        Inventory inventory = player.getOpenInventory().getTopInventory();
         proj.runTask(() -> {
-            InventoryNms.sendInventoryTitle(player, inventory, view.getTitle(player));
+            InventoryFk.sendInventoryTitle(player, inventory, view.getTitle(player));
         });
     }
 

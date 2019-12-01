@@ -52,4 +52,10 @@ public class WriteProxyObservableSet<V> extends ObservableSetWrapper<V> {
         return this.fireProxyRemove((V) element);
     }
 
+    @Override public void clear() {
+        for (V e : set) {
+            remove(e);
+        }
+    }
+
 }

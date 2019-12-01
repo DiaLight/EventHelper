@@ -2,9 +2,9 @@ package dialight.teams.gui;
 
 import dialight.compatibility.ItemStackBuilderBc;
 import dialight.compatibility.PlayerInventoryBc;
-import dialight.extensions.Colorizer;
+import dialight.misc.Colorizer;
 import dialight.extensions.InventoryEx;
-import dialight.extensions.ItemStackBuilder;
+import dialight.misc.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.teams.Teams;
