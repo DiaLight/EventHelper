@@ -2,6 +2,7 @@ package dialight.teams.gui.sort;
 
 import dialight.guilib.slot.Slot;
 import dialight.guilib.view.page.Scroll9x5PageView;
+import dialight.teams.gui.teams.PlayerBlackListSlot;
 
 public class SortView extends Scroll9x5PageView<SortGui, SortElement> {
 
@@ -11,7 +12,6 @@ public class SortView extends Scroll9x5PageView<SortGui, SortElement> {
 
     public SortView(SortGui gui, SortElement layout) {
         super(gui, layout, "Сортировщики команд");
-        this.setBotPaneSlot(0, new PlayerBlackListSlot(gui.getProj()));
     }
 
     @Override protected Slot createBotBackground(int x) {

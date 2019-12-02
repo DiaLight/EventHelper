@@ -1,12 +1,12 @@
 package dialight.teams.gui.playerblacklist;
 
-import dialight.misc.Colorizer;
-import dialight.misc.ItemStackBuilder;
 import dialight.guilib.elements.NamedElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.extensions.NamedElementScroll9X5View;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import org.bukkit.Material;
 
 public class PlayerBlackListView extends NamedElementScroll9X5View<PlayerBlackListGui, PlayerBlackListElement> {
@@ -14,13 +14,10 @@ public class PlayerBlackListView extends NamedElementScroll9X5View<PlayerBlackLi
     private final Slot background = buildDefaultBackground();
     private final Slot backward = buildDefaultBackward(this);
     private final Slot forward = buildDefaultForward(this);
-    private final Slot selectView;
-    private final Slot config;
-
 
     public PlayerBlackListView(PlayerBlackListGui gui, PlayerBlackListElement layout) {
         super(gui, layout);
-        selectView = new StaticSlot(new ItemStackBuilder(Material.BOOK)
+        Slot selectView = new StaticSlot(new ItemStackBuilder(Material.BOOK)
                 .displayName("Выбор представления данных")
                 .lore(Colorizer.asList(
                         "|a|ЛКМ|y|: Все игроки",
@@ -64,9 +61,7 @@ public class PlayerBlackListView extends NamedElementScroll9X5View<PlayerBlackLi
                 }
             }
         };
-        config = new PlayerBlackListConfigSlot(gui.getProj());
         this.setBotPaneSlot(0, selectView);
-        this.setBotPaneSlot(1, config);
         this.setBotPaneSlot(8, clear);
         this.setEmptyTitleReplace("Черный список игроков");
     }

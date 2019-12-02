@@ -5,7 +5,6 @@ import dialight.observable.list.ObservableList;
 import dialight.observable.list.ObservableListWrapper;
 import dialight.observable.map.ObservableMap;
 import dialight.observable.map.ObservableMapWrapper;
-import dialight.observable.set.ObservableSet;
 import dialight.offlinelib.SavedPlayerState;
 import dialight.stateengine.StateEngineHandler;
 import dialight.teams.captain.SortByCaptain;
@@ -20,7 +19,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public class CollectMembersHandler extends StateEngineHandler<SortByCaptainState> {
@@ -59,30 +57,23 @@ public class CollectMembersHandler extends StateEngineHandler<SortByCaptainState
         ObservableScoreboard scoreboard = proj.getScoreboard();
         scoreboard.teamsByName().clear();
 
-        ObservableSet<UUID> playerBlackList = proj.getTeams().getPlayerBlackList();
-        for (Player player : proj.getPlugin().getServer().getOnlinePlayers()) {
-            if (playerBlackList.contains(player.getUniqueId())) continue;
-            unsorted.add(proj.getOfflineLib().getUuidPlayer(player));
-            player.setScoreboard(scoreboard.asBukkit());
+        for (UuidPlayer uuidPlayer : proj.getTeams().collectSortMembers()) {
+            unsorted.add(uuidPlayer);
+            Player player = uuidPlayer.getPlayer();
+            if (player != null) player.setScoreboard(scoreboard.asBukkit());
         }
 
-//        UuidPlayer diaLight = proj.getOfflineLib().getUuidPlayer("DiaLight");
-//        if(diaLight != null) {
-//            proj.getCaptainsByTeam().put("GreenTeam", diaLight);
-//        }
-
-        for (String teamName : proj.getTeams().getTeamWhiteList()) {
-            ObservableTeam mainTeam = mainScoreboard.teamsByName().get(teamName);
-            ObservableTeam team = scoreboard.getOrCreate(teamName);
+        for (ObservableTeam mainTeam : proj.getTeams().collectSortTeams()) {
+            ObservableTeam team = scoreboard.getOrCreate(mainTeam.getName());
             team.color().setValue(mainTeam.color().getValue());
-            UuidPlayer captain = proj.getCaptainsByTeam().get(teamName);
+            UuidPlayer captain = proj.getCaptainsByTeam().get(team.getName());
             if(captain == null) {
                 captain = popRandomUnsorted();
             } else {
                 unsorted.remove(captain);
             }
             if(captain == null) throw new IllegalStateException("Not enough players");
-            captains.put(captain, teamName);
+            captains.put(captain, team.getName());
             result.put(captain, team.getName());
             team.getMembers().add(captain);
         }

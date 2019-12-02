@@ -2,11 +2,13 @@ package dialight.teams;
 
 import dialight.eventhelper.project.ProjectApi;
 import dialight.guilib.slot.Slot;
+import dialight.misc.player.UuidPlayer;
 import dialight.observable.ObservableObject;
 import dialight.observable.set.ObservableSet;
 import dialight.teams.observable.ObservableScoreboardManager;
-import org.bukkit.Location;
+import dialight.teams.observable.ObservableTeam;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,12 +42,17 @@ public class TeamsApi implements ProjectApi {
     public boolean isOfflineMode() {
         return proj.isOfflineMode();
     }
-    public void setOfflineMode(boolean offlineMode) {
-        proj.setOfflineMode(offlineMode);
+
+    public List<UuidPlayer> collectSortMembers() {
+        return proj.collectSortMembers();
     }
 
-    public Map<String, Location> getTeamEntryPoints() {
-        return proj.getTeamEntryPoints();
+    public List<ObservableTeam> collectSortTeams() {
+        return proj.collectSortTeams();
+    }
+
+    public ObservableObject<Map<String, ? extends TeamSortResult>> getSortResult() {
+        return proj.getSortResult();
     }
 
 }

@@ -1,9 +1,9 @@
 package dialight.teams.captain.gui.control;
 
-import dialight.misc.ActionInvoker;
 import dialight.guilib.elements.FixedElement;
-import dialight.observable.list.ObservableList;
+import dialight.misc.ActionInvoker;
 import dialight.misc.player.UuidPlayer;
+import dialight.observable.list.ObservableList;
 import dialight.teams.captain.SortByCaptain;
 
 public class ControlLayout extends FixedElement {
@@ -11,17 +11,14 @@ public class ControlLayout extends FixedElement {
     private final SortByCaptain proj;
     private final ControlSlot controlSlot;
     private final PauseSlot pauseSlot;
-    private final ResultsSlot resultsSlot;
 
     public ControlLayout(SortByCaptain proj) {
         super(9, 6);
         this.proj = proj;
         controlSlot = new ControlSlot(proj);
         pauseSlot = new PauseSlot(proj);
-        resultsSlot = new ResultsSlot(proj);
         this.setSlot(1, 1, controlSlot);
         this.setSlot(3, 1, pauseSlot);
-        this.setSlot(5, 1, resultsSlot);
     }
 
     @Override public void onViewersNotEmpty() {

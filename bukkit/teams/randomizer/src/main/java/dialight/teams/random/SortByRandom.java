@@ -3,20 +3,21 @@ package dialight.teams.random;
 import dialight.eventhelper.EventHelper;
 import dialight.eventhelper.project.Project;
 import dialight.eventhelper.project.ProjectApi;
-import dialight.misc.Colorizer;
 import dialight.guilib.GuiLibApi;
 import dialight.maingui.MainGuiApi;
-import dialight.offlinelib.OfflineLibApi;
+import dialight.misc.Colorizer;
 import dialight.misc.player.UuidPlayer;
+import dialight.offlinelib.OfflineLibApi;
+import dialight.teams.TeamSortResult;
 import dialight.teams.TeamsApi;
-import dialight.teams.observable.ObservableScoreboard;
 import dialight.teams.observable.ObservableTeam;
 import dialight.teams.random.gui.TeamRandomizerGui;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class SortByRandom extends Project {
 
@@ -69,118 +70,88 @@ public class SortByRandom extends Project {
         return teams;
     }
 
+    private static class TeamFillStatus extends TeamSortResult {
+
+        private final int size;
+
+        public TeamFillStatus(ObservableTeam team) {
+            super(team);
+            size = team.getMembers().size();
+        }
+
+        private int getSize() {
+            return size + members.size();
+        }
+
+    }
 
     public void doFillRandomize(Player invoker) {
-        ObservableScoreboard scoreboard = teams.getScoreboardManager().getMainScoreboard();
-        List<ObservableTeam> teamsToRandomize = new ArrayList<>();
-        if (teams.getTeamWhiteList().isEmpty()) {
-            teamsToRandomize.addAll(scoreboard.teamsByName().values());
-        } else {
-            for (String name : teams.getTeamWhiteList()) {
-                ObservableTeam oteam = scoreboard.teamsByName().get(name);
-                if(oteam != null) teamsToRandomize.add(oteam);
-            }
-        }
-        List<UUID> playersToRandomize = new ArrayList<>();
-        List<UuidPlayer> uuidPlayers = new ArrayList<>();
-        if (teams.isOfflineMode()) {
-            for (OfflinePlayer offlinePlayer : getPlugin().getServer().getOfflinePlayers()) {
-                uuidPlayers.add(offlinelib.getUuidPlayer(offlinePlayer.getUniqueId()));
-            }
-        } else {
-            for (Player player : getPlugin().getServer().getOnlinePlayers()) {
-                uuidPlayers.add(offlinelib.getUuidPlayer(player.getUniqueId()));
-            }
-        }
-        for (UuidPlayer uuidPlayer : uuidPlayers) {
-            ObservableTeam oteam = scoreboard.teamsByMember().get(uuidPlayer);
-            if(oteam == null) {
-                playersToRandomize.add(uuidPlayer.getUuid());
-            } else {
-                if(!teamsToRandomize.contains(oteam)) {
-                    playersToRandomize.add(uuidPlayer.getUuid());
-                }
-            }
-        }
-        for (UUID uuid : teams.getPlayerBlackList()) {
-            playersToRandomize.remove(uuid);
-        }
+        List<UuidPlayer> playersToRandomize = teams.collectSortMembers();
         if(playersToRandomize.isEmpty()) {
             invoker.sendMessage(Colorizer.apply("|r|Нет игроков для рандомизации"));
             return;
         }
+        List<ObservableTeam> teamsToRandomize = teams.collectSortTeams();
         if(teamsToRandomize.isEmpty()) {
             invoker.sendMessage(Colorizer.apply("|r|Нет команд для рандомизации"));
             return;
         }
-        invoker.sendMessage(Colorizer.apply("|y|Рандомизация с дозаполнением команд: команды |w|" + teamsToRandomize.size() + "|y| игроки |w|" + playersToRandomize.size()));
+
+        // filter players
+        for (ObservableTeam team : teamsToRandomize) {
+            playersToRandomize.removeIf(player -> team.getMembers().contains(player));
+        }
+
+        // prepare fill status
+        Map<String, TeamFillStatus> fillTeams = teamsToRandomize.stream().map(TeamFillStatus::new).collect(Collectors.toMap(TeamSortResult::getName, Function.identity()));
+
+        invoker.sendMessage(Colorizer.apply("|y|Рандомизация команд с дозаполнением: команды |w|" + fillTeams.size() + "|y| игроки |w|" + playersToRandomize.size()));
 
         while(!playersToRandomize.isEmpty()) {
-            UUID uuid = playersToRandomize.remove(rnd.nextInt(playersToRandomize.size()));
-            UuidPlayer uuidPlayer = offlinelib.getUuidPlayer(uuid);
-
-            ObservableTeam minTeam = teamsToRandomize.get(0);
-            int minSize = minTeam.getTeam().getEntries().size();
-            for (ObservableTeam team : teamsToRandomize) {
-                int size = team.getTeam().getEntries().size();
+            UuidPlayer uuidPlayer = playersToRandomize.remove(rnd.nextInt(playersToRandomize.size()));
+            TeamFillStatus minTeam = null;
+            int minSize = Integer.MAX_VALUE;
+            for (TeamFillStatus team : fillTeams.values()) {
+                int size = team.getSize();
                 if(size < minSize) {
                     minSize = size;
                     minTeam = team;
                 }
             }
-            minTeam.getTeam().addEntry(uuidPlayer.getName());
+            Objects.requireNonNull(minTeam);
+            minTeam.addMember(uuidPlayer);
         }
+        teams.getSortResult().setValue(fillTeams);
     }
 
     public void doRandomize(Player invoker) {
-        ObservableScoreboard scoreboard = teams.getScoreboardManager().getMainScoreboard();
-        List<ObservableTeam> teamsToRandomize = new ArrayList<>();
-        if (teams.getTeamWhiteList().isEmpty()) {
-            teamsToRandomize.addAll(scoreboard.teamsByName().values());
-        } else {
-            for (String name : teams.getTeamWhiteList()) {
-                ObservableTeam oteam = scoreboard.teamsByName().get(name);
-                if(oteam != null) teamsToRandomize.add(oteam);
-            }
-        }
-        List<UUID> playersToRandomize = new ArrayList<>();
-        if (teams.isOfflineMode()) {
-            for (OfflinePlayer offlinePlayer : getPlugin().getServer().getOfflinePlayers()) {
-                playersToRandomize.add(offlinePlayer.getUniqueId());
-            }
-        } else {
-            for (Player player : getPlugin().getServer().getOnlinePlayers()) {
-                playersToRandomize.add(player.getUniqueId());
-            }
-        }
-        for (UUID uuid : teams.getPlayerBlackList()) {
-            playersToRandomize.remove(uuid);
-        }
-
-        if(playersToRandomize.isEmpty()) {
-            invoker.sendMessage(Colorizer.apply("|r|Нет игроков для рандомизации"));
-            return;
-        }
+        List<ObservableTeam> teamsToRandomize = teams.collectSortTeams();
         if(teamsToRandomize.isEmpty()) {
             invoker.sendMessage(Colorizer.apply("|r|Нет команд для рандомизации"));
             return;
         }
-        invoker.sendMessage(Colorizer.apply("|y|Рандомизация: команды |w|" + teamsToRandomize.size() + "|y| игроки |w|" + playersToRandomize.size()));
+        List<UuidPlayer> playersToRandomize = teams.collectSortMembers();
+        if(playersToRandomize.isEmpty()) {
+            invoker.sendMessage(Colorizer.apply("|r|Нет игроков для рандомизации"));
+            return;
+        }
 
-        int players_in_team = playersToRandomize.size() / teamsToRandomize.size();
-        for (ObservableTeam oteam : teamsToRandomize) {
+        Map<String, TeamSortResult> teamsResult = teamsToRandomize.stream().map(TeamSortResult::new).collect(Collectors.toMap(TeamSortResult::getName, Function.identity()));
+
+        invoker.sendMessage(Colorizer.apply("|y|Рандомизация: команды |w|" + teamsResult.size() + "|y| игроки |w|" + playersToRandomize.size()));
+
+        int players_in_team = playersToRandomize.size() / teamsResult.size();
+        for (TeamSortResult oteam : teamsResult.values()) {
             oteam.getMembers().removeIf(UuidPlayer::isOffline);
             for (int i = 0; i < players_in_team; i++) {
-                UUID uuid = playersToRandomize.remove(rnd.nextInt(playersToRandomize.size()));
-                UuidPlayer uuidPlayer = offlinelib.getUuidPlayer(uuid);
-                oteam.getTeam().addEntry(uuidPlayer.getName());
+                UuidPlayer uuidPlayer = playersToRandomize.remove(rnd.nextInt(playersToRandomize.size()));
+                oteam.addMember(uuidPlayer);
             }
         }
-        LinkedList<ObservableTeam> teamsLeft = new LinkedList<>(teamsToRandomize);
-        for (UUID uuid : playersToRandomize) {
-            UuidPlayer uuidPlayer = offlinelib.getUuidPlayer(uuid);
-            ObservableTeam team = teamsLeft.remove(rnd.nextInt(teamsLeft.size()));
-            team.getTeam().addEntry(uuidPlayer.getName());
+        LinkedList<TeamSortResult> teamsLeft = new LinkedList<>(teamsResult.values());
+        for (UuidPlayer uuidPlayer : playersToRandomize) {
+            TeamSortResult sortResult = teamsLeft.remove(rnd.nextInt(teamsLeft.size()));
+            sortResult.addMember(uuidPlayer);
         }
     }
 }

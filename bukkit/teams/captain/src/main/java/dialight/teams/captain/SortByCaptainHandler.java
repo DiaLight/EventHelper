@@ -5,8 +5,8 @@ import dialight.freezer.Frozen;
 import dialight.misc.ActionInvoker;
 import dialight.misc.Colorizer;
 import dialight.misc.player.UuidPlayer;
-import dialight.observable.map.ObservableMap;
 import dialight.stateengine.StateEngine;
+import dialight.teams.TeamSortResult;
 import dialight.teams.captain.state.SelectNextMemberHandler;
 import dialight.teams.captain.utils.BlockData;
 import dialight.teams.observable.ObservableTeam;
@@ -195,9 +195,7 @@ public class SortByCaptainHandler {
         }
         team.getMembers().add(selected);
         Location memberLocation = proj.getArenaHandler().getMemberLocation(selected);
-        proj.runTask(() -> {
-            captainBlock.apply(memberLocation.clone().subtract(0, 1, 0));
-        });
+        captainBlock.apply(memberLocation.clone().subtract(0, 1, 0));
         proj.getMembersHandler().select(captain, selected);
         if(proj.getMembersHandler().getUnsorted().isEmpty()) {
             proj.getStateEngine().setHandler(SortByCaptainState.NONE);
@@ -207,29 +205,40 @@ public class SortByCaptainHandler {
         isDay = !isDay;
     }
 
+    private static class CaptainSortResult extends TeamSortResult {
+
+        private final UuidPlayer captain;
+
+        public CaptainSortResult(ObservableTeam team, UuidPlayer captain) {
+            super(team);
+            this.captain = captain;
+        }
+
+        public UuidPlayer getCaptain() {
+            return captain;
+        }
+
+    }
+
     private void onCleanup() {
         ActionInvoker actionInvoker = new ActionInvoker(proj.getPlugin());
         proj.getFakeBossBar().clear();
         proj.getFreezer().unregisterAll(actionInvoker);
 
-        Map<String, TeamSortResult> results = new HashMap<>();
+        Map<String, CaptainSortResult> results = new HashMap<>();
         for (Map.Entry<UuidPlayer, String> entry : proj.getMembersHandler().getResult().entrySet()) {
             String teamName = entry.getValue();
-            TeamSortResult teamResult = results.get(teamName);
+            CaptainSortResult teamResult = results.get(teamName);
             if(teamResult == null) {
                 UuidPlayer captain = proj.getMembersHandler().getCaptainMap().getCaptainByTeam(teamName);
                 ObservableTeam team = proj.getScoreboard().teamsByName().get(teamName);
                 Objects.requireNonNull(team);
-                teamResult = new TeamSortResult(team, captain, new ArrayList<>());
+                teamResult = new CaptainSortResult(team, captain);
                 results.put(teamName, teamResult);
             }
-            teamResult.getMembers().add(entry.getKey());
+            teamResult.addMember(entry.getKey());
         }
-        ObservableMap<String, TeamSortResult> oresults = proj.getSortResult();
-        oresults.clear();
-        for (Map.Entry<String, TeamSortResult> entry : results.entrySet()) {
-            oresults.put(entry.getKey(), entry.getValue());
-        }
+        proj.getTeams().getSortResult().setValue(results);
     }
 
     public void broadcast(String msg) {

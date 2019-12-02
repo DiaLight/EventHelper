@@ -16,7 +16,6 @@ import dialight.offlinelib.OfflineLibApi;
 import dialight.stateengine.StateEngine;
 import dialight.teams.TeamsApi;
 import dialight.teams.captain.gui.control.ControlGui;
-import dialight.teams.captain.gui.results.ResultsGui;
 import dialight.teams.captain.gui.select.SelectMemberGui;
 import dialight.teams.captain.state.*;
 import dialight.teams.captain.tool.SortByCaptainTool;
@@ -47,13 +46,11 @@ public class SortByCaptain extends Project {
     private StateEngine<SortByCaptainState> stateEngine;
 
     private final ObservableMap<String, UuidPlayer> captainsByTeam = new ObservableMapWrapper<>();
-    private final ObservableMap<String, TeamSortResult> sortResult = new ObservableMapWrapper<>();
     private SortByCaptainHandler sortByCaptainHandler;
 
     private SortByCaptainTool tool;
     private SelectMemberGui gui;
     private ControlGui controlGui;
-    private ResultsGui resultsGui;
 
     private FakeBossBar fakeBossBar;
 
@@ -102,17 +99,12 @@ public class SortByCaptain extends Project {
         teams.addControlItem(new SortByCaptainSlot(this));
         gui = new SelectMemberGui(this);
         controlGui = new ControlGui(this);
-        resultsGui = new ResultsGui(this);
         tool = new SortByCaptainTool(this);
         toollib.register(tool);
     }
 
     @Override public void disable() {
         stateEngine.setHandler(SortByCaptainState.NONE);
-    }
-
-    public ObservableMap<String, TeamSortResult> getSortResult() {
-        return sortResult;
     }
 
     public FakeBossBar getFakeBossBar() {
@@ -185,10 +177,6 @@ public class SortByCaptain extends Project {
 
     public ControlGui getControlGui() {
         return controlGui;
-    }
-
-    public ResultsGui getResultsGui() {
-        return resultsGui;
     }
 
     public SortByCaptainTool getTool() {

@@ -1,4 +1,4 @@
-package dialight.teams.captain.gui.results;
+package dialight.teams.gui.results;
 
 
 import dialight.guilib.slot.Slot;
@@ -6,8 +6,8 @@ import dialight.guilib.slot.SlotClickEvent;
 import dialight.misc.Colorizer;
 import dialight.misc.ItemStackBuilder;
 import dialight.misc.player.UuidPlayer;
-import dialight.teams.captain.SortByCaptain;
-import dialight.teams.captain.TeamSortResult;
+import dialight.teams.TeamSortResult;
+import dialight.teams.Teams;
 import dialight.teams.observable.ObservableTeam;
 import dialight.teleporter.SelectedPlayers;
 import org.bukkit.Location;
@@ -20,11 +20,11 @@ import java.util.List;
 
 public class ResultsSlot implements Slot {
 
-    @NotNull private final SortByCaptain proj;
+    @NotNull private final Teams proj;
     @NotNull private final TeamSortResult result;
     private final ItemStack item;
 
-    public ResultsSlot(SortByCaptain proj, TeamSortResult result) {
+    public ResultsSlot(Teams proj, TeamSortResult result) {
         this.proj = proj;
         this.result = result;
         this.item = new ItemStackBuilder(Material.LEATHER_CHESTPLATE)
@@ -49,7 +49,7 @@ public class ResultsSlot implements Slot {
                 selectedPlayers.addAllUuidPlayers(result.getMembers());
             } break;
             case RIGHT: {
-                Location entryPoint = proj.getTeams().getTeamEntryPoints().get(result.getName());
+                Location entryPoint = proj.getTeamEntryPoints().get(result.getName());
                 if(entryPoint != null) {
                     for (UuidPlayer member : result.getMembers()) {
                         member.teleport(entryPoint);
@@ -60,7 +60,7 @@ public class ResultsSlot implements Slot {
 
             } break;
             case SHIFT_RIGHT: {
-                ObservableTeam team = proj.getTeams().getScoreboardManager().getMainScoreboard().teamsByName().get(result.getName());
+                ObservableTeam team = proj.getScoreboardManager().getMainScoreboard().teamsByName().get(result.getName());
                 team.getMembers().addAll(result.getMembers());
             } break;
             case MIDDLE: {

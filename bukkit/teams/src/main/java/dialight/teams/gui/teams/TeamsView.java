@@ -19,7 +19,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 
 public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageElement<ObservableTeam>> {
 
-    private final ObservableScoreboard scoreboard;
     private final Slot background;
     private final Slot backward = buildDefaultBackward(this);
     private final Slot forward = buildDefaultForward(this);
@@ -27,7 +26,6 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageElement<Obs
 
     public TeamsView(TeamsGui gui, CachedPageElement<ObservableTeam> layout, ObservableScoreboard scoreboard) {
         super(gui, layout, "Команды");
-        this.scoreboard = scoreboard;
         Teams proj = getGui().getProj();
         PluginDescriptionFile desc = proj.getPlugin().getDescription();
         background = new StaticSlot(new ItemStackBuilder()
@@ -57,13 +55,13 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageElement<Obs
                 }
             }
         };
-        Slot controlItems = new StaticSlot(new ItemStackBuilder()
+        Slot sortTems = new StaticSlot(new ItemStackBuilder()
                 .let(isb -> {
                     ItemStackBuilderBc.of(isb).bed(DyeColor.WHITE);
                 })
-                .displayName(Colorizer.apply("|a|Распределение команд"))
+                .displayName(Colorizer.apply("|a|Сортировка по командам"))
                 .addLore(Colorizer.asList(
-                        "|a|ЛКМ|y|: Откыть список распределителей"
+                        "|a|ЛКМ|y|: Откыть список сортировщиков"
                 ))
                 .build()) {
             @Override
@@ -112,11 +110,15 @@ public class TeamsView extends Scroll9x5PageView<TeamsGui, CachedPageElement<Obs
                 }
             }
         };
-        TeamWhiteListSlot teamWhiteListSlot = new TeamWhiteListSlot(proj, scoreboard);
 
         setBotPaneSlot(0, addTeam);
-        setBotPaneSlot(1, controlItems);
-        setBotPaneSlot(7, teamWhiteListSlot);
+        setBotPaneSlot(1, sortTems);
+        setBotPaneSlot(2, new ResultsSlot(proj));
+
+//        setBotPaneSlot(4, new ConfigSlot(proj));
+
+        setBotPaneSlot(6, new PlayerBlackListSlot(gui.getProj()));
+        setBotPaneSlot(7, new TeamWhiteListSlot(proj, scoreboard));
         setBotPaneSlot(8, clearTeams);
         tutorial = new StaticSlot(new ItemStackBuilder()
                 .let(isb -> {

@@ -10,6 +10,7 @@ import dialight.eventhelper.project.ProjectApi;
 import dialight.extensions.ServerEx;
 import dialight.guilib.GuiLibApi;
 import dialight.maingui.MainGuiApi;
+import dialight.misc.player.UuidPlayer;
 import dialight.observable.ObservableObject;
 import dialight.observable.set.ObservableSet;
 import dialight.observable.set.ObservableSetWrapper;
@@ -17,26 +18,27 @@ import dialight.offlinelib.OfflineLibApi;
 import dialight.teams.gui.TeamsLobbyGui;
 import dialight.teams.gui.TeamsSlot;
 import dialight.teams.gui.playerblacklist.PlayerBlackListGui;
+import dialight.teams.gui.results.ResultsGui;
 import dialight.teams.gui.sort.SortGui;
 import dialight.teams.gui.teams.TeamsGui;
 import dialight.teams.gui.whitelist.TeamWhiteListGui;
+import dialight.teams.observable.ObservableScoreboard;
 import dialight.teams.observable.ObservableScoreboardManager;
 import dialight.teams.observable.ObservableTeam;
 import dialight.teams.observable.inject.ObservableInjectScoreboardManager;
 import dialight.teleporter.TeleporterApi;
 import dialight.toollib.ToolLibApi;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Teams extends Project {
@@ -53,11 +55,13 @@ public class Teams extends Project {
     private TeamsGui teamsGui;
     private TeamWhiteListGui teamWhiteListGui;
     private PlayerBlackListGui playerBlackListGui;
+    private ResultsGui resultsGui;
 
     private final ObservableSet<String> teamWhiteList = new ObservableSetWrapper<>();
     private final ObservableSet<UUID> playerBlackList = new ObservableSetWrapper<>(new HashSet<>());
     private final ObservableObject<Boolean> offlineMode = new ObservableObject<>(false);
     private final Map<String, Location> teamEntryPoints = new HashMap<>();
+    private final ObservableObject<Map<String, ? extends TeamSortResult>> sortResult = new ObservableObject<>(new HashMap<>());
 
     private ObservableScoreboardManager scoreboardManager;
 
@@ -81,6 +85,7 @@ public class Teams extends Project {
         teamsGui = new TeamsGui(this, scoreboardManager.getMainScoreboard());
         teamWhiteListGui = new TeamWhiteListGui(this, scoreboardManager.getMainScoreboard());
         playerBlackListGui = new PlayerBlackListGui(this);
+        resultsGui = new ResultsGui(this);
 
         maingui.registerToolItem(TeamsTool.ID, new TeamsSlot(this));
         toollib.register(tool);
@@ -129,6 +134,14 @@ public class Teams extends Project {
 
     @Override public ProjectApi getApi() {
         return new TeamsApi(this);
+    }
+
+    public ObservableObject<Map<String, ? extends TeamSortResult>> getSortResult() {
+        return sortResult;
+    }
+
+    public ResultsGui getResultsGui() {
+        return resultsGui;
     }
 
     public ObservableScoreboardManager getScoreboardManager() {
@@ -205,4 +218,35 @@ public class Teams extends Project {
         return teamEntryPoints;
     }
 
+    public List<UuidPlayer> collectSortMembers() {
+        List<UuidPlayer> playersToRandomize = new ArrayList<>();
+        if (this.isOfflineMode()) {
+            for (OfflinePlayer offlinePlayer : getPlugin().getServer().getOfflinePlayers()) {
+                UUID uuid = offlinePlayer.getUniqueId();
+                if(this.getPlayerBlackList().contains(uuid)) continue;
+                playersToRandomize.add(offlinelib.getUuidPlayer(uuid));
+            }
+        } else {
+            for (Player player : getPlugin().getServer().getOnlinePlayers()) {
+                UUID uuid = player.getUniqueId();
+                if(this.getPlayerBlackList().contains(uuid)) continue;
+                playersToRandomize.add(offlinelib.getUuidPlayer(uuid));
+            }
+        }
+        return playersToRandomize;
+    }
+
+    public List<ObservableTeam> collectSortTeams() {
+        ObservableScoreboard scoreboard = this.getScoreboardManager().getMainScoreboard();
+        List<ObservableTeam> teamsToRandomize = new ArrayList<>();
+        if (this.getTeamWhiteList().isEmpty()) {
+            teamsToRandomize.addAll(scoreboard.teamsByName().values());
+        } else {
+            for (String name : this.getTeamWhiteList()) {
+                ObservableTeam oteam = scoreboard.teamsByName().get(name);
+                if(oteam != null) teamsToRandomize.add(oteam);
+            }
+        }
+        return teamsToRandomize;
+    }
 }

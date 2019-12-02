@@ -1,4 +1,4 @@
-package dialight.teams.gui.sort;
+package dialight.teams.gui.teams;
 
 import dialight.compatibility.TeamBc;
 import dialight.misc.Colorizer;

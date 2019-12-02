@@ -1,4 +1,4 @@
-package dialight.teams.captain.gui.results;
+package dialight.teams.gui.results;
 
 import dialight.compatibility.ItemStackBuilderBc;
 import dialight.guilib.elements.CachedPageElement;
@@ -9,8 +9,8 @@ import dialight.guilib.view.page.Scroll9x5PageView;
 import dialight.misc.Colorizer;
 import dialight.misc.ItemStackBuilder;
 import dialight.misc.player.UuidPlayer;
-import dialight.teams.captain.SortByCaptain;
-import dialight.teams.captain.TeamSortResult;
+import dialight.teams.TeamSortResult;
+import dialight.teams.Teams;
 import dialight.teams.observable.ObservableTeam;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -25,7 +25,7 @@ public class ResultsView extends Scroll9x5PageView<ResultsGui, CachedPageElement
 
     public ResultsView(ResultsGui gui, CachedPageElement<TeamSortResult> layout) {
         super(gui, layout, "Результат сортировки");
-        SortByCaptain proj = getGui().getProj();
+        Teams proj = getGui().getProj();
         PluginDescriptionFile desc = proj.getPlugin().getDescription();
         background = new StaticSlot(new ItemStackBuilder()
                 .let(builder -> {
@@ -51,8 +51,8 @@ public class ResultsView extends Scroll9x5PageView<ResultsGui, CachedPageElement
             public void onClick(SlotClickEvent e) {
                 switch (e.getEvent().getClick()) {
                     case LEFT: {
-                        for (TeamSortResult result : proj.getSortResult().values()) {
-                            Location entryPoint = proj.getTeams().getTeamEntryPoints().get(result.getName());
+                        for (TeamSortResult result : proj.getSortResult().getValue().values()) {
+                            Location entryPoint = proj.getTeamEntryPoints().get(result.getName());
                             if(entryPoint != null) {
                                 for (UuidPlayer member : result.getMembers()) {
                                     member.teleport(entryPoint);
@@ -61,8 +61,8 @@ public class ResultsView extends Scroll9x5PageView<ResultsGui, CachedPageElement
                         }
                     } break;
                     case RIGHT: {
-                        for (TeamSortResult result : proj.getSortResult().values()) {
-                            ObservableTeam team = proj.getTeams().getScoreboardManager().getMainScoreboard().teamsByName().get(result.getName());
+                        for (TeamSortResult result : proj.getSortResult().getValue().values()) {
+                            ObservableTeam team = proj.getScoreboardManager().getMainScoreboard().teamsByName().get(result.getName());
                             team.getMembers().addAll(result.getMembers());
                         }
                     } break;

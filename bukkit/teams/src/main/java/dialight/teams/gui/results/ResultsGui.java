@@ -1,18 +1,18 @@
-package dialight.teams.captain.gui.results;
+package dialight.teams.gui.results;
 
 import dialight.guilib.gui.Gui;
 import dialight.guilib.view.View;
-import dialight.teams.captain.SortByCaptain;
+import dialight.teams.Teams;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class ResultsGui extends Gui {
 
-    @NotNull private final SortByCaptain proj;
+    @NotNull private final Teams proj;
     private final ResultsView view;
     private final ResultsElement layout;
 
-    public ResultsGui(SortByCaptain proj) {
+    public ResultsGui(Teams proj) {
         this.proj = proj;
         this.layout = new ResultsElement(proj);
         this.view = new ResultsView(this, layout);
@@ -22,7 +22,7 @@ public class ResultsGui extends Gui {
         return view;
     }
 
-    @NotNull public SortByCaptain getProj() {
+    @NotNull public Teams getProj() {
         return proj;
     }
 
