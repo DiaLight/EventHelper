@@ -1,6 +1,7 @@
 package dialight.nms;
 
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -27,7 +28,7 @@ public abstract class ItemStackNms {
         this.item = item;
     }
 
-    public abstract NbtTagCompoundNms getNbt();
+    @Nullable public abstract NbtTagCompoundNms getNbt();
 
     public abstract NbtTagCompoundNms serialize();
 

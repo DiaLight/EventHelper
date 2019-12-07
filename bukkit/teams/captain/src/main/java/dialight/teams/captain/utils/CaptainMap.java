@@ -4,13 +4,12 @@ import dialight.misc.player.UuidPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class CaptainMap implements Iterable<CaptainEntry> {
 
     private final List<CaptainEntry> list = new ArrayList<>();
+    private final Map<Object, Runnable> onChange = new LinkedHashMap<>();
 
     public UuidPlayer getCaptainByTeam(String teamName) {
         for (CaptainEntry entry : list) {
@@ -65,11 +64,34 @@ public class CaptainMap implements Iterable<CaptainEntry> {
         int teamIndex = getTeamIndex(teamName);
         if(captainIndex != -1) {
             if(teamIndex != -1) list.remove(teamIndex);
-            return list.set(captainIndex, new CaptainEntry(captain, teamName));
+            CaptainEntry oldValue = list.set(captainIndex, new CaptainEntry(captain, teamName));
+            fireChange();
+            return oldValue;
         }
-        if(teamIndex != -1) return list.set(teamIndex, new CaptainEntry(captain, teamName));
+        if(teamIndex != -1) {
+            CaptainEntry oldValue = list.set(teamIndex, new CaptainEntry(captain, teamName));
+            fireChange();
+            return oldValue;
+        }
         list.add(new CaptainEntry(captain, teamName));
+        fireChange();
         return null;
+    }
+
+    public UuidPlayer removeByTeam(String teamName) {
+        int teamIndex = getTeamIndex(teamName);
+        if(teamIndex == -1) return null;
+        CaptainEntry entry = list.remove(teamIndex);
+        fireChange();
+        return entry.getCaptain();
+    }
+
+    public String removeByCaptain(UuidPlayer captain) {
+        int captainIndex = getCaptainIndex(captain);
+        if(captainIndex == -1) return null;
+        CaptainEntry entry = list.remove(captainIndex);
+        fireChange();
+        return entry.getTeamName();
     }
 
     public Iterable<UuidPlayer> captains() {
@@ -85,6 +107,7 @@ public class CaptainMap implements Iterable<CaptainEntry> {
 
     public void clear() {
         list.clear();
+        fireChange();
     }
 
     public int size() {
@@ -93,6 +116,19 @@ public class CaptainMap implements Iterable<CaptainEntry> {
 
     public CaptainEntry get(int index) {
         return list.get(index);
+    }
+
+    protected void fireChange() {
+        for(Runnable op : onChange.values()) op.run();
+    }
+
+    public CaptainMap onChange(Object key, Runnable op) {
+        onChange.put(key, op);
+        return this;
+    }
+    public CaptainMap removeListeners(Object key) {
+        onChange.remove(key);
+        return this;
     }
 
     private class CaptainIterator implements Iterator<UuidPlayer> {
@@ -108,6 +144,7 @@ public class CaptainMap implements Iterable<CaptainEntry> {
             if(next == null) return null;
             return next.getCaptain();
         }
+
     }
     private class TeamIterator implements Iterator<String> {
 
@@ -122,6 +159,7 @@ public class CaptainMap implements Iterable<CaptainEntry> {
             if(next == null) return null;
             return next.getTeamName();
         }
+
     }
 
 }

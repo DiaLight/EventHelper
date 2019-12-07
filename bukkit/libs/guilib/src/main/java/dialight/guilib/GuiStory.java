@@ -28,20 +28,15 @@ public class GuiStory {
 
     public void addGui(@NotNull Player player, @NotNull Gui gui) {
         Story story = getOrCreate(player);
-        Gui current = getCurrentGui(player);
-        if(current == null) {
-            story.stripTailTo(gui);
-        } else {
-            story.stripTailTo(current);
-        }
+        story.stripTailTo(gui);
         if(story.queue.peekLast() != gui) story.queue.addLast(gui);
         if(DEBUG) Bukkit.broadcastMessage("opened: " + toString(player));
     }
 
-    public void stripTailTo(@NotNull Player player, @NotNull Gui gui) {
+    public boolean stripTailTo(@NotNull Player player, @NotNull Gui gui) {
         Story story = guiStory.get(player.getUniqueId());
-        if (story == null) return;
-        story.stripTailTo(gui);
+        if (story == null) return true;
+        return story.stripTailTo(gui);
     }
     @Nullable public Gui getPrev(@NotNull Player player) {
         Story story = guiStory.get(player.getUniqueId());
@@ -90,13 +85,21 @@ public class GuiStory {
 
         public final Deque<Gui> queue = new LinkedList<>();
 
-        public void stripTailTo(Gui gui) {
-            Iterator<Gui> iterator = queue.descendingIterator();
+        public boolean stripTailTo(Gui gui) {
+            Iterator<Gui> iterator = queue.iterator();
+            boolean found = false;
             while (iterator.hasNext()) {
                 Gui next = iterator.next();
-                if (gui == next) break;
-                iterator.remove();
+                if(found) {
+                    iterator.remove();
+                    continue;
+                }
+                if (gui == next) {
+                    found = true;
+                }
             }
+            return found;
         }
+
     }
 }

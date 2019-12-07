@@ -38,7 +38,7 @@ public class Schematic {
             if(vec.getZ() < minZ) minZ = vec.getBlockZ();
             if(vec.getZ() > maxZ) maxZ = vec.getBlockZ();
         }
-        return new Tuple2t<>(new Vector(minX, minY, minZ), new Vector(maxX, maxY, maxZ));
+        return new Tuple2t<>(new Vector(minX, minY, minZ), new Vector(maxX, maxY + 2, maxZ));
     }
     public Vector getSize() {
         Tuple2t<Vector, Vector> minMax = getMinMax();

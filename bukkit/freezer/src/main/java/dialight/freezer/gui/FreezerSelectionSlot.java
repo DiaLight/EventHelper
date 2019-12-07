@@ -1,13 +1,14 @@
 package dialight.freezer.gui;
 
-import dialight.misc.ActionInvoker;
-import dialight.misc.Colorizer;
-import dialight.misc.ItemStackBuilder;
 import dialight.extensions.PlayerEx;
+import dialight.extensions.UuidEx;
 import dialight.freezer.Freezer;
 import dialight.freezer.Frozen;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
+import dialight.misc.ActionInvoker;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.misc.player.UuidPlayer;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -68,6 +69,10 @@ public class FreezerSelectionSlot implements Slot {
         }
         ItemStackBuilder isb = new ItemStackBuilder(material);
         if (isOnline) {
+//            if(!isSelected) {
+//                ItemStackBuilderBc.of(isb).playerHead();
+//                isb.nbt("{SkullOwner:\"" + up.getName() + "\"}");
+//            }
             isb.displayName(up.getName());
         } else {
             isb.displayName(up.getName() + Colorizer.apply(" |r|(Офлайн)"));
@@ -78,6 +83,8 @@ public class FreezerSelectionSlot implements Slot {
             isb.addLore(Colorizer.apply("|a|ЛКМ|y|: выбрать игрока"));
         }
         isb.addLore(Colorizer.apply("|a|Shift|y|+|a|ПКМ|y|: телепортироваться к игроку"));
+        isb.addLore(UuidEx.of(up.getUuid()).toLore());
+        isb.addLore(Colorizer.apply("|w|Пират|y|: ") + up.isPirate());
         return isb.build();
     }
 

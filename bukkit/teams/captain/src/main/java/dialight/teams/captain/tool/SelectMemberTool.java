@@ -70,10 +70,10 @@ public class SelectMemberTool extends SubTool {
                 if(value != null) {
                     proj.select(invoker, value);
                 } else {
-                    proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
+                    proj.getGuilib().openGui(e.getPlayer(), proj.getSelectMemberGui());
                 }
             } else {
-                proj.getGuilib().openGui(e.getPlayer(), proj.getGui());
+                proj.getGuilib().openGui(e.getPlayer(), proj.getSelectMemberGui());
             } break;
             case DROP:
                 proj.runTask(() -> {

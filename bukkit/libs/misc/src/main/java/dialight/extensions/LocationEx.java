@@ -44,13 +44,13 @@ public class LocationEx {
         return new LocationEx(location);
     }
 
-    public Location cloneAsBlockOffset(double dx, double dy, double dz) {
+    public Location cloneAsBlock() {
         return new Location(
                 location.getWorld(),
                 location.getBlockX(),
                 location.getBlockY(),
                 location.getBlockZ()
-        ).add(dx, dy, dz);
+        );
     }
 
     public void lookAt(Location loc) {

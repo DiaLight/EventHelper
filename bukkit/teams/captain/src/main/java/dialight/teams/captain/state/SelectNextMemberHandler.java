@@ -17,7 +17,7 @@ public class SelectNextMemberHandler extends StateEngineHandler<SortByCaptainSta
 
     private UuidPlayer currentCaptain;
     private Collection<UuidPlayer> unsorted;
-    private ObservableObject<UuidPlayer> lookingAt = new ObservableObject<>();
+    private SilentWriteObservableObject<UuidPlayer> lookingAt = new SilentWriteObservableObject<>();
     private SilentWriteObservableObject<UuidPlayer> selected = new SilentWriteObservableObject<>();
     private PropertyObject<Boolean> pause = new PropertyObject<>(false);
     private int time = 0;
@@ -59,7 +59,7 @@ public class SelectNextMemberHandler extends StateEngineHandler<SortByCaptainSta
     }
 
     @Override public void leave() {
-        lookingAt.setValue(null);
+        lookingAt.silentSetValue(null);
         Location memberLocation = proj.getArenaHandler().getMemberLocation(currentCaptain);
         currentCaptain.teleport(memberLocation);
         pause.silentSetValue(false);

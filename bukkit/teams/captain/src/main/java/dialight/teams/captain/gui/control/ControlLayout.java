@@ -11,14 +11,17 @@ public class ControlLayout extends FixedElement {
     private final SortByCaptain proj;
     private final ControlSlot controlSlot;
     private final PauseSlot pauseSlot;
+    private final SelectCaptainSlot selectCaptain;
 
     public ControlLayout(SortByCaptain proj) {
         super(9, 6);
         this.proj = proj;
         controlSlot = new ControlSlot(proj);
         pauseSlot = new PauseSlot(proj);
+        selectCaptain = new SelectCaptainSlot(proj);
         this.setSlot(1, 1, controlSlot);
         this.setSlot(3, 1, pauseSlot);
+        this.setSlot(5, 1, selectCaptain);
     }
 
     @Override public void onViewersNotEmpty() {

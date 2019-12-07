@@ -40,7 +40,7 @@ public class ResultsView extends Scroll9x5PageView<ResultsGui, CachedPageElement
                 ))
                 .build());
         Slot teleportAll = new StaticSlot(new ItemStackBuilder(Material.FISHING_ROD)
-                .displayName(Colorizer.apply("|a|Телепортировать игроков по командам"))
+                .displayName(Colorizer.apply("|a|Операции над командами"))
                 .lore(Colorizer.asList(
                         "|a|ЛКМ|y|: Телепортировать игроков по командам",
                         "|w|У команд должны быть установлены точки вхождения",

@@ -1,16 +1,15 @@
 package dialight.teams.captain.gui.select;
 
 import dialight.compatibility.ItemStackBuilderBc;
-import dialight.guilib.slot.StaticSlot;
-import dialight.misc.ActionInvoker;
-import dialight.misc.ColorConverter;
-import dialight.misc.Colorizer;
-import dialight.misc.ItemStackBuilder;
 import dialight.guilib.elements.NamedElement;
 import dialight.guilib.slot.DynamicSlot;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
+import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.extensions.NamedElementScroll9X5View;
+import dialight.misc.ActionInvoker;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.misc.player.UuidPlayer;
 import dialight.teams.captain.SortByCaptain;
 import dialight.teams.observable.ObservableTeam;
@@ -36,7 +35,7 @@ public class SelectMemberView extends NamedElementScroll9X5View<SelectMemberGui,
                 ObservableTeam oteam = proj.getCaptainHandler().getCurrentTeam().getValue();
                 return new ItemStackBuilder()
                         .let(builder -> {
-                            ItemStackBuilderBc.of(builder).stainedGlassPane(ColorConverter.toWoolColor(oteam.color().getValue()));
+                            ItemStackBuilderBc.of(builder).stainedGlassPane(oteam.getDyeColor());
                         })
                         .displayName(Colorizer.apply(
                                 "|g|- " + oteam.color().getValue() + "⬛ |w|" + oteam.getName()

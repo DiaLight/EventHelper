@@ -2,16 +2,16 @@ package dialight.teams.gui.teams;
 
 
 import dialight.compatibility.PlayerInventoryBc;
-import dialight.misc.Colorizer;
 import dialight.extensions.InventoryEx;
-import dialight.misc.ItemStackBuilder;
 import dialight.guilib.gui.Gui;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
-import dialight.observable.collection.ObservableCollection;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.misc.player.UuidPlayer;
-import dialight.teams.observable.ObservableTeam;
+import dialight.observable.collection.ObservableCollection;
 import dialight.teams.Teams;
+import dialight.teams.observable.ObservableTeam;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

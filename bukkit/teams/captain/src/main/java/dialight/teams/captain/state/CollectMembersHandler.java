@@ -53,7 +53,6 @@ public class CollectMembersHandler extends StateEngineHandler<SortByCaptainState
         captains.clear();
         savedStates.clear();
 
-        ObservableScoreboard mainScoreboard = proj.getTeams().getScoreboardManager().getMainScoreboard();
         ObservableScoreboard scoreboard = proj.getScoreboard();
         scoreboard.teamsByName().clear();
 
@@ -66,7 +65,7 @@ public class CollectMembersHandler extends StateEngineHandler<SortByCaptainState
         for (ObservableTeam mainTeam : proj.getTeams().collectSortTeams()) {
             ObservableTeam team = scoreboard.getOrCreate(mainTeam.getName());
             team.color().setValue(mainTeam.color().getValue());
-            UuidPlayer captain = proj.getCaptainsByTeam().get(team.getName());
+            UuidPlayer captain = proj.getCaptainsMap().getCaptainByTeam(team.getName());
             if(captain == null) {
                 captain = popRandomUnsorted();
             } else {

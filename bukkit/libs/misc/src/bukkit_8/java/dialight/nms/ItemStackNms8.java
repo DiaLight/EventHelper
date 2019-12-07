@@ -58,7 +58,9 @@ public class ItemStackNms8 extends ItemStackNms {
     }
 
     @Override public NbtTagCompoundNms getNbt() {
-        NbtTagCompoundNms nbt = NbtTagCompoundNms.of(asNms().getTag());
+        NBTTagCompound tag = asNms().getTag();
+        if(tag == null) return null;
+        NbtTagCompoundNms nbt = NbtTagCompoundNms.of(tag);
         return nbt.clone();  // for ReflectionUtils.MINOR_VERSION < 13
     }
     @Override public NbtTagCompoundNms serialize() {

@@ -29,6 +29,8 @@ public class SelectMemberLayout extends NamedSetElement<UuidPlayer, UUID> {
     @Override public void onViewersEmpty() {
         ObservableList<UuidPlayer> unsorted = proj.getMembersHandler().getUnsorted();
         unsorted.removeListeners(this);
+
+        proj.runTask(this::clear);
     }
 
     private void onAdd(UuidPlayer player, Integer index) {

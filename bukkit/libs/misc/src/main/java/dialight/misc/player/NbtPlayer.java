@@ -32,7 +32,8 @@ public class NbtPlayer {
 
     public String getName() {
         NbtTagCompoundNms bukkit = nbt.getCompound("bukkit");
-        return bukkit.getString("lastKnownName");
+        String name = bukkit.getString("lastKnownName");
+        return name.isEmpty() ? null : name;
     }
     private UUID getWorldUniqueId() {
         return new UUID(nbt.getLong("WorldUUIDMost"), nbt.getLong("WorldUUIDLeast"));

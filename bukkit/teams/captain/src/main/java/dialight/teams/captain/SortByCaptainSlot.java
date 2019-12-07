@@ -45,6 +45,8 @@ public class SortByCaptainSlot extends DynamicSlot {
         ItemStackBuilder isb = new ItemStackBuilder(Material.BEACON);
         isb.displayName(Colorizer.apply("|a|Сортировка по капитанам"));
 
+
+
         isb.addLore(Colorizer.asList(
                 "|a|ЛКМ|y|: открыть гуи",
                 "|a|ПКМ|y|: открыть гуи",

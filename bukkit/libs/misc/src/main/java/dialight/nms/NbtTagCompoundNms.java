@@ -121,11 +121,8 @@ public abstract class NbtTagCompoundNms implements NbtBaseNms {
     public static NbtTagCompoundNms create() {
         try {
             return (NbtTagCompoundNms) m_create.invoke(null);
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 

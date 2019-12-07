@@ -153,5 +153,6 @@ public class SortByRandom extends Project {
             TeamSortResult sortResult = teamsLeft.remove(rnd.nextInt(teamsLeft.size()));
             sortResult.addMember(uuidPlayer);
         }
+        teams.getSortResult().setValue(teamsLeft.stream().collect(Collectors.toMap(TeamSortResult::getName, Function.identity())));
     }
 }

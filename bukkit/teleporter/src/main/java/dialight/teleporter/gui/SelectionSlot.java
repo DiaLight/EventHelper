@@ -1,9 +1,10 @@
 package dialight.teleporter.gui;
 
-import dialight.misc.Colorizer;
-import dialight.misc.ItemStackBuilder;
+import dialight.extensions.UuidEx;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.misc.player.UuidPlayer;
 import dialight.teleporter.SelectedPlayers;
 import dialight.teleporter.Teleporter;
@@ -50,18 +51,30 @@ public class SelectionSlot implements Slot {
             if(isOnline) {
                 material = Material.DIAMOND;
             } else {
-                material = Material.DIAMOND_ORE;
+                if(up.isAlien()) {
+                    material = Material.INK_SACK;
+                } else {
+                    material = Material.DIAMOND_ORE;
+                }
             }
         } else {
 //            if(this.layout == selectedLayout) throw new RuntimeException();
             if(isOnline) {
                 material = Material.COAL;
             } else {
-                material = Material.COAL_ORE;
+                if(up.isAlien()) {
+                    material = Material.LOG;
+                } else {
+                    material = Material.COAL_ORE;
+                }
             }
         }
         ItemStackBuilder isb = new ItemStackBuilder(material);
         if (isOnline) {
+//            if(!isSelected) {
+//                ItemStackBuilderBc.of(isb).playerHead();
+//                isb.nbt("{SkullOwner:\"" + up.getName() + "\"}");
+//            }
             isb.displayName(up.getName());
         } else {
             isb.displayName(up.getName() + Colorizer.apply(" |r|(Офлайн)"));
@@ -73,6 +86,8 @@ public class SelectionSlot implements Slot {
         }
 //            "~|g|ПКМ|y|: Телепортировать игрока к другому игроку";
         isb.addLore(Colorizer.apply("|a|Shift|y|+|a|ПКМ|y|: телепортироваться к игроку"));
+        isb.addLore(UuidEx.of(up.getUuid()).toLore());
+        isb.addLore(Colorizer.apply("|w|Пират|y|: ") + up.isPirate());
         return isb.build();
     }
 

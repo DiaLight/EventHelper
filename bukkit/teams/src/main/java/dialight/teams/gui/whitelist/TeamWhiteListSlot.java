@@ -1,5 +1,6 @@
 package dialight.teams.gui.whitelist;
 
+import dialight.compatibility.ItemStackBuilderBc;
 import dialight.misc.Colorizer;
 import dialight.misc.ItemStackBuilder;
 import dialight.guilib.slot.Slot;
@@ -49,12 +50,12 @@ public class TeamWhiteListSlot implements Slot {
         ItemStackBuilder isb = new ItemStackBuilder();
         if(oteam != null) {
             if (inFilter) {
-                isb.reset(Material.LEATHER_BOOTS);
-            } else {
                 isb.reset(Material.LEATHER_CHESTPLATE);
+                isb.leatherArmorColor(oteam.getLeatherColor());
+            } else {
+                ItemStackBuilderBc.of(isb).wool(oteam.getDyeColor());
             }
             isb.displayName(oteam.color().getValue() + Colorizer.apply("⬛ |w|" + oteam.getName()));
-            isb.leatherArmorColor(oteam.getLeatherColor());
         } else {
             isb.reset(Material.ARMOR_STAND);
             isb.displayName(Colorizer.apply("|w|" + name));

@@ -1,14 +1,13 @@
 package dialight.teams.gui.team;
 
 import dialight.compatibility.ItemStackBuilderBc;
-import dialight.misc.ColorConverter;
-import dialight.misc.Colorizer;
-import dialight.misc.ItemStackBuilder;
 import dialight.guilib.elements.NamedElement;
 import dialight.guilib.slot.Slot;
 import dialight.guilib.slot.SlotClickEvent;
 import dialight.guilib.slot.StaticSlot;
 import dialight.guilib.view.extensions.NamedElementScroll9X5View;
+import dialight.misc.Colorizer;
+import dialight.misc.ItemStackBuilder;
 import dialight.misc.player.UuidPlayer;
 import dialight.teams.Teams;
 import dialight.teams.observable.ObservableTeam;
@@ -33,7 +32,7 @@ public class TeamView extends NamedElementScroll9X5View<TeamGui, TeamElement> {
         ObservableTeam oteam = gui.getOteam();
         background = new StaticSlot(new ItemStackBuilder()
                 .let(builder -> {
-                    ItemStackBuilderBc.of(builder).stainedGlassPane(ColorConverter.toWoolColor(oteam.color().getValue()));
+                    ItemStackBuilderBc.of(builder).stainedGlassPane(oteam.getDyeColor());
                 })
                 .displayName(Colorizer.apply(
                         "|g|- " + oteam.color().getValue() + "⬛ |w|" + oteam.getName()

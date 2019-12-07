@@ -71,23 +71,23 @@ public class ColorConverter {
             .put(DyeColor.YELLOW,   ChatColor.YELLOW)
             .build();
 
-    @Deprecated public static final Map<ChatColor, DyeColor> CHAT_TO_DYE = ImmutableMap.<ChatColor, DyeColor>builder()
-            .put(ChatColor.WHITE,       DyeColor.WHITE)
-            .put(ChatColor.BLACK,       DyeColor.BLACK)
-            .put(ChatColor.DARK_BLUE,   DyeColor.BLUE)
-            .put(ChatColor.DARK_GRAY,   DyeColor.GRAY)
-            .put(ChatColor.GRAY,        DyeColorBc.LIGHT_GRAY)
-            .put(ChatColor.DARK_RED,    DyeColor.BROWN)
-            .put(ChatColor.RED,         DyeColor.RED)
-            .put(ChatColor.GREEN,       DyeColor.LIME)
-            .put(ChatColor.DARK_GREEN,  DyeColor.GREEN)
-            .put(ChatColor.BLUE,        DyeColor.LIGHT_BLUE)
-            .put(ChatColor.YELLOW,      DyeColor.YELLOW)
-            .put(ChatColor.GOLD,        DyeColor.ORANGE)
-            .put(ChatColor.AQUA,        DyeColor.CYAN)
-            .put(ChatColor.DARK_AQUA,   DyeColor.CYAN)
-            .put(ChatColor.LIGHT_PURPLE, DyeColor.MAGENTA)
-            .put(ChatColor.DARK_PURPLE, DyeColor.PURPLE)
+    @Deprecated public static final Map<Character, DyeColor> CHAT_TO_DYE = ImmutableMap.<Character, DyeColor>builder()
+            .put(ChatColor.WHITE.getChar(),       DyeColor.WHITE)
+            .put(ChatColor.BLACK.getChar(),       DyeColor.BLACK)
+            .put(ChatColor.DARK_BLUE.getChar(),   DyeColor.BLUE)
+            .put(ChatColor.DARK_GRAY.getChar(),   DyeColor.GRAY)
+            .put(ChatColor.GRAY.getChar(),        DyeColorBc.LIGHT_GRAY)
+            .put(ChatColor.DARK_RED.getChar(),    DyeColor.BROWN)
+            .put(ChatColor.RED.getChar(),         DyeColor.RED)
+            .put(ChatColor.GREEN.getChar(),       DyeColor.LIME)
+            .put(ChatColor.DARK_GREEN.getChar(),  DyeColor.GREEN)
+            .put(ChatColor.BLUE.getChar(),        DyeColor.LIGHT_BLUE)
+            .put(ChatColor.YELLOW.getChar(),      DyeColor.YELLOW)
+            .put(ChatColor.GOLD.getChar(),        DyeColor.ORANGE)
+            .put(ChatColor.AQUA.getChar(),        DyeColor.CYAN)
+            .put(ChatColor.DARK_AQUA.getChar(),   DyeColor.CYAN)
+            .put(ChatColor.LIGHT_PURPLE.getChar(), DyeColor.MAGENTA)
+            .put(ChatColor.DARK_PURPLE.getChar(), DyeColor.PURPLE)
             .build();
 
     public static Color toLeatherColor(ChatColor chatColor) {
@@ -102,7 +102,7 @@ public class ColorConverter {
      */
     @Deprecated public static DyeColor toWoolColor(ChatColor chatColor) {
         if(chatColor == null) return DyeColor.WHITE;
-        DyeColor dye = CHAT_TO_DYE.get(chatColor);
+        DyeColor dye = CHAT_TO_DYE.get(chatColor.getChar());
         if(dye == null) return DyeColor.WHITE;
         return dye;
     }

@@ -50,7 +50,7 @@ public class PauseSlot extends DynamicSlot {
     }
 
     @NotNull @Override public ItemStack createItem() {
-        ItemStackBuilder isb = new ItemStackBuilder(Material.CAKE);
+        ItemStackBuilder isb = new ItemStackBuilder(Material.WATCH);
         isb.displayName(Colorizer.apply("|a|Пауза"));
         isb.addLore(Colorizer.asList(
                 "|a|ЛКМ|y|: приостановить сортировку по капитанам",

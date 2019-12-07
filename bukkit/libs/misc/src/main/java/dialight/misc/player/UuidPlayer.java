@@ -25,36 +25,40 @@ public class UuidPlayer {
     private final UUID uuid;
     private final NbtPlayer nbtp;
     private String cachedName = null;
+    private Boolean pirateCache = null;
 
-    public UuidPlayer(Server server, UUID uuid, NbtPlayer nbtp) {
+    public UuidPlayer(Server server, UUID uuid, String name, NbtPlayer nbtp) {
         this.server = server;
         this.uuid = uuid;
+        this.cachedName = name;
         this.nbtp = nbtp;
+
+        if(cachedName != null) {
+            pirateCache = PlayerEngine.generateOfflineUuid(cachedName).equals(uuid);
+        }
     }
 
     public UUID getUuid() {
         return uuid;
     }
 
-    public String getName() {
+    public boolean isPirate() {
+        if(pirateCache != null) return pirateCache;
+        if (isOnline()) {
+            pirateCache = !server.getOnlineMode();
+            return pirateCache;
+        }
+        pirateCache = server.getOnlineMode();
+        return pirateCache;
+    }
+
+    public boolean isAlien() {
+        return isPirate() ^ !server.getOnlineMode();
+    }
+
+    @NotNull public String getName() {
         if(cachedName != null) return cachedName;
-        String name = getOfflinePlayer().getName();
-        if(name != null) {
-            cachedName = name;
-            return name;
-        }
-        Player player = getPlayer();
-        if(player != null) {
-            cachedName = player.getName();
-            return player.getName();
-        }
-        name = this.nbtp.getName();
-        if(name != null && !name.isEmpty()) {
-            cachedName = name;
-            return name;
-        }
         return "null";
-//        throw new RuntimeException("name can't be null " + uuid);
     }
 
     @NotNull public OfflinePlayer getOfflinePlayer() {

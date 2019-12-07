@@ -10,8 +10,6 @@ import dialight.guilib.gui.Gui;
 import dialight.maingui.MainGuiApi;
 import dialight.misc.ActionInvoker;
 import dialight.misc.player.UuidPlayer;
-import dialight.observable.map.ObservableMap;
-import dialight.observable.map.ObservableMapWrapper;
 import dialight.offlinelib.OfflineLibApi;
 import dialight.stateengine.StateEngine;
 import dialight.teams.TeamsApi;
@@ -19,6 +17,7 @@ import dialight.teams.captain.gui.control.ControlGui;
 import dialight.teams.captain.gui.select.SelectMemberGui;
 import dialight.teams.captain.state.*;
 import dialight.teams.captain.tool.SortByCaptainTool;
+import dialight.teams.captain.utils.CaptainMap;
 import dialight.teams.observable.ObservableScoreboard;
 import dialight.teleporter.TeleporterApi;
 import dialight.toollib.ToolLibApi;
@@ -45,11 +44,12 @@ public class SortByCaptain extends Project {
     private SelectNextMemberHandler memberHandler;
     private StateEngine<SortByCaptainState> stateEngine;
 
-    private final ObservableMap<String, UuidPlayer> captainsByTeam = new ObservableMapWrapper<>();
+    private final CaptainMap captainsByTeam = new CaptainMap();
+    private CaptainSelection captainSelection;
     private SortByCaptainHandler sortByCaptainHandler;
 
     private SortByCaptainTool tool;
-    private SelectMemberGui gui;
+    private SelectMemberGui selectMember;
     private ControlGui controlGui;
 
     private FakeBossBar fakeBossBar;
@@ -96,15 +96,22 @@ public class SortByCaptain extends Project {
         sortByCaptainHandler = new SortByCaptainHandler(this);
         sortByCaptainHandler.setup();
 
+        captainSelection = new CaptainSelection(this);
         teams.addControlItem(new SortByCaptainSlot(this));
-        gui = new SelectMemberGui(this);
+        selectMember = new SelectMemberGui(this);
         controlGui = new ControlGui(this);
         tool = new SortByCaptainTool(this);
         toollib.register(tool);
     }
 
     @Override public void disable() {
-        stateEngine.setHandler(SortByCaptainState.NONE);
+        if(stateEngine != null) {
+            stateEngine.setHandler(SortByCaptainState.NONE);
+        }
+    }
+
+    public CaptainSelection getCaptainSelection() {
+        return captainSelection;
     }
 
     public FakeBossBar getFakeBossBar() {
@@ -127,7 +134,7 @@ public class SortByCaptain extends Project {
         return teleporter;
     }
 
-    public ObservableMap<String, UuidPlayer> getCaptainsByTeam() {
+    public CaptainMap getCaptainsMap() {
         return captainsByTeam;
     }
 
@@ -171,8 +178,8 @@ public class SortByCaptain extends Project {
         return toollib;
     }
 
-    public Gui getGui() {
-        return gui;
+    public Gui getSelectMemberGui() {
+        return selectMember;
     }
 
     public ControlGui getControlGui() {
@@ -189,13 +196,23 @@ public class SortByCaptain extends Project {
         if(Objects.equals(oldSelected, uuidPlayer)) {
             memberHandler.getSelected().setValue(null);
         } else {
-            memberHandler.getSelected().setValue(uuidPlayer);
+            String teamName = membersHandler.getResult().get(uuidPlayer);
+            if(teamName == null) {
+                memberHandler.getSelected().setValue(uuidPlayer);
+            } else {
+                invoker.sendMessage(CaptainMessages.alreadySelected(uuidPlayer, teamName));
+            }
         }
     }
 
     public void selectAndConfirm(ActionInvoker invoker, UuidPlayer uuidPlayer) {
         if(!validateInvoker(invoker)) return;
-        memberHandler.selectAndConfirm(uuidPlayer);
+        String teamName = membersHandler.getResult().get(uuidPlayer);
+        if(teamName == null) {
+            memberHandler.selectAndConfirm(uuidPlayer);
+        } else {
+            invoker.sendMessage(CaptainMessages.alreadySelected(uuidPlayer, teamName));
+        }
     }
 
     public boolean validateInvoker(ActionInvoker invoker) {

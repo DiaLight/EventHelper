@@ -3,6 +3,7 @@ package dialight.teams.captain;
 import dialight.misc.ActionInvoker;
 import dialight.misc.Colorizer;
 import dialight.misc.player.UuidPlayer;
+import dialight.teams.observable.ObservableTeam;
 import org.bukkit.ChatColor;
 
 public class CaptainMessages {
@@ -22,6 +23,8 @@ public class CaptainMessages {
     public static String notSelector = pluginPrefix + Colorizer.apply("|r|Сейчас выбираете не вы");
     public static String notReadyYet = pluginPrefix + Colorizer.apply("|r|Пока еще не готово(");
     public static String notStarted = pluginPrefix + Colorizer.apply("|r|Сортировка игроков по командам не запущена");
+    public static String selectTeamFirst = pluginPrefix + Colorizer.apply("|r|Сначала выберите команду");
+    public static String clearedAllCaptainsForTeam = pluginPrefix + Colorizer.apply("|y|Удалены все капитаны команд");
 
     public static String nextCaptain(String name, ChatColor color) {
         return pluginPrefix + Colorizer.apply("|y|Сейчас выбирает ") + color + Colorizer.apply(name);
@@ -58,4 +61,23 @@ public class CaptainMessages {
         return pluginPrefix + Colorizer.apply("|y|") + invoker.getName() + " возобновил счет времени";
     }
 
+    public static String selectCaptainForTeam(ObservableTeam oteam) {
+        return pluginPrefix + Colorizer.apply("|y|Выберите капитана для команды ") + oteam.color().getValue() + "⬛ " + oteam.getName();
+    }
+
+    public static String selectedCaptainForTeam(ObservableTeam oteam, UuidPlayer captain) {
+        return pluginPrefix + Colorizer.apply("|y|Капитаном для команды ") + oteam.color().getValue() + "⬛ " + oteam.getName() + Colorizer.apply("|y| становится |w|") + captain.getName();
+    }
+
+    public static String teamNotFound(String teamName) {
+        return pluginPrefix + Colorizer.apply("|r|Команда с именем ") + teamName + " не найдена";
+    }
+
+    public static String clearedCaptainForTeam(ObservableTeam oteam, UuidPlayer captain) {
+        return pluginPrefix + Colorizer.apply("|y|У команды ") + oteam.color().getValue() + "⬛ " + oteam.getName() + Colorizer.apply("|y| удален капитан |w|") + captain.getName();
+    }
+
+    public static String alreadySelected(UuidPlayer uidp, String teamName) {
+        return pluginPrefix + Colorizer.apply("|r|Игрок ") + uidp.getName() + " уже состоит в команде " + teamName;
+    }
 }

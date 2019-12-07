@@ -105,30 +105,89 @@ public class BuildArenaHandler extends StateEngineHandler<SortByCaptainState> {
             block.apply(loc);
             blocks.add(loc);
         }
-        this.active = LocationEx.of(floc.clone().add(schematic.active)).cloneAsBlockOffset(0.5, 0.1, 0.5);
+        this.active = LocationEx.of(floc.clone().add(schematic.active)).cloneAsBlock().add(0.5, 0.1, 0.5);
         this.selected = this.active.clone().add(2, 0, 0);
         blocks.add(this.selected);  // todo remove me
         Location active_head = this.active.clone().add(0, 0.5, 0);
         for (Map.Entry<Vector, UuidPlayer> entry : schematic.getUsers().entrySet()) {
             Vector vec = entry.getKey();
             UuidPlayer user = entry.getValue();
-            Location loc = LocationEx.of(floc.clone().add(vec)).cloneAsBlockOffset(0.5, 0.1, 0.5);
+            Location loc = LocationEx.of(floc.clone().add(vec)).cloneAsBlock().add(0.5, 0.1, 0.5);
             LocationEx.of(loc).lookAt(active_head);
             users.put(user, loc);
             user.setLocation(loc);
         }
+
+//        Vector size = schematic.getSize().add(new Vector(2, 2, 2));
+//        Vector centerOffset = schematic.centerOffset().add(new Vector(1, 1, 1));
+//        Location pos = floc.clone().subtract(centerOffset);
+//        for (int x = 0; x < size.getBlockX(); x++) {
+//            Location loc;
+//            loc = pos.clone().add(x, 0, 0);
+//            loc.getBlock().setType(Material.GLASS);
+//            blocks.add(loc);
+//
+//            loc = pos.clone().add(x, size.getY(), 0);
+//            loc.getBlock().setType(Material.GLASS);
+//            blocks.add(loc);
+//
+//            loc = pos.clone().add(x, 0, size.getZ());
+//            loc.getBlock().setType(Material.GLASS);
+//            blocks.add(loc);
+//
+//            loc = pos.clone().add(x, size.getY(), size.getZ());
+//            loc.getBlock().setType(Material.GLASS);
+//            blocks.add(loc);
+//        }
+//        for (int y = 0; y < size.getBlockY(); y++) {
+//            Location loc;
+//            loc = pos.clone().add(0, y, 0);
+//            loc.getBlock().setType(Material.GLASS);
+//            blocks.add(loc);
+//
+//            loc = pos.clone().add(size.getX(), y, 0);
+//            loc.getBlock().setType(Material.GLASS);
+//            blocks.add(loc);
+//
+//            loc = pos.clone().add(0, y, size.getZ());
+//            loc.getBlock().setType(Material.GLASS);
+//            blocks.add(loc);
+//
+//            loc = pos.clone().add(size.getX(), y, size.getZ());
+//            loc.getBlock().setType(Material.GLASS);
+//            blocks.add(loc);
+//        }
+//        for (int z = 0; z < size.getBlockZ(); z++) {
+//            Location loc;
+//            loc = pos.clone().add(0, 0, z);
+//            loc.getBlock().setType(Material.GLASS);
+//            blocks.add(loc);
+//
+//            loc = pos.clone().add(size.getX(), 0, z);
+//            loc.getBlock().setType(Material.GLASS);
+//            blocks.add(loc);
+//
+//            loc = pos.clone().add(0, size.getY(), z);
+//            loc.getBlock().setType(Material.GLASS);
+//            blocks.add(loc);
+//
+//            loc = pos.clone().add(size.getX(), size.getY(), z);
+//            loc.getBlock().setType(Material.GLASS);
+//            blocks.add(loc);
+//        }
     }
 
     private static Location searchSpaceToPlaceBuilding(Location startLoc, Schematic schematic) {
         Vector size = schematic.getSize();
-        Location cur = startLoc.clone().subtract(size.getX() / 2.0, 0.0, size.getZ() / 2.0);
+        size.add(new Vector(4, 4, 4));
+        Location cur = LocationEx.of(startLoc).cloneAsBlock().subtract(size.getX() / 2, 0, size.getZ() / 2);
         int firstGood = cur.getBlockY();
         int maxY = cur.getWorld().getMaxHeight();
         boolean found = false;
         while(cur.getBlockY() < maxY) {
             boolean goodLayer = true;
-            for (int x = 0; x < size.getBlockX(); x++) {
-                for (int z = 0; z < size.getBlockZ(); z++) {
+            for (int x = 0; x <= size.getBlockX(); x++) {
+                for (int z = 0; z <= size.getBlockZ(); z++) {
                     Material btype = cur.clone().add(x, 0.0, z).getBlock().getType();
                     if (btype != Material.AIR) {
                         goodLayer = false;

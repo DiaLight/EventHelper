@@ -73,7 +73,9 @@ public class GuiLib extends Project {
     public void openPrev(Player player) {
         Gui gui = story.getPrev(player);
         if(gui != null) {
-            story.stripTailTo(player, gui);
+            if(!story.stripTailTo(player, gui)) {
+                story.clearStory(player);
+            }
             View view = getOrCreateView(gui, player);
             player.openInventory(view.getInventory());
         } else {

@@ -34,9 +34,12 @@ public class ResultsSlot implements Slot {
                 .displayName(result.getColor() + Colorizer.apply("⬛ |w|" + result.getName()))
                 .lore(Colorizer.asList(
                         "|a|ЛКМ|y|: внести игроков в телепортер",
-                        "|a|ПКМ|y|: Телепортировать игроков в точку вхождения",
-                        "|w|У команд должны быть установлены точки вхождения",
-                        "|a|Shift|y|+|a|ПКМ|y|: Добавить игроков в соответствующую команду"
+                        "|a|ПКМ|y|: Телепортировать игроков",
+                        "|y| в точку вхождения",
+                        "|w|У команд должны быть установлены",
+                        "|y| точки вхождения",
+                        "|a|Shift|y|+|a|ПКМ|y|: Добавить игроков",
+                        "|y| в соответствующую команду"
                 ))
                 .build();
     }
@@ -76,11 +79,11 @@ public class ResultsSlot implements Slot {
         ItemStackBuilder isb = new ItemStackBuilder(item);
         if(members.isEmpty()) {
             isb.addLore(Colorizer.asList(
-                    "|g|В команде нет игроков"
+                    "|g|Нет игроков"
             ));
         } else {
             isb.addLore(Colorizer.asList(
-                    "|g|Игроки в команде:"
+                    "|g|Игроки:"
             ));
             Iterator<UuidPlayer> iterator = members.iterator();
             int previewSize = 8;
