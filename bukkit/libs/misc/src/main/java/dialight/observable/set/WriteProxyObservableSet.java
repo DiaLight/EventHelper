@@ -1,7 +1,10 @@
 package dialight.observable.set;
 
 import dialight.observable.collection.ObservableCollection;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.function.Function;
 
 public class WriteProxyObservableSet<V> extends ObservableSetWrapper<V> {
@@ -53,9 +56,27 @@ public class WriteProxyObservableSet<V> extends ObservableSetWrapper<V> {
     }
 
     @Override public void clear() {
-        for (V e : set) {
-            remove(e);
+        for (V e : new ArrayList<>(set)) {
+            remove(e);  // can edit set
         }
+    }
+
+    @NotNull @Override public Iterator<V> iterator() {  // no remove iterator
+        return new Iterator<V>() {
+            private final Iterator<V> inner = set.iterator();
+            private V lastElement = null;
+
+            @Override public boolean hasNext() { return inner.hasNext(); }
+            @Override public V next() {
+                V element = inner.next();
+                lastElement = element;
+                return element;
+            }
+
+            @Override public void remove() {
+                throw new UnsupportedOperationException("WriteProxyObservableSet does not support remove while iterating");
+            }
+        };
     }
 
 }

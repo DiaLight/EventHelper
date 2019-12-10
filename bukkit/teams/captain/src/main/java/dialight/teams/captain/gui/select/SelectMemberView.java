@@ -33,6 +33,7 @@ public class SelectMemberView extends NamedElementScroll9X5View<SelectMemberGui,
 
             @NotNull @Override public ItemStack createItem() {
                 ObservableTeam oteam = proj.getCaptainHandler().getCurrentTeam().getValue();
+                if(oteam == null) return new ItemStack(Material.WOOL);
                 return new ItemStackBuilder()
                         .let(builder -> {
                             ItemStackBuilderBc.of(builder).stainedGlassPane(oteam.getDyeColor());

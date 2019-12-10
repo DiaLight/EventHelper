@@ -3,7 +3,6 @@ package dialight.stateengine;
 import dialight.misc.ActionInvoker;
 import dialight.observable.ObservableObject;
 import dialight.teams.captain.CaptainMessages;
-import dialight.teams.captain.SortByCaptainState;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +40,7 @@ public class StateEngine<T extends Enum> {
     }
 
     public void addHandler(StateEngineHandler<T> handler) {
-        if(this.handler.getValue() != null && this.handler.getValue().getState() != noneState) throw new IllegalStateException("Can't add state while StateEngine is running");
+        if(this.handler.getValue() != null && !isNone()) throw new IllegalStateException("Can't add state while StateEngine is running");
         handlers.put(handler.getState(), handler);
         if(handler.getState() == noneState) {
             this.handler.setValue(handler);
@@ -104,8 +103,12 @@ public class StateEngine<T extends Enum> {
         }
     }
 
+    public boolean isNone() {
+        return handler.getValue().getState() == noneState;
+    }
+
     public void start(ActionInvoker invoker) {
-        if(handler.getValue().getState() != SortByCaptainState.NONE) {
+        if(!isNone()) {
             invoker.sendMessage(CaptainMessages.alreadyStarted(handler.getValue().getState()));
             return;
         }
@@ -117,7 +120,7 @@ public class StateEngine<T extends Enum> {
     }
 
     public void kill(ActionInvoker invoker) {
-        if(handler.getValue().getState() == noneState) {
+        if(isNone()) {
             invoker.sendMessage(CaptainMessages.notStarted);
             return;
         }

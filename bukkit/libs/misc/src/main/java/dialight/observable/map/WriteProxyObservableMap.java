@@ -1,7 +1,6 @@
 package dialight.observable.map;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -54,9 +53,8 @@ public class WriteProxyObservableMap<K, V> extends ObservableMapWrapper<K, V> {
     }
 
     @Override public void clear() {
-        List<K> keys = new ArrayList<>(map.keySet());
-        for (K key : keys) {
-            fireProxyRemove(key);
+        for (K key : new ArrayList<>(map.keySet())) {
+            fireProxyRemove(key);  // can edit map
         }
     }
 

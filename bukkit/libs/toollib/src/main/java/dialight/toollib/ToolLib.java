@@ -62,7 +62,8 @@ public class ToolLib extends Project {
     }
 
     public boolean hasAccess(Player player) {
-        return player.isOp();
+//        return player.isOp();
+        return true;
     }
 
     public ObservableCollection<Tool> getImmutableObservable() {

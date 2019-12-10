@@ -75,11 +75,14 @@ public class PlayerEngine implements Listener {
         String name = null;
         if(nbt == null) {
             name = tryResolveName(plugin.getServer(), uuid);
+            if(name != null && name.isEmpty()) name = null;
 
             nbt = PlayerNms.createNbt(mainWorld, GameProfileNms.create(uuid, name));
-            NbtTagCompoundNms bukkitNbt = NbtTagCompoundNms.create();
-            bukkitNbt.setString("lastKnownName", name);
-            nbt.set("bukkit", bukkitNbt);
+            if(name != null) {
+                NbtTagCompoundNms bukkitNbt = NbtTagCompoundNms.create();
+                bukkitNbt.setString("lastKnownName", name);
+                nbt.set("bukkit", bukkitNbt);
+            }
 
             OfflinePlayerNms.setData(mainWorld, uuid, nbt);
             nbtp.setNbt(nbt);

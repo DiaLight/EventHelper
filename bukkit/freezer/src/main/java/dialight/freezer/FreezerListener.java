@@ -21,7 +21,6 @@ import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
@@ -187,12 +186,11 @@ public class FreezerListener implements Listener {
         if(frozen == null) return;
         e.setCancelled(true);
     }
-    @EventHandler public void onOpen(InventoryOpenEvent e) {
-        Frozen frozen = this.proj.get(e.getPlayer().getUniqueId());
-        if(frozen == null) return;
-        if(e.getPlayer().isOp()) return;
-        e.setCancelled(true);
-    }
+//    @EventHandler public void onOpen(InventoryOpenEvent e) {
+//        Frozen frozen = this.proj.get(e.getPlayer().getUniqueId());
+//        if(frozen == null) return;
+//        e.setCancelled(true);  // This breaks GuiLib usage
+//    }
 
     @EventHandler public void onFoodLevelChange(FoodLevelChangeEvent e) {
         if(e.getEntityType() != EntityType.PLAYER) return;

@@ -81,6 +81,7 @@ public class SortByCaptain extends Project {
         stateEngine.addHandler(memberHandler = new SelectNextMemberHandler(this));
 
         offlineLib.getOnline().onAdd(this, player -> {
+            if(stateEngine.isNone()) return;
             UuidPlayer uuidPlayer = offlineLib.getUuidPlayer(player);
             if (membersHandler.isMember(uuidPlayer)) {
                 player.setScoreboard(scoreboard.asBukkit());
